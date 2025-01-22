@@ -12,8 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->id(); // ID utama
+            $table->string('name'); // Nama file asli
+            $table->string('path'); // Path file di penyimpanan
+            $table->string('extension'); // Ekstensi file (e.g., pdf, jpg)
+            $table->bigInteger('size'); // Ukuran file dalam byte
+            $table->string('mime_type'); // Tipe MIME file (e.g., application/pdf)
+            $table->string('documentable_type'); // Nama model pemilik dokumen (e.g., User atau Project)
+            $table->unsignedBigInteger('documentable_id'); // ID model pemilik dokumen
+            $table->timestamps(); // Kolom created_at dan updated_at
+            $table->softDeletes(); // Kolom deleted
         });
     }
 
