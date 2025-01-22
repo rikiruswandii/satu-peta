@@ -17,7 +17,8 @@
                         <div class="nk-block-head-content">
                             <h5 class="nk-block-title">Masuk</h5>
                             <div class="nk-block-des">
-                                <p>Akses panel {{ config('app.name', 'Satu Peta Purwakarta') }} menggunakan email dan kata sandi Anda.</p>
+                                <p>Akses panel {{ config('app.name', 'Satu Peta Purwakarta') }} menggunakan email dan
+                                    kata sandi Anda.</p>
                             </div>
                             <!-- Session Status -->
                             <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -35,7 +36,7 @@
                                     placeholder="Masukkan alamat email terdaftar..">
                                 @error('email')
                                     <div class="invalid-feedback">
-                                        {{ $errors->get('email') }}
+                                        {{ $message  }}
                                     </div>
                                 @enderror
                             </div>
@@ -59,7 +60,7 @@
                                     placeholder="Masukkan kata sandi..">
                                 @error('password')
                                     <div class="invalid-feedback">
-                                        {{ $errors->get('password') }}
+                                        {{ $message  }}
                                     </div>
                                 @enderror
                             </div>
@@ -83,11 +84,12 @@
                     <div class="form-note-s2 pt-4"> Belum punya akun? <a href="{{ route('register') }}">Klik untuk
                             registrasi!</a>
                     </div>
-                    
+
                 </div><!-- .nk-block -->
                 <div class="nk-block nk-auth-footer">
                     <div class="mt-3">
-                        <p>&copy; 2022 DashLite. All Rights Reserved.</p>
+                        <p>&copy; {{ Date('Y') }} {{ config('app.name', 'Satu Peta Purwakarta') }}. All Rights
+                            Reserved.</p>
                     </div>
                 </div><!-- .nk-block -->
             </div><!-- .nk-split-content -->

@@ -1,52 +1,108 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
-
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
-
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+<x-auth-layout>
+    <!-- content @s -->
+    <div class="nk-content ">
+        <div class="nk-split nk-split-page nk-split-md">
+            <div class="nk-split-content nk-block-area nk-block-area-column nk-auth-container bg-white w-lg-45">
+                <div class="nk-block nk-block-middle nk-auth-body">
+                    <div class="brand-logo pb-5">
+                        <a href="html/index.html" class="logo-link">
+                            {{-- <img class="logo-light logo-img logo-img-lg" src="./images/logo.png"
+                                srcset="./images/logo2x.png 2x" alt="logo">
+                            <img class="logo-dark logo-img logo-img-lg" src="./images/logo-dark.png"
+                                srcset="./images/logo-dark2x.png 2x" alt="logo-dark"> --}}
+                            <h1>{{ config('app.name', 'Satu Peta Purwakarta') }}</h1>
+                        </a>
+                    </div>
+                    <div class="nk-block-head">
+                        <div class="nk-block-head-content">
+                            <h5 class="nk-block-title">Register</h5>
+                            <div class="nk-block-des">
+                                <p>Buat akun baru {{ config('app.name', 'Satu Peta Purwakarta') }}</p>
+                            </div>
+                            <!-- Session Status -->
+                            <x-auth-session-status class="mb-4" :status="session('status')" />
+                        </div>
+                    </div><!-- .nk-block-head -->
+                    <form method="POST" action="{{ route('register') }}">
+                        @csrf
+                        <div class="form-group">
+                            <label class="form-label" for="name">Nama</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control form-control-lg" name="name" id="name"
+                                    value="{{ old('name') }}" required autofocus autocomplete="name"
+                                    placeholder="Masukkan nama Anda..">
+                                @error('name')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control form-control-lg" name="email" id="email"
+                                    value="{{ old('email') }}" required autocomplete="email"
+                                    placeholder="Masukkan alamat email Anda..">
+                                @error('email')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="password">Kata Sandi</label>
+                            <div class="form-control-wrap">
+                                <a tabindex="-1" href="#" class="form-icon form-icon-right passcode-switch lg"
+                                    data-target="password">
+                                    <em class="passcode-icon icon-show icon ni ni-eye"></em>
+                                    <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
+                                </a>
+                                <input type="password" class="form-control form-control-lg" name="password"
+                                    id="password" required autocomplete="new-password"
+                                    placeholder="Masukkan kata sandi Anda..">
+                                @error('password')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="password">Konfimasi Kata Sandi</label>
+                            <div class="form-control-wrap">
+                                <a tabindex="-1" href="#" class="form-icon form-icon-right passcode-switch lg"
+                                    data-target="password">
+                                    <em class="passcode-icon icon-show icon ni ni-eye"></em>
+                                    <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
+                                </a>
+                                <input type="password" class="form-control form-control-lg" name="password_confirmation"
+                                    id="password_confirmation" required autocomplete="new-password"
+                                    placeholder="Konfirmasi kata sandi Anda..">
+                                @error('password_confirmation')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-lg btn-primary btn-block">Registrasi</button>
+                        </div>
+                    </form><!-- form -->
+                    <div class="form-note-s2 pt-4"> Sudah punya akun ? <a href="{{ route('login') }}"><strong>Klik
+                                untuk masuk!</strong></a>
+                    </div>
+                </div><!-- .nk-block -->
+                <div class="nk-block nk-auth-footer">
+                    <div class="mt-3">
+                        <p>&copy; {{ Date('Y') }} {{ config('app.name', 'Satu Peta Purwakarta') }}. All Rights
+                            Reserved.</p>
+                    </div>
+                </div><!-- nk-block -->
+            </div><!-- nk-split-content -->
+            <div class="nk-split-content nk-split-stretch bg-abstract"></div><!-- nk-split-content -->
+        </div><!-- nk-split -->
+    </div>
+</x-auth-layout>
