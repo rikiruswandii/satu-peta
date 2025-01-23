@@ -49,7 +49,7 @@
                                             class="icon ni ni-more-h rounded-full hover:!bg-color-secondary hover:!bg-opacity-30 hover:!text-gray-500"></em></a>
                                     <div class="dropdown-menu dropdown-menu-end">
                                         <ul class="link-list-opt no-bdr">
-                                            <li><a href="{{ route('users.detail', ['id' => Crypt::encrypt($d->id)]) }}"><em
+                                            <li><a href="{{ route('user.detail', ['id' => Crypt::encrypt($d->id)]) }}"><em
                                                         class="icon ni ni-eye text-blue-500"></em><span>View
                                                         Details</span></a></li>
                                             <li class="divider"></li>

@@ -76,13 +76,10 @@
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a href="html/user-profile-regular.html"><em
+                                    <li><a href="{{ route('user.detail', ['id' => Auth::user()->id]) }}"><em
                                                 class="icon ni ni-user-alt"></em><span>View
                                                 Profile</span></a></li>
-                                    <li><a href="html/user-profile-setting.html"><em
-                                                class="icon ni ni-setting-alt"></em><span>Account
-                                                Setting</span></a></li>
-                                    <li><a href="html/user-profile-activity.html"><em
+                                    <li><a href="{{ route('user.log', ['id' => Auth::user()->id]) }}"><em
                                                 class="icon ni ni-activity-alt"></em><span>Login
                                                 Activity</span></a></li>
                                     <li><a class="dark-switch" href="#"><em

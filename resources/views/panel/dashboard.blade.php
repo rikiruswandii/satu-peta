@@ -93,7 +93,7 @@
                         <h6 class="card-title text-primary mb-1">{{ Auth::user()->name }}</h6>
                         <p class="fw-semibold text-muted">{{ Auth::user()->role['name'] }}</p>
                     </div>
-                    <a href="#" class="btn btn-primary w-100 rounded-0 text-white">View Profile</a>
+                    <a href="{{ route('user.detail', ['id' => Crypt::encrypt(Auth::user()->id)]) }}" class="btn btn-primary w-100 rounded-0 text-white">View Profile</a>
                 </div>
             </div>
         </div>
