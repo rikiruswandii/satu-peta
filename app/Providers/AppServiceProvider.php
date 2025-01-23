@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $app_url = config('app.url');
+        if (app()->isProduction() && ! empty($app_url)) {
+            URL::forceRootUrl($app_url);
+            $schema = explode(':', $app_url)[0];
+            URL::forceScheme($schema);
+        }
     }
 }
