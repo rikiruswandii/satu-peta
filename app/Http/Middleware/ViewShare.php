@@ -80,6 +80,12 @@ class ViewShare
                             'iconchild' => 'ni ni-user-list-fill',
                             'is_active' => request()->routeIs('users'),
                         ],
+                        [
+                            'route' => 'logs',
+                            'text' => 'Aktivitas Pengguna',
+                            'iconchild' => 'ni ni-todo-fill',
+                            'is_active' => request()->routeIs('logs'),
+                        ],
                     ],
                 ],
             ],

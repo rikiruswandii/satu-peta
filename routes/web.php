@@ -1,11 +1,9 @@
 <?php
 
-use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\Panel\Dashboard;
 use App\Http\Controllers\Panel\User\Detail;
 use App\Http\Controllers\Panel\User\Log;
 use App\Http\Controllers\Panel\Users;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,7 +13,7 @@ Route::get('/', function () {
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
         Route::get('/dashboard', [Dashboard::class, 'index'])->name('/');
-        Route::post('uploads/process', [FileUploadController::class, 'process'])->name('uploads.process');
+        Route::get('/logs', [Log::class, 'index'])->name('logs');
 
         Route::prefix('users')->group(function () {
             Route::get('/', [Users::class, 'index'])->name('users');
