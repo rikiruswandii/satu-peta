@@ -1,3 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+#message {
+    display: none;
+}
+
+#message p {
+    font-size: 12px;
+}
+
+.valid {
+    color: green;
+}
+
+.valid:before {
+    content: "✔";
+    font-family: Verdana, Tahoma, "DejaVu Sans", sans-serif;
+
+}
+
+.invalid {
+    color: red;
+}
+
+.invalid:before {
+    content: "✖";
+    font-family: Verdana, Tahoma, "DejaVu Sans", sans-serif;
+}

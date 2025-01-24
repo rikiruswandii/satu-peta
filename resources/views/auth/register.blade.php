@@ -28,26 +28,26 @@
                         <div class="form-group">
                             <label class="form-label" for="name">Nama</label>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg" name="name" id="name"
+                                <input type="text" class="form-control form-control-lg @error('name') is-invalid @enderror" name="name" id="name"
                                     value="{{ old('name') }}" required autofocus autocomplete="name"
                                     placeholder="Masukkan nama Anda..">
                                 @error('name')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="email">Email</label>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg" name="email" id="email"
+                                <input type="text" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" id="email"
                                     value="{{ old('email') }}" required autocomplete="email"
                                     placeholder="Masukkan alamat email Anda..">
                                 @error('email')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
                         </div>
@@ -59,13 +59,13 @@
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="password" class="form-control form-control-lg" name="password"
+                                <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password"
                                     id="password" required autocomplete="new-password"
                                     placeholder="Masukkan kata sandi Anda..">
                                 @error('password')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
                         </div>
@@ -77,13 +77,13 @@
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="password" class="form-control form-control-lg" name="password_confirmation"
+                                <input type="password" class="form-control form-control-lg @error('password_confirmation') is-invalid @enderror" name="password_confirmation"
                                     id="password_confirmation" required autocomplete="new-password"
                                     placeholder="Konfirmasi kata sandi Anda..">
                                 @error('password_confirmation')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
                         </div>

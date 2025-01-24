@@ -40,12 +40,11 @@
                         <a href="#" class="dropdown-toggle me-n1" data-bs-toggle="dropdown">
                             <div class="user-toggle">
                                 <div class="user-avatar sm">
-                                    @if (Auth::user()->image)
-                                        <img src="{{ Auth::user()->image ? Storage::url('uploads/' . Auth::user()->image) : '' }}"
-                                            class="avatar avatar-rounded" alt="Avatar Pengguna">
+                                    @if (Auth::user()->documents->isNotEmpty())
+                                        <img src="{{ Storage::url(Auth::user()->documents()->where('documentable_id', Auth::user()->id)->where('type', 'avatar')->first()->path) }}"
+                                            alt="Avatar Pengguna">
                                     @else
-                                        <img src="{{ asset('assets/images/default.png') }}"
-                                            class="avatar avatar-rounded" alt="Avatar Default">
+                                        <img src="{{ asset('assets/images/default.png') }}" alt="Avatar Default">
                                     @endif
                                 </div>
                                 <div class="user-info d-none d-xl-block">
@@ -60,12 +59,11 @@
                             <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
                                 <div class="user-card">
                                     <div class="user-avatar">
-                                        @if (Auth::user()->image)
-                                            <img src="{{ Auth::user()->image ? Storage::url('uploads/' . Auth::user()->image) : '' }}"
-                                                class="avatar avatar-rounded" alt="Avatar Pengguna">
+                                        @if (Auth::user()->documents->isNotEmpty())
+                                            <img src="{{ Storage::url(Auth::user()->documents()->where('documentable_id', Auth::user()->id)->where('type', 'avatar')->first()->path) }}"
+                                                alt="Avatar Pengguna">
                                         @else
-                                            <img src="{{ asset('assets/images/default.png') }}"
-                                                class="avatar avatar-rounded" alt="Avatar Default">
+                                            <img src="{{ asset('assets/images/default.png') }}" alt="Avatar Default">
                                         @endif
                                     </div>
                                     <div class="user-info">
@@ -76,10 +74,11 @@
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a href="{{ route('user.detail', ['id' => Auth::user()->id]) }}"><em
+                                    <li><a
+                                            href="{{ route('user.detail', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
                                                 class="icon ni ni-user-alt"></em><span>View
                                                 Profile</span></a></li>
-                                    <li><a href="{{ route('user.log', ['id' => Auth::user()->id]) }}"><em
+                                    <li><a href="{{ route('user.log', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
                                                 class="icon ni ni-activity-alt"></em><span>Login
                                                 Activity</span></a></li>
                                     <li><a class="dark-switch" href="#"><em
@@ -89,8 +88,14 @@
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a href="#"><em class="icon ni ni-signout"></em><span>Sign
+                                    <li><a
+                                            onclick="document.getElementById('logoutAction').submit();"
+                                            class="px-1 cursor-pointer"><em class="icon ni ni-signout"></em><span>Sign
                                                 out</span></a></li>
+                                    <li>
+                                        <form id="logoutAction" method="post" action="{{ route('logout') }}">@csrf
+                                        </form>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

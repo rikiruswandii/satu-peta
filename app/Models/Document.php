@@ -14,7 +14,7 @@ class Document extends Model
 
     protected static $logName = 'document_activity';
 
-    protected static $logAttributes = ['name', 'file_path', 'extension', 'size', 'mime_type'];
+    protected static $logAttributes = ['name', 'path', 'extension', 'size', 'mime_type'];
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -23,7 +23,7 @@ class Document extends Model
             ->useLogName(static::$logName);
     }
 
-    protected $fillable = ['name', 'file_path', 'extension', 'size', 'mime_type'];
+    protected $fillable = ['name', 'path', 'type', 'extension', 'size', 'mime_type', 'documentable_type', 'documentable_id'];
 
     public function documentable(): MorphTo
     {

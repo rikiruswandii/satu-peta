@@ -81,8 +81,8 @@
                 <div class="card text-center">
                     <div class="card-body">
                         <div class="mb-3 d-flex justify-content-center align-items-center">
-                            @if (!empty(Auth::user()->avatar))
-                                <img src="{{ Auth::user()->avatar ? Storage::url('uploads/' . Auth::user()->avatar) : '' }}"
+                            @if (!empty(Auth::user()->documents->isNotEmpty()))
+                                <img src="{{ Storage::url(Auth::user()->documents()->where('documentable_id', Auth::user()->id)->where('type', 'avatar')->first()->path) }}"
                                     class="rounded-circle img-fluid" style="height: 9rem; width: 9rem;"
                                     alt="Avatar Default">
                             @else

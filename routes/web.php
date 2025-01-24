@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\Panel\Dashboard;
 use App\Http\Controllers\Panel\User\Detail;
 use App\Http\Controllers\Panel\User\Log;
@@ -14,6 +15,7 @@ Route::get('/', function () {
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
         Route::get('/dashboard', [Dashboard::class, 'index'])->name('/');
+        Route::post('uploads/process', [FileUploadController::class, 'process'])->name('uploads.process');
 
         Route::prefix('users')->group(function () {
             Route::get('/', [Users::class, 'index'])->name('users');
@@ -22,13 +24,13 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
             Route::delete('/destroy', [Users::class, 'destroy'])->name('users.destroy');
             Route::post('/store', [Users::class, 'store'])->name('users.store');
         });
-        
+
         Route::prefix('user')->group(function () {
             Route::get('/detail/{id}', [Detail::class, 'index'])->name('user.detail');
             Route::get('/log/{id}', [Log::class, 'userLog'])->name('user.log');
-            Route::post('/update', [Detail::class, 'update'])->name('user.update');
-            Route::post('/photo', [Detail::class, 'photo'])->name('user.photo');
-            Route::post('/change', [Detail::class, 'change'])->name('user.change');
+            Route::post('/update/{id}', [Detail::class, 'update'])->name('user.update');
+            Route::post('/photo/{id}', [Detail::class, 'photo'])->name('user.photo');
+            Route::post('/change/{id}', [Detail::class, 'change'])->name('user.change');
             Route::delete('/destroy', [Detail::class, 'destroy'])->name('user.destroy');
         });
     }

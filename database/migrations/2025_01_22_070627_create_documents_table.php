@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name'); // Nama file asli
             $table->string('path'); // Path file di penyimpanan
             $table->string('extension'); // Ekstensi file (e.g., pdf, jpg)
+            $table->string('type'); // Ekstensi file (e.g., pdf, jpg)
             $table->bigInteger('size'); // Ukuran file dalam byte
             $table->string('mime_type'); // Tipe MIME file (e.g., application/pdf)
             $table->string('documentable_type'); // Nama model pemilik dokumen (e.g., User atau Project)

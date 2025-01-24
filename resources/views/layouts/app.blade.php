@@ -18,8 +18,10 @@
     <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/skins/theme-green.css') }}">
+    <link href="https://cdn.jsdelivr.net/gh/qopiku/dropify/dist/css/dropify.min.css" rel="stylesheet">
 
     @stack('css')
+    @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 
 <body class="nk-body bg-lighter npc-default has-sidebar ">
@@ -83,8 +85,7 @@
     <!-- JavaScript -->
     <script src="{{ asset('assets/js/bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
-    <script src="{{ asset('assets/js/charts/chart-ecommerce.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/gh/qopiku/dropify/dist/js/dropify.min.js"></script>
     @stack('scripts')
 </body>
 

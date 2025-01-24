@@ -21,8 +21,8 @@
                                     <div class="card-inner">
                                         <div class="user-card">
                                             <div class="user-avatar bg-primary">
-                                                @if ($user->image)
-                                                    <img src="{{ $user->image ? Storage::url('uploads/' . $user->image) : '' }}"
+                                                @if ($user->documents->isNotEmpty())
+                                                    <img src="{{ Storage::url($user->documents()->where('documentable_id', $user->id)->where('type', 'avatar')->first()->path) }}"
                                                         alt="Avatar Pengguna">
                                                 @else
                                                     <img src="{{ asset('assets/images/default.png') }}"
@@ -61,14 +61,17 @@
                                             <li>
                                                 <a href="javascript:void(0);" data-bs-toggle="modal"
                                                     data-bs-target="#changePassModal"><em
-                                                        class="icon ni ni-lock-fill"></em><span>Ganti Kata Sandi</span></a>
+                                                        class="icon ni ni-lock-fill"></em><span>Ganti Kata
+                                                        Sandi</span></a>
                                             </li>
                                             <li><a class="{{ request()->routeIs('user.detail') ? 'active' : '' }} hover:!text-color-secondary"
                                                     href="{{ route('user.detail', ['id' => Crypt::encrypt($user->id)]) }}"><em
-                                                        class="icon ni ni-user-fill-c"></em><span>Informasi Pengguna</span></a></li>
+                                                        class="icon ni ni-user-fill-c"></em><span>Informasi
+                                                        Pengguna</span></a></li>
                                             <li><a href="{{ route('user.log', ['id' => Crypt::encrypt($user->id)]) }}"
                                                     class="{{ request()->routeIs('user.log') ? 'active' : '' }} hover:!text-color-secondary"><em
-                                                        class="icon ni ni-activity-round-fill"></em><span>Aktivitas Pengguna</span></a></li>
+                                                        class="icon ni ni-activity-round-fill"></em><span>Aktivitas
+                                                        Pengguna</span></a></li>
                                         </ul>
                                     </div>
                                 </div><!-- .card-inner-group -->
@@ -82,23 +85,19 @@
     @php
         $modalPhoto = [
             'title' => 'Ganti Photo',
-            'footer' =>
-                '<button type="submit" class="btn btn-primary" form="changePhotoForm">Simpan</button>',
+            'footer' => '<button type="submit" class="btn btn-primary" form="changePhotoForm">Simpan</button>',
         ];
         $modalDelete = [
             'title' => 'Hapus Pengguna',
-            'footer' =>
-                '<button type="submit" class="btn btn-danger" form="deleteUserForm">Simpan</button>',
+            'footer' => '<button type="submit" class="btn btn-danger" form="deleteUserForm">Simpan</button>',
         ];
         $modalData = [
             'title' => 'Sunting Pengguna',
-            'footer' =>
-                '<button type="submit" class="btn btn-primary" form="editProfileForm">Simpan</button>',
+            'footer' => '<button type="submit" class="btn btn-primary" form="editProfileForm">Simpan</button>',
         ];
         $changepass = [
             'title' => 'Ganti Kata Sandi',
-            'footer' =>
-                '<button type="submit" class="btn btn-primary" form="changePassForm">Simpan</button>',
+            'footer' => '<button type="submit" class="btn btn-primary" form="changePassForm">Simpan</button>',
         ];
 
         $photo = 'user.photo';
@@ -115,11 +114,15 @@
                         action="{{ route($photo, ['id' => Crypt::encrypt($user->id)]) }}" enctype="multipart/form-data">
                         @csrf
 
+                        <label class="form-label" for="file"></label>
+                        <input type="file" class="filepond @error('file') is-invalid @enderror" name="file"
+                            accept="image/png, image/jpeg, image/jpg" />
+                        @error('file')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                         <div class="form-group">
-                            <input type="file" name="avatar" class="dropify !text-xs" data-show-remove="false"
-                                data-allowed-file-extensions="png jpg jpeg gif"
-                                data-default-file="{{ $user->image ? Storage::url('uploads/' . $user->image) : '' }}"
-                                value="{{ $user->image }}">
                         </div>
                     </form>
                 </div>
@@ -130,17 +133,27 @@
                 <form id="editProfileForm" method="POST"
                     action="{{ route($update, ['id' => Crypt::encrypt($user->id)]) }}" enctype="multipart/form-data">
                     @csrf
-                    @method('PATCH')
 
                     <div class="form-group">
                         <label for="name" class="form-label">Nama</label>
-                        <input type="text" class="form-control" id="name" name="name"
-                            placeholder="masukkan nama.." value="{{ old('name', $user->name) }}" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                            name="name" placeholder="masukkan nama.." value="{{ old('name', $user->name) }}" required>
+                        @error('name')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email"
-                            placeholder="masukkan email.." value="{{ old('email', $user->email) }}" required>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email" placeholder="masukkan email.." value="{{ old('email', $user->email) }}"
+                            required>
+                        @error('email')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
                 </form>
             </x-slot>
@@ -154,13 +167,19 @@
 
                     <div class="row">
                         <h6>{{ __('Apakah Anda yakin ingin menghapus akun Anda?') }}</h6>
-                        <p>{{ __('Setelah akun Anda dihapus, semua sumber daya dan datanya akan dihapus secara permanen. Silakan masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun Anda secara permanen.') }}</p>
+                        <p>{{ __('Setelah akun Anda dihapus, semua sumber daya dan datanya akan dihapus secara permanen. Silakan masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun Anda secara permanen.') }}
+                        </p>
                         <div class="form-group">
-                            <label for="name" class="form-label">Kata Sandi</label>
-                            <input id="password"
-                        name="password"
-                        type="password" class="form-control"
+                            <label for="current-password" class="form-label">Kata Sandi</label>
+                            <input id="current-password" name="password" type="password"
+                                class="form-control @error('password') is-invalid @enderror"
                                 placeholder="masukkan kata sandi.." required>
+
+                            @error('password')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
                     </div>
                 </form>
@@ -178,10 +197,9 @@
                     <input type="text" name="hidden_username" id="hidden_username" autocomplete="username"
                         class="d-none">
 
-                    <div class="form-group row">
-                        <label for="current_password"
-                            class="col-md-4 col-form-label text-md-right">{{ __('Current Password') }}</label>
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="current_password" class="form-label">{{ __('Current Password') }}</label>
                             <input id="current_password" type="password"
                                 class="form-control @error('current_password') is-invalid @enderror"
                                 name="current_password" required autofocus autocomplete="current-password">
@@ -191,12 +209,8 @@
                                 </span>
                             @enderror
                         </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="password"
-                            class="col-md-4 col-form-label text-md-right">{{ __('New Password') }}</label>
-                        <div class="col-md-6 position-relative">
+                        <div class="form-group">
+                            <label for="password" class="form-label">{{ __('New Password') }}</label>
                             <input id="password" type="password"
                                 class="form-control @error('password') is-invalid @enderror" name="password" required
                                 autocomplete="new-password">
@@ -207,24 +221,26 @@
                             @enderror
 
                             <div class="alert alert-secondary mt-2 mb-0" role="alert" id="message">
-                                <p style="font-weight: bold;"> Kata Sandi harus terdiri dari: </p>
-                                <p id="length" class="invalid"> Minimal <b> 8 karakter </b> </p>
-                                <p id="letter" class="invalid"> Huruf <b> kecil (a-z)</b> </p>
-                                <p id="capital" class="invalid"> Huruf <b> KAPITAL (A-Z)</b></p>
-                                <p id="number" class="invalid"> <b>Angka</b>(0-9) </p>
-                                <p id="symbol" class="invalid"> <b>Symbol</b>(!$#%@)</p>
+                                <p style="font-weight: bold;">Kata Sandi harus terdiri dari:</p>
+                                <p id="length" class="invalid">Minimal <b>8 karakter</b></p>
+                                <p id="letter" class="invalid">Huruf <b>kecil (a-z)</b></p>
+                                <p id="capital" class="invalid">Huruf <b>KAPITAL (A-Z)</b></p>
+                                <p id="number" class="invalid"><b>Angka</b>(0-9)</p>
+                                <p id="symbol" class="invalid"><b>Symbol</b>(!$#%@)</p>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="password-confirm"
-                            class="col-md-4 col-form-label text-md-right">{{ __('Confirm New Password') }}</label>
-                        <div class="col-md-6 position-relative">
-                            <input id="password-confirm" type="password" class="form-control"
+                        <div class="form-group">
+                            <label for="password-confirm" class="form-label">{{ __('Confirm New Password') }}</label>
+                            <input id="password-confirm" type="password"
+                                class="form-control @error('password_confirmation') is-invalid @enderror"
                                 name="password_confirmation" required autocomplete="new-password">
                             <span id="password-match-icon"
                                 class="position-absolute top-50 end-0 translate-middle-y me-3"></span>
+                            @error('password_confirmation')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
                     </div>
                 </form>
@@ -238,102 +254,81 @@
                 const passwordInput = document.getElementById('password');
                 const confirmPasswordInput = document.getElementById('password-confirm');
                 const passwordMatchIcon = document.getElementById('password-match-icon');
+                const messageBox = document.getElementById('message');
 
-                confirmPasswordInput.addEventListener('input', function() {
-                    if (confirmPasswordInput.value === '') {
-                        confirmPasswordInput.classList.remove('is-invalid', 'is-valid');
-                        passwordMatchIcon.classList.remove('text-danger', 'text-success');
-                        return;
-                    }
+                // Validation for confirm password match
+                if (confirmPasswordInput && passwordInput) {
+                    confirmPasswordInput.addEventListener('input', function() {
+                        if (confirmPasswordInput.value === '') {
+                            confirmPasswordInput.classList.remove('is-invalid', 'is-valid');
+                            passwordMatchIcon.classList.remove('text-danger', 'text-success');
+                            return;
+                        }
 
-                    if (confirmPasswordInput.value === passwordInput.value) {
-                        confirmPasswordInput.classList.add('is-valid');
-                        confirmPasswordInput.classList.remove('is-invalid');
-                        passwordMatchIcon.classList.add('text-success');
-                        passwordMatchIcon.classList.remove('text-danger');
+                        if (confirmPasswordInput.value === passwordInput.value) {
+                            confirmPasswordInput.classList.add('is-valid');
+                            confirmPasswordInput.classList.remove('is-invalid');
+                            passwordMatchIcon.classList.add('text-success');
+                            passwordMatchIcon.classList.remove('text-danger');
+                        } else {
+                            confirmPasswordInput.classList.add('is-invalid');
+                            confirmPasswordInput.classList.remove('is-valid');
+                            passwordMatchIcon.classList.add('text-danger');
+                            passwordMatchIcon.classList.remove('text-success');
+                        }
+                    });
+                }
+
+                // Password strength validation
+                if (passwordInput) {
+                    const letter = document.getElementById("letter");
+                    const capital = document.getElementById("capital");
+                    const number = document.getElementById("number");
+                    const symbol = document.getElementById("symbol");
+                    const length = document.getElementById("length");
+
+                    passwordInput.addEventListener('focus', function() {
+                        messageBox.style.display = "block";
+                    });
+
+                    passwordInput.addEventListener('blur', function() {
+                        messageBox.style.display = "none";
+                    });
+
+                    passwordInput.addEventListener('keyup', function() {
+                        const lowerCaseLetters = /[a-z]/g;
+                        const upperCaseLetters = /[A-Z]/g;
+                        const numbers = /[0-9]/g;
+                        const symbols = /[!$#%@]/g;
+
+                        // Validate lowercase
+                        toggleClass(passwordInput.value.match(lowerCaseLetters), letter);
+
+                        // Validate uppercase
+                        toggleClass(passwordInput.value.match(upperCaseLetters), capital);
+
+                        // Validate number
+                        toggleClass(passwordInput.value.match(numbers), number);
+
+                        // Validate length
+                        toggleClass(passwordInput.value.length >= 8, length);
+
+                        // Validate symbol
+                        toggleClass(passwordInput.value.match(symbols), symbol);
+                    });
+                }
+
+                function toggleClass(condition, element) {
+                    if (condition) {
+                        element.classList.add("valid");
+                        element.classList.remove("invalid");
                     } else {
-                        confirmPasswordInput.classList.add('is-invalid');
-                        confirmPasswordInput.classList.remove('is-valid');
-                        passwordMatchIcon.classList.add('text-danger');
-                        passwordMatchIcon.classList.remove('text-success');
+                        element.classList.add("invalid");
+                        element.classList.remove("valid");
                     }
-                });
+                }
             });
-
-            var myInput = document.getElementById("password");
-            var retype = document.getElementById("password_confirmation");
-            var letter = document.getElementById("letter");
-            var capital = document.getElementById("capital");
-            var number = document.getElementById("number");
-            var symbol = document.getElementById("symbol");
-            var length = document.getElementById("length");
-
-            if (myInput) {
-                myInput.onfocus = function() {
-                    document.getElementById("message").style.display = "block";
-                }
-
-                myInput.onblur = function() {
-                    document.getElementById("message").style.display = "none";
-                }
-
-                myInput.onkeyup = function() {
-                    var lowerCaseLetters = /[a-z]/g;
-                    var upperCaseLetters = /[A-Z]/g;
-                    var numbers = /[0-9]/g;
-                    var symbols = /[!$#%@]/g;
-
-                    if (myInput.value.match(lowerCaseLetters)) {
-                        letter.classList.remove("invalid");
-                        letter.classList.add("valid");
-                    } else {
-                        letter.classList.remove("valid");
-                        letter.classList.add("invalid");
-                    }
-
-                    if (myInput.value.match(upperCaseLetters)) {
-                        capital.classList.remove("invalid");
-                        capital.classList.add("valid");
-                    } else {
-                        capital.classList.remove("valid");
-                        capital.classList.add("invalid");
-                    }
-
-                    if (myInput.value.match(numbers)) {
-                        number.classList.remove("invalid");
-                        number.classList.add("valid");
-                    } else {
-                        number.classList.remove("valid");
-                        number.classList.add("invalid");
-                    }
-
-                    if (myInput.value.length >= 8) {
-                        length.classList.remove("invalid");
-                        length.classList.add("valid");
-                    } else {
-                        length.classList.remove("valid");
-                        length.classList.add("invalid");
-                    }
-
-                    if (myInput.value.match(symbols)) {
-                        symbol.classList.remove("invalid");
-                        symbol.classList.add("valid");
-                    } else {
-                        symbol.classList.remove("valid");
-                        symbol.classList.add("invalid");
-                    }
-                }
-            }
-
-            if (retype) {
-                retype.onfocus = function() {
-                    document.getElementById("feedback").style.display = "block";
-                }
-
-                retype.onblur = function() {
-                    document.getElementById("feedback").style.display = "none";
-                }
-            }
         </script>
     @endpush
+
 </x-app-layout>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Panel\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Document;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Illuminate\Http\File;
 
 class Detail extends Controller
 {
@@ -34,7 +36,6 @@ class Detail extends Controller
         $validator = \Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
-            'username' => ['required', 'string', 'lowercase', 'max:255'],
         ]);
 
         if ($validator->fails()) {
@@ -45,25 +46,17 @@ class Detail extends Controller
             $decrypt = Crypt::decrypt($id);
             $user = User::findOrFail($decrypt);
 
-
             if ($user->isDirty('email')) {
                 $user->email_verified_at = null;
             }
 
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->username = $request->username;
 
             // Simpan perubahan ke database
             $user->save();
-            \Log::info('User berhasil diupdate:', $user->toArray());
-            if (request()->routeIs('user.detail') || request()->routeIs('user.activity')) {
-                return redirect()->route('user.detail', ['id' => $id])->with([
-                    'success' => 'Profil berhasil diperbarui.',
-                ]);
-            }
 
-            return redirect()->route('profile.user', ['id' => $id])->with([
+            return redirect()->route('user.detail', ['id' => $id])->with([
                 'success' => 'Profil berhasil diperbarui.',
             ]);
         } catch (\Exception $e) {
@@ -75,90 +68,112 @@ class Detail extends Controller
         }
     }
 
-    public function photo(Request $request, $id): RedirectResponse
+    public function photo(Request $request, $id)
     {
-        // Validasi file avatar
+        // Validasi input
         $validator = \Validator::make(
-            $request->all(),[
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        ]);
+            $request->all(),
+            [
+                'file' => ['required', 'string'], // Path file sementara dari FilePond
+            ]
+        );
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         try {
-            $decrypt = Crypt::decrypt($id);
-            $user = User::findOrFail($decrypt);
+            $decryptId = Crypt::decrypt($id);
 
-            // Jika ada file image yang diunggah
-            if ($request->hasFile('image')) {
-                // Hapus file lama dari storage jika ada
-                if ($user->image) {
-                    Storage::disk('public')->delete('uploads/' . $user->image);
-                }
+            $user = User::findOrFail($decryptId);
 
-                // Dapatkan file dari request
-                $file = $request->file('image');
+            // Ambil serverId dari request
+            $serverId = $request->input('file');  // Filepond akan mengirimkan serverId
 
-                // Tentukan nama file yang di-hash
-                $fileName = $file->hashName();
+            // Mendapatkan path file sementara dari server menggunakan serverId
+            $filepond = app(\Sopamo\LaravelFilepond\Filepond::class);
+            $disk = config('filepond.temporary_files_disk');
 
-                // Simpan file baru ke storage di folder 'uploads' (disk 'public') dengan nama yang di-hash
-                $path = $file->storeAs('uploads', $fileName, 'public');
+            // Mendapatkan path sementara dari FilePond
+            $temporaryPath = $filepond->getPathFromServerId($serverId);
 
-                if (! $path) {
-                    return redirect()->route('profile.user', ['id' => $id])->with('error', 'Gagal menyimpan file.');
-                }
+            $fullpath = Storage::disk($disk)->path($temporaryPath); // Mendapatkan path lengkap file sementara
 
-                // Simpan nama file baru (yang di-hash) ke dalam database user
-                $user->image = $fileName;
-                $user->save();
+            // Cek jika file sementara ada
+            if (!file_exists($fullpath)) {
+                return redirect()->back()->with('error', 'File tidak ditemukan.');
             }
 
-            // Cek route yang dipanggil
-            if (request()->routeIs('user.detail') || request()->routeIs('user.activity')) {
-                return redirect()->route('user.detail', ['id' => $id])->with([
-                    'success' => 'Avatar berhasil diperbarui.',
-                ]);
+            // Hapus file lama dari storage dan tabel documents
+            $oldDocument = $user->documents()->where('documentable_id', $user->id)->first();
+            if ($oldDocument) {
+                Storage::disk('public')->delete($oldDocument->path); // Hapus file lama
+                $oldDocument->delete(); // Hapus data lama dari tabel documents
             }
 
-            return redirect()->route('profile.user', ['id' => $id])->with([
-                'success' => 'Avatar berhasil diperbarui.',
+            // Pindahkan file dari lokasi sementara ke folder final
+            $newFilePath = 'uploads/avatars/' . basename($temporaryPath);
+
+            // Menggunakan put untuk menyimpan file ke disk 'public'
+            $temporaryFile = Storage::disk($disk)->get($temporaryPath);
+            Storage::disk('public')->put($newFilePath, $temporaryFile);
+
+            // Ambil informasi file
+            $fileInfo = pathinfo($fullpath);
+
+            // Simpan data file ke tabel documents
+            Document::create([
+                'name' => $fileInfo['basename'], // Nama lengkap file (termasuk ekstensi)
+                'path' => $newFilePath,
+                'extension' => $fileInfo['extension'], // Ekstensi file
+                'type' => 'avatar',
+                'documentable_type' => User::class,
+                'documentable_id' => $user->id,
+                'mime_type' => mime_content_type($fullpath),
+                'size' => filesize($fullpath),
             ]);
+
+
+            return redirect()->back()->with('success', 'Avatar berhasil diperbarui.');
         } catch (\Exception $e) {
-            return back()->withInput()->with([
-                'error' => 'Gagal memperbarui profil: ' . $e->getMessage(),
+            // Tangani error
+            \Log::error('Error updating avatar', ['error' => $e->getMessage()]);
+            return redirect()->back()->withInput()->with([
+                'error' => 'Gagal memperbarui avatar: ' . $e->getMessage(),
             ]);
         }
     }
 
-    public function changePassword(Request $request, $id): RedirectResponse
+
+
+
+    public function change(Request $request, $id): RedirectResponse
     {
         $validator = \Validator::make(
             $request->all(),
             [
-            'current_password' => 'required',
-            'password' => [
-                'required',
-                'min:8',
-                'regex:/^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W]).*$/',
-                'confirmed',
-            ],
-        ]);
+                'current_password' => 'required',
+                'password' => [
+                    'required',
+                    'min:8',
+                    'regex:/^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W]).*$/',
+                    'confirmed',
+                ],
+            ]
+        );
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        
+
         try {
             $decrypt = Crypt::decrypt($id);
             $user = User::findOrFail($decrypt);
 
 
-            if (! Hash::check($request->current_password, $user->password)) {
+            if (!Hash::check($request->current_password, $user->password)) {
                 throw ValidationException::withMessages([
-                    'error' => ['The provided password does not match our records.'],
+                    'error' => ['Kata sandi yang diberikan tidak cocok dengan catatan kami.'],
                 ]);
             }
 
@@ -169,17 +184,11 @@ class Detail extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
 
-            if (request()->routeIs('user.detail')) {
-                return redirect()->route('user.detail', ['id' => $id])->with([
-                    'success' => 'Password changed successfully!',
-                ]);
-            }
-
-            return redirect()->route('profile.user', ['id' => $id])->with([
-                'success' => 'Password changed successfully!',
+            return redirect()->route('user.detail', ['id' => $id])->with([
+                'success' => 'Kata sandi berhasil diganti!',
             ]);
         } catch (ValidationException $e) {
-            return redirect()->route('profile.user', ['id' => $id])->with('error', 'Password change failed!');
+            return redirect()->route('profile.user', ['id' => $id])->with('error', 'Kata sandi gagal diganti!');
         }
     }
 

@@ -29,16 +29,27 @@ class Log extends Controller
 
     public function userLog($id)
     {
+        // Dekripsi ID
         $decrypt = Crypt::decrypt($id);
+
+        // Mencari user berdasarkan ID yang didekripsi
         $user = User::findOrFail($decrypt);
+
+        // Menghitung jumlah aktivitas user
         $count = Activity::where('causer_id', $user->id)->count();
+
+        // Menentukan judul dan deskripsi
         $title = 'Log Aktivitas';
         $description = $title . ' page!';
-        $data = Activity::where('causer_id', $user)
+
+        // Mengambil data aktivitas user
+        $data = Activity::where('causer_id', $user->id) // Menggunakan ID user
             ->where('causer_type', User::class)
             ->orderByDesc('created_at')
             ->get();
 
-        return view('panel.user.log', compact('data', 'count', 'user', 'title', 'description'))->with('encrypt', $id);
+        // Mengirim data ke view
+        return view('panel.user.log', compact('data', 'count', 'user', 'title', 'description', 'id'));
     }
+
 }

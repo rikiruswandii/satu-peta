@@ -31,13 +31,13 @@
                                 <label class="form-label" for="email">Email</label>
                             </div>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg" name="email" id="email"
+                                <input type="text" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" id="email"
                                     value="{{ old('email') }}" required autofocus autocomplete="email"
                                     placeholder="Masukkan alamat email terdaftar..">
                                 @error('email')
-                                    <div class="invalid-feedback">
-                                        {{ $message  }}
-                                    </div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
                         </div><!-- .form-group -->
@@ -55,13 +55,13 @@
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="password" class="form-control form-control-lg" name="password"
+                                <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password"
                                     id="password" required autocomplete="current-password"
                                     placeholder="Masukkan kata sandi..">
                                 @error('password')
-                                    <div class="invalid-feedback">
-                                        {{ $message  }}
-                                    </div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
                         </div><!-- .form-group -->

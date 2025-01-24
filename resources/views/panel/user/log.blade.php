@@ -40,7 +40,7 @@
                                 <tr>
                                     <td>{{ $no++ }}</td>
                                     <td>{{ $d->log_name }}</td>
-                                    <td>{{ $d->decription }}</td>
+                                    <td>{{ $d->description }}</td>
                                     <td>{{ $d->created_at }}</td>
                                 </tr>
                             @endforeach
