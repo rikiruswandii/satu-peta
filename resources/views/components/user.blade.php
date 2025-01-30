@@ -122,8 +122,6 @@
                                 <strong>{{ $message }}</strong>
                             </span>
                         @enderror
-                        <div class="form-group">
-                        </div>
                     </form>
                 </div>
             </x-slot>

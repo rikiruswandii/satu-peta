@@ -88,6 +88,12 @@ class ViewShare
                         ],
                     ],
                 ],
+                [
+                    'route' => 'settings.index',
+                    'icon' => 'ni ni-setting-fill',
+                    'text' => 'Pengaturan',
+                    'is_active' => request()->routeIs('settings.index'),
+                ],
             ],
         ];
 
