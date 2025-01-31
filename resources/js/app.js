@@ -19,10 +19,11 @@ const inputElements = document.querySelectorAll('input[type="file"].filepond');
 
 // Loop melalui setiap elemen dan inisialisasi FilePond
 inputElements.forEach(inputElement => {
+    const existingFileUrl = inputElement.getAttribute('data-existing-file');
     const pond = FilePond.create(inputElement, {
-        labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`,
+        labelIdle: `Drag & Drop your file or <span class="filepond--label-action">Browse</span>`,
         allowMultiple: false, // Hanya satu file yang diunggah
-        acceptedFileTypes: ['image/*'], // Hanya file gambar yang diterima
+        acceptedFileTypes: ['image/*', 'application/json'], // Hanya file gambar yang diterima
     });
     pond.setOptions({
         server: {
@@ -44,6 +45,16 @@ inputElements.forEach(inputElement => {
             }
         }
     });
+
+    // Jika ada file lama, tampilkan di FilePond
+    if (existingFileUrl) {
+        pond.files = [{
+            source: existingFileUrl,
+            options: {
+                type: 'public',
+            }
+        }];
+    }
 });
 
 $("#success-alert").fadeTo(2000, 500).slideUp(500, function () {

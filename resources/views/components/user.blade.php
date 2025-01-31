@@ -113,10 +113,10 @@
                     <form id="changePhotoForm" method="POST"
                         action="{{ route($photo, ['id' => Crypt::encrypt($user->id)]) }}" enctype="multipart/form-data">
                         @csrf
-
-                        <label class="form-label" for="file"></label>
                         <input type="file" class="filepond @error('file') is-invalid @enderror" name="file"
-                            accept="image/png, image/jpeg, image/jpg" />
+                            accept="image/png, image/jpeg, image/jpg"
+                            data-existing-file="{{ optional(Auth::user()->documents->where('documentable_id', Auth::user()->id)->first())->path? Storage::url(optional(Auth::user()->documents->where('documentable_id', Auth::user()->id)->first())->path): '' }}"
+                            required />
                         @error('file')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

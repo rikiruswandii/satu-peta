@@ -89,7 +89,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="logo" class="form-label">Logo</label>
-                                                <div class="user-avatar mt-3">
+                                                <div class="user-avatar sq mt-3">
                                                     @if ($data->logo)
                                                         @php
                                                             $logo = $data->logo;
@@ -164,8 +164,8 @@
                                 </div>
                                 <div class="nk-block-head-content">
                                     <div class="toggle-wrap nk-block-tools-toggle">
-                                        <a href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="#addModal" class="btn btn-primary"><em
+                                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addModal"
+                                            class="btn btn-primary"><em
                                                 class="icon ni ni-plus-round-fill mr-2"></em><span>Tambah</span></a>
                                     </div><!-- .toggle-wrap -->
                                 </div>
@@ -220,8 +220,7 @@
                                                     </a>
                                                     <div class="dropdown-menu dropdown-menu-end">
                                                         <ul class="link-list-opt no-bdr">
-                                                            <li><a href="javascript:void(0);"
-                                                                    data-bs-toggle="modal"
+                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                                     data-bs-target="#updateModal"
                                                                     data-id="{{ Crypt::encrypt($row->id) }}"
                                                                     data-name="{{ $row->title }}"
@@ -229,8 +228,7 @@
                                                                     <em
                                                                         class="icon ni ni-edit"></em><span>Sunting</span>
                                                                 </a></li>
-                                                            <li><a href="javascript:void(0);"
-                                                                    data-bs-toggle="modal"
+                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                                     data-bs-target="#deleteMapModal"
                                                                     data-id="{{ Crypt::encrypt($row->id) }}"
                                                                     data-name="{{ $row->title }}">
@@ -312,7 +310,8 @@
                             <!-- Div untuk input Image -->
                             <div class="form-group mb-3">
                                 <label class="form-label" for="logo-update">Logo</label>
-                                <input type="file" name="file" id="logo-update" class="filepond">
+                                <input type="file" name="file" id="logo-update" class="filepond"
+                                    data-existing-file="" accept="image/jpeg, image/png">
                             </div>
 
                             <!-- Div untuk input URL Video -->
@@ -345,9 +344,11 @@
                 var url = $(this).data('url');
                 var name = $(this).data('name');
 
-                $('#updateModal').find('input[name="id"]').val(id);
-                $('#updateModal').find('input[name="title"]').val(name);
-                $('#updateModal').find('input[name="url"]').val(url);
+                var modal = $('#updateModal');
+
+                modal.find('input[name="id"]').val(id);
+                modal.find('input[name="title"]').val(name);
+                modal.find('input[name="url"]').val(url);
             });
         </script>
     @endpush

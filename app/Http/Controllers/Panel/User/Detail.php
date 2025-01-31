@@ -84,56 +84,64 @@ class Detail extends Controller
         try {
             $decryptId = Crypt::decrypt($id);
 
-            $user = User::findOrFail($decryptId);
+            $user = User::with('documents')->findOrFail($decryptId);
+if ($request->filled('file')) {
+            $serverId = $request->input('file'); // FilePond mengirimkan serverId
+            \Log::info("Server ID FilePond: $serverId");
 
-            // Ambil serverId dari request
-            $serverId = $request->input('file');  // Filepond akan mengirimkan serverId
-
-            // Mendapatkan path file sementara dari server menggunakan serverId
             $filepond = app(\Sopamo\LaravelFilepond\Filepond::class);
             $disk = config('filepond.temporary_files_disk');
-
-            // Mendapatkan path sementara dari FilePond
             $temporaryPath = $filepond->getPathFromServerId($serverId);
+            $fullpath = Storage::disk($disk)->path($temporaryPath);
 
-            $fullpath = Storage::disk($disk)->path($temporaryPath); // Mendapatkan path lengkap file sementara
+            \Log::info("Path sementara file: $temporaryPath");
+            \Log::info("Path lengkap file: $fullpath");
 
-            // Cek jika file sementara ada
             if (!file_exists($fullpath)) {
+                \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
                 return redirect()->back()->with('error', 'File tidak ditemukan.');
             }
 
-            // Hapus file lama dari storage dan tabel documents
-            $oldDocument = $user->documents()->where('documentable_id', $user->id)->first();
-            if ($oldDocument) {
-                Storage::disk('public')->delete($oldDocument->path); // Hapus file lama
-                $oldDocument->delete(); // Hapus data lama dari tabel documents
-            }
-
-            // Pindahkan file dari lokasi sementara ke folder final
+            // Pindahkan file ke folder tujuan
             $newFilePath = 'uploads/avatars/' . basename($temporaryPath);
-
-            // Menggunakan put untuk menyimpan file ke disk 'public'
             $temporaryFile = Storage::disk($disk)->get($temporaryPath);
-            Storage::disk('public')->put($newFilePath, $temporaryFile);
+            Storage::put($newFilePath, $temporaryFile);
 
-            // Ambil informasi file
+            \Log::info("File berhasil dipindahkan ke: $newFilePath");
+
             $fileInfo = pathinfo($fullpath);
 
-            // Simpan data file ke tabel documents
-            Document::create([
-                'name' => $fileInfo['basename'], // Nama lengkap file (termasuk ekstensi)
-                'path' => $newFilePath,
-                'extension' => $fileInfo['extension'], // Ekstensi file
-                'type' => 'avatar',
-                'documentable_type' => User::class,
-                'documentable_id' => $user->id,
-                'mime_type' => mime_content_type($fullpath),
-                'size' => filesize($fullpath),
-            ]);
-
-
+            // Perbarui data file dalam database, bukan menghapusnya
+            $document = $user->documents->where('documentable_id', $user->id)->first();
+            if ($document && Storage::exists($document->path)) {
+                Storage::delete($document->path);
+                // Update user dokumen lama
+                $document->update([
+                    'name' => $fileInfo['basename'],
+                    'path' => $newFilePath,
+                    'extension' => $fileInfo['extension'],
+                    'mime_type' => mime_content_type($fullpath),
+                    'size' => filesize($fullpath),
+                ]);
+                \Log::info('ditemukan');
+            } else {
+                // Jika tidak ada dokumen, buat baru
+                Document::create([
+                    'name' => $fileInfo['basename'],
+                    'path' => $newFilePath,
+                    'extension' => $fileInfo['extension'],
+                    'type' => 'avatar',
+                    'documentable_type' => User::class,
+                    'documentable_id' => $user->id,
+                    'mime_type' => mime_content_type($fullpath),
+                    'size' => filesize($fullpath),
+                ]);
+                \Log::info('tidak ditemukan');
+            }
             return redirect()->back()->with('success', 'Avatar berhasil diperbarui.');
+            } else {
+                \Log::warning('File tidak ditemukan dalam request.');
+            }
         } catch (\Exception $e) {
             // Tangani error
             \Log::error('Error updating avatar', ['error' => $e->getMessage()]);

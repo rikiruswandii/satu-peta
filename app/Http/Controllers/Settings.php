@@ -8,6 +8,7 @@ use App\Settings\GeneralSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -255,62 +256,61 @@ class Settings extends Controller
             $data = RelatedLink::findOrFail($id);
             \Log::info('Data RelatedLink ditemukan: ', ['data' => $data]);
 
-            if ($request->has('file')) {
-                // Ambil serverId dari request
-                $serverId = $request->input('file');
-                \Log::info('Server ID dari FilePond: ', ['serverId' => $serverId]);
+            if ($request->filled('file')) {
+                Log::info('File terdeteksi dalam request.');
 
-                // Mendapatkan path file sementara dari server menggunakan serverId
+                $serverId = $request->input('file'); // FilePond mengirimkan serverId
+                Log::info("Server ID FilePond: $serverId");
+
                 $filepond = app(\Sopamo\LaravelFilepond\Filepond::class);
                 $disk = config('filepond.temporary_files_disk');
-                \Log::info('Disk yang digunakan untuk file sementara: ', ['disk' => $disk]);
-
-                // Mendapatkan path sementara dari FilePond
                 $temporaryPath = $filepond->getPathFromServerId($serverId);
-                \Log::info('Path sementara file: ', ['temporaryPath' => $temporaryPath]);
-
                 $fullpath = Storage::disk($disk)->path($temporaryPath);
-                \Log::info('Path lengkap file sementara: ', ['fullpath' => $fullpath]);
 
-                // Cek jika file sementara ada
+                Log::info("Path sementara file: $temporaryPath");
+                Log::info("Path lengkap file: $fullpath");
+
                 if (!file_exists($fullpath)) {
-                    \Log::error('File sementara tidak ditemukan: ', ['fullpath' => $fullpath]);
+                    Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
-                // Hapus file lama dari storage dan tabel documents
-                $oldDocument = $data->documents()->where('documentable_id', $data->id)->first();
-                if ($oldDocument) {
-                    \Log::info('File lama ditemukan: ', ['oldDocument' => $oldDocument]);
-                    Storage::disk(env('FILESYSTEM_DISK'))->delete($oldDocument->path); // Hapus file lama
-                    $oldDocument->delete(); // Hapus data lama dari tabel documents
-                    \Log::info('File lama berhasil dihapus.');
-                }
-
-                // Pindahkan file dari lokasi sementara ke folder final
+                // Pindahkan file ke folder tujuan
                 $newFilePath = 'uploads/logos/' . basename($temporaryPath);
-                \Log::info('Path baru untuk file: ', ['newFilePath' => $newFilePath]);
-
-                // Menggunakan put untuk menyimpan file ke disk 'public'
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
-                Storage::disk(env('FILESYSTEM_DISK'))->put($newFilePath, $temporaryFile);
-                \Log::info('File berhasil dipindahkan ke lokasi final.');
+                Storage::put($newFilePath, $temporaryFile);
 
-                // Ambil informasi file
+                Log::info("File berhasil dipindahkan ke: $newFilePath");
+
                 $fileInfo = pathinfo($fullpath);
-                \Log::info('Informasi file: ', ['fileInfo' => $fileInfo]);
 
-                // Simpan data file ke tabel documents
-                $document = Document::create([
-                    'name' => $fileInfo['basename'], // Nama lengkap file (termasuk ekstensi)
-                    'path' => $newFilePath,
-                    'extension' => $fileInfo['extension'], // Ekstensi file
-                    'type' => 'logo',
-                    'documentable_type' => RelatedLink::class,
-                    'documentable_id' => $data->id,
-                    'mime_type' => mime_content_type($fullpath),
-                    'size' => filesize($fullpath),
-                ]);
+                // Perbarui data file dalam database, bukan menghapusnya
+                $document = $data->documents->where('documentable_id', $data->id)->first();
+                if ($document && Storage::exists($document->path)) {
+                    Storage::delete($document->path);
+                    // Update data dokumen lama
+                    $document->update([
+                        'name' => $fileInfo['basename'],
+                        'path' => $newFilePath,
+                        'extension' => $fileInfo['extension'],
+                        'mime_type' => mime_content_type($fullpath),
+                        'size' => filesize($fullpath),
+                    ]);
+                    Log::info('ditemukan');
+                } else {
+                    // Jika tidak ada dokumen, buat baru
+                    Document::create([
+                        'name' => $fileInfo['basename'],
+                        'path' => $newFilePath,
+                        'extension' => $fileInfo['extension'],
+                        'type' => 'logo',
+                        'documentable_type' => RelatedLink::class,
+                        'documentable_id' => $data->id,
+                        'mime_type' => mime_content_type($fullpath),
+                        'size' => filesize($fullpath),
+                    ]);
+                    Log::info('tidak ditemukan');
+                }
                 \Log::info('File berhasil disimpan ke tabel documents: ', ['document' => $document]);
             }
 

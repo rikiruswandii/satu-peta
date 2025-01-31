@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Settings\GeneralSettings;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,9 @@ class ViewShare
      */
     public function handle(Request $request, Closure $next): Response
     {
+        //settings
+        View::share('app', app(GeneralSettings::class));
+        
         //menu guest
         $guest = $this->guestMenus();
         View::share('guest', $guest);
@@ -68,6 +72,22 @@ class ViewShare
                     'is_active' => request()->routeIs('/'),
                 ],
             ],
+            'Master' => [
+                [
+                    'route' => 'maps',
+                    'icon' => 'ni ni-map',
+                    'text' => 'Peta',
+                    'is_active' => request()->routeIs('maps'),
+                ],
+            ],
+            'Informasi' => [
+                [
+                    'route' => 'articles',
+                    'icon' => 'ni ni-article',
+                    'text' => 'Artikel',
+                    'is_active' => request()->routeIs('articles'),
+                ],
+            ],
             'Lainnya' => [
                 [
                     'text' => 'Pengguna',
@@ -89,10 +109,10 @@ class ViewShare
                     ],
                 ],
                 [
-                    'route' => 'settings.index',
+                    'route' => 'settings',
                     'icon' => 'ni ni-setting-fill',
                     'text' => 'Pengaturan',
-                    'is_active' => request()->routeIs('settings.index'),
+                    'is_active' => request()->routeIs('settings'),
                 ],
             ],
         ];

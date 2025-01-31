@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Category extends Model
+class RegionalAgency extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected static $logName = 'categories_activity';
+    protected static $logName = 'region_agencies_activity';
 
-    protected static $logAttributes = ['title'];
+    protected static $logAttributes = [ 'user_id','name'];
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -24,12 +24,10 @@ class Category extends Model
             ->useLogName(static::$logName);
     }
 
-    public function artikel(): HasMany
+    public function map(): HasMany
     {
-        return $this->hasMany(Article::class);
+        return $this->hasMany(Map::class);
     }
-
-    protected $table = 'categories';
 
     protected $fillable = [
         'id',

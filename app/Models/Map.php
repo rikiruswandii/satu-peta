@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Article extends Model
+class Map extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected static $logName = 'articles_activity';
+    protected static $logName = 'maps_activity';
 
-    protected static $logAttributes = ['user_id'];
+    protected static $logAttributes = ['user_id', 'name'];
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -30,9 +30,14 @@ class Article extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
-    public function category(): BelongsTo
+    public function regional_agency(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(RegionalAgency::class);
+    }
+    
+    public function sector(): BelongsTo
+    {
+        return $this->belongsTo(Sector::class);
     }
 
     public function user()
@@ -40,16 +45,11 @@ class Article extends Model
         return $this->belongsTo(User::class);
     }
 
-    protected $table = 'articles';
-
     protected $fillable = [
-        'id',
         'user_id',
-        'category_id',
-        'title',
-        'content',
-        'image',
-        'view',
+        'regional_agency_id',
+        'sector_id',
+        'name',
         'slug',
     ];
 }
