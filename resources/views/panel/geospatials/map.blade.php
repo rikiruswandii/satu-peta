@@ -6,6 +6,14 @@
             'title' => 'Hapus Peta',
             'footer' => '<button type="submit" class="btn btn-danger" form="deleteForm">Hapus</button>',
         ];
+        $modalAktivasi = [
+            'title' => 'Aktivasi Peta',
+            'footer' => '<button type="submit" class="btn btn-primary" form="aktivasiMapForm">Aktifkan</button>',
+        ];
+        $modalDetail = [
+            'title' => 'Lihat Peta',
+            'footer' => '',
+        ];
         $modalTambah = [
             'title' => 'Tambah Peta',
             'footer' => '<button type="submit" class="btn btn-primary" form="addMapForm">
@@ -13,13 +21,12 @@
     <span>Tambah</span>
 </button>',
         ];
-        $modalTambahRegionalAgency = [
-            'title' => 'Tambah Grup',
-            'footer' => '<button type="submit" class="btn btn-primary" form="addRegionalAgencyForm">Tambah</button>',
-        ];
-        $modalTambahSector = [
-            'title' => 'Tambah Sektor',
-            'footer' => '<button type="submit" class="btn btn-primary" form="addSectorForm">Tambah</button>',
+        $modalEdit = [
+            'title' => 'Sunting Peta',
+            'footer' => '<button type="submit" class="btn btn-primary" form="editMapForm">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+    <span>Simpan</span>
+</button>',
         ];
     @endphp
     <div class="container-fluid">
@@ -53,9 +60,10 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama</th>
-                                        <th>Perangkat Daerah</th>
-                                        <th>Sektor</th>
-                                        <th>Diterbitkan</th>
+                                        <th>Grup</th>
+                                        <th>Kategori</th>
+                                        <th>File</th>
+                                        <th>Aktif</th>
                                         <th>Diperbarui</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -70,7 +78,28 @@
                                             <td>{{ $row->name }}</td>
                                             <td>{{ $row->regional_agency?->name }}</td>
                                             <td>{{ $row->sector?->name }}</td>
-                                            <td>{{ $row->created_at }}</td>
+                                            @if ($row->documents->isNotEmpty())
+                                                @foreach ($row->documents as $document)
+                                                    <td>
+                                                        <a
+                                                            href="{{ route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]) }}">
+                                                            <span class="badge rounded-pill bg-primary"><em
+                                                                    class="icon ni ni-download-cloud"></em>Unduh</span>
+                                                        </a>
+                                                    </td>
+                                                @endforeach
+                                            @else
+                                                <td><span class="badge bg-secondary">Tidak ada dokumen</span></td>
+                                            @endif
+                                            <td>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="customCheck1"
+                                                        {{ $row->is_active === true ? 'checked' : '' }} disabled>
+                                                    <label class="custom-control-label" for="customCheck1">
+                                                    </label>
+                                                </div>
+                                            </td>
                                             <td>{{ $row->updated_at }}</td>
                                             <td>
                                                 <div class="dropdown">
@@ -81,9 +110,30 @@
                                                     </a>
                                                     <div class="dropdown-menu dropdown-menu-end">
                                                         <ul class="link-list-opt no-bdr">
-                                                            <li><a href="javascript:void(0);">
+                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                                    data-bs-target="#detailMapModal"
+                                                                    data-regional-agency="{{ $row->regional_agency?->name }}"
+                                                                    data-sector="{{ $row->sector?->name }}"
+                                                                    data-geojson="{{ optional($row->documents)->first()->path ? Storage::url($row->documents->first()->path) : '' }}"
+                                                                    data-name="{{ $row->name }}"
+                                                                    data-id="{{ $row->id }}">
+                                                                    <em class="icon ni ni-eye"></em><span>Lihat</span>
+                                                                </a></li>
+                                                            <li class="divider"></li>
+                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                                    data-bs-target="#editMapModal"
+                                                                    data-regional-agency="{{ $row->regional_agency?->id }}"
+                                                                    data-sector="{{ $row->sector?->id }}"
+                                                                    data-name="{{ $row->name }}"
+                                                                    data-id="{{ $row->id }}">
+                                                                    <em class="icon ni ni-edit"></em><span>Edit</span>
+                                                                </a></li>
+                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                                    data-bs-target="#aktivasiMapModal"
+                                                                    data-name="{{ $row->name }}"
+                                                                    data-id="{{ Crypt::encrypt($row->id) }}">
                                                                     <em
-                                                                        class="icon ni ni-edit text-color-secondary"></em><span>Edit</span>
+                                                                        class="icon ni {{ $row->is_active === false ? 'ni-check-round' : 'ni-cross-round' }} "></em><span>{{ $row->is_active === false ? 'Aktif' : 'Nonaktif' }}</span>
                                                                 </a></li>
                                                             <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                                     data-bs-target="#deleteMapModal"
@@ -131,8 +181,9 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label" for="file">SHP <span class="text-danger">*</span></label><br>
-                                <span>Masukkan file .shp disini.</span>
+                                <label class="form-label" for="file">Geojson <span
+                                        class="text-danger">*</span></label><br>
+                                <span>Masukkan file JSON/geoJSON disini.</span>
                                 <div class="form-control-wrap">
                                     <input type="file" class="filepond @error('file') is-invalid @enderror"
                                         name="file" id="file" accept="application/json" required>
@@ -144,12 +195,14 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="form-label" for="regional_agency_id">Grup <span
                                         class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
-                                    <select class="form-select js-select2 @error('regional_agency_id') is-invalid @enderror"
+                                    <select
+                                        class="form-select js-select2 @error('regional_agency_id') is-invalid @enderror"
                                         data-search="on" data-dropdown-parent="#addMapModal" name="regional_agency_id"
                                         id="regional_agency_id">
                                         <option value="Pilih Hak Akses" disabled>Pilih Grup</option>
@@ -168,12 +221,113 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label" for="sector_id">Sektor <span class="text-danger">*</span></label>
+                                <label class="form-label" for="sector_id">Kategori <span
+                                        class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
                                     <select class="form-select js-select2 @error('sector_id') is-invalid @enderror"
                                         data-search="on" data-dropdown-parent="#addMapModal" name="sector_id"
                                         id="sector_id">
-                                        <option value="Pilih Hak Akses" disabled>Pilih Sektor</option>
+                                        <option value="Pilih Hak Akses" disabled>Pilih Kategori</option>
+                                        @foreach ($sectors as $d)
+                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('sector_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="can_download" value="1" class="custom-control-input" id="can_download" {{ old('can_download') ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="can_download">Izinkan unduhan untuk layer ini</label>
+                                </div>
+                                @error('can_download')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </x-slot>
+        </x-modal>
+        <x-modal :id="'editMapModal'" :data="$modalEdit">
+            <x-slot name="body">
+                <form id="editMapForm" method="POST" action="{{ route('maps.update') }}"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="row g-gs">
+                        <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+                        <input type="hidden" name="id" value="">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="edit-name">Nama <span class="text-danger">*</span></label>
+                                <div class="form-control-wrap">
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        name="name" id="edit-name" value="{{ old('name') }}" required
+                                        placeholder="Masukkan nama..">
+                                    @error('name')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="edit-file">Geojson
+                                    {{-- <span class="text-danger">*</span> --}}
+                                </label><br>
+                                <span>Masukkan file JSON/geoJSON disini.</span>
+                                <div class="form-control-wrap">
+                                    <input type="file" class="filepond @error('file') is-invalid @enderror"
+                                        name="file" id="edit-file" accept="application/json" required>
+                                    @error('file')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="edit_regional_agency_id">Grup <span
+                                        class="text-danger">*</span></label>
+                                <div class="form-control-wrap">
+                                    <select
+                                        class="form-select js-select2 @error('regional_agency_id') is-invalid @enderror"
+                                        data-search="on" data-dropdown-parent="#editMapModal" name="regional_agency_id"
+                                        id="edit_regional_agency_id">
+                                        <option value="Pilih Hak Akses" disabled>Pilih Grup</option>
+                                        @foreach ($regional_agencies as $d)
+                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('regional_agency_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="edit_sector_id">Kategori <span
+                                        class="text-danger">*</span></label>
+                                <div class="form-control-wrap">
+                                    <select class="form-select js-select2 @error('sector_id') is-invalid @enderror"
+                                        data-search="on" data-dropdown-parent="#editMapModal" name="sector_id"
+                                        id="edit_sector_id">
+                                        <option value="Pilih Hak Akses" disabled>Pilih Kategori</option>
                                         @foreach ($sectors as $d)
                                             <option value="{{ $d->id }}">{{ $d->name }}</option>
                                         @endforeach
@@ -190,52 +344,35 @@
                 </form>
             </x-slot>
         </x-modal>
-
-        <x-modal :id="'addRegionalAgencyModal'" :data="$modalTambahRegionalAgency">
+        <x-modal :id="'detailMapModal'" :data="$modalDetail" :size="'xl'" :cancelButtonText="'Tutup'">
             <x-slot name="body">
-                <form id="addRegionalAgencyForm" method="POST" action="{{ route('regional.agency.store') }}">
-                    @csrf
-                    <div class="row g-gs">
-                        <div class="col-md-12">
-                            <input type="hidden" name="user_id" id="user_id" value="{{ Auth::user()->id }}">
-                            <div class="form-group">
-                                <label class="form-label" for="name">Nama</label>
-                                <div class="form-control-wrap">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" id="name" value="{{ old('name') }}" required
-                                        placeholder="Masukkan nama..">
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                <x-map-container geoJsonPath="" mapId="detailMap" />
+                <table class="table table-sm table-bordered" style="width: 100%; font-size: 0.8rem;">
+                    <tr>
+                        <td>Nama</td>
+                        <td id="map-name"></td>
+                    </tr>
+                    <tr>
+                        <td>Grup</td>
+                        <td id="map-regional-agency"></td>
+                    </tr>
+                    <tr>
+                        <td>Kategori</td>
+                        <td id="map-sector"></td>
+                    </tr>
+                </table>
             </x-slot>
         </x-modal>
-        <x-modal :id="'addSectorModal'" :data="$modalTambahSector">
+        <x-modal :id="'aktivasiMapModal'" :data="$modalAktivasi">
             <x-slot name="body">
-                <form id="addSectorForm" method="POST" action="{{ route('sector.store') }}">
+                <form method="POST" id="aktivasiMapForm" action="{{ route('maps.activate') }}">
                     @csrf
                     <div class="row g-gs">
                         <div class="col-md-12">
-                            <input type="hidden" name="user_id" id="user_id" value="{{ Auth::user()->id }}">
                             <div class="form-group">
-                                <label class="form-label" for="name">Nama</label>
-                                <div class="form-control-wrap">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" id="name" value="{{ old('name') }}" required
-                                        placeholder="Masukkan nama..">
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
+                                <span>Apakah Anda yakin ingin mengaktifkan <strong id="name-map-activated"></strong></span>
                             </div>
+                            <input type="hidden" name="id" value="">
                         </div>
                     </div>
                 </form>
@@ -248,10 +385,17 @@
     @push('scripts')
         <script>
             $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+                var id = $(this).data('id');
+                $('#deleteMapModal').find('input[name="id"]').val(id);
+                var name = $(this).data('name');
+                $('#nameAccount').text(name);
+            });
+
+            $(document).on('click', '[data-bs-target="#aktivasiMapModal"]', function() {
+                var id = $(this).data('id');
+                $('#aktivasiMapModal').find('input[name="id"]').val(id);
+                var name = $(this).data('name');
+                $('#name-map-activated').text(name);
             });
 
             $(document).ready(function() {
@@ -261,6 +405,49 @@
                     submitButton.find(".spinner-border").show(); // Tampilkan spinner
                     submitButton.find("span:last-child").hide(); // Sembunyikan teks tombol
                 });
+            });
+
+            $(document).on('click', '[data-bs-target="#editMapModal"]', function() {
+                var id = $(this).data('id');
+                var regional_agency = $(this).data('regional-agency');
+                var sector = $(this).data('sector');
+                var name = $(this).data('name');
+
+                var modal = $('#editMapModal');
+
+                modal.find('input[name="id"]').val(id);
+                modal.find('input[name="name"]').val(name);
+                modal.find('select[name="sector_id"]').val(sector).trigger('change');
+                modal.find('select[name="regional_agency_id"]').val(regional_agency).trigger('change');
+            });
+
+            $(document).on('click', '[data-bs-target="#detailMapModal"]', function() {
+                var path = $(this).data('geojson');
+                var regional_agency = $(this).data('regional-agency');
+                var sector = $(this).data('sector');
+                var name = $(this).data('name');
+                console.log(name); // tidak kosong
+                console.log(regional_agency); // tidak kosong
+                console.log(sector); // tidak kosong
+
+                var modal = $('#detailMapModal');
+
+                modal.find('td[id="map-name"]').html(name);
+                modal.find('td[id="map-regional-agency"]').html(regional_agency);
+                modal.find('td[id="map-sector"]').html(sector);
+
+                // Pastikan nilai path tidak kosong
+                if (!path) {
+                    console.error('GeoJSON path tidak ditemukan.');
+                    return;
+                }
+
+                // Temukan elemen x-map-container dan perbarui atributnya
+                var mapContainer = $('#detailMapModal').find('x-map-container');
+                mapContainer.attr('geoJsonPath', path);
+
+                // Perbarui peta dengan path baru
+                initMap('detailMap', 'osm', path, [], []);
             });
         </script>
     @endpush

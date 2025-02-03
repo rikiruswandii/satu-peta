@@ -20,7 +20,7 @@ class ViewShare
     {
         //settings
         View::share('app', app(GeneralSettings::class));
-        
+
         //menu guest
         $guest = $this->guestMenus();
         View::share('guest', $guest);
@@ -78,6 +78,18 @@ class ViewShare
                     'icon' => 'ni ni-map',
                     'text' => 'Peta',
                     'is_active' => request()->routeIs('maps'),
+                ],
+                [
+                    'route' => 'groups',
+                    'icon' => 'ni ni-link-group',
+                    'text' => 'Grup',
+                    'is_active' => request()->routeIs('groups'),
+                ],
+                [
+                    'route' => 'datasets',
+                    'icon' => 'ni ni-grid-fill',
+                    'text' => 'Kategori',
+                    'is_active' => request()->routeIs('datasets'),
                 ],
             ],
             'Informasi' => [

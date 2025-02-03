@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('sectors', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
+            $table->unsignedBigInteger('parent_id')->nullable()->index(); // Kolom sector dengan tipe unsignedBigInteger
             $table->string('name', 255);
             $table->string('slug', 255);
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedBigInteger('parent_id')->nullable()->index(); // Kolom sector dengan tipe unsignedBigInteger
 
             // Menambahkan foreign key constraints
             $table->foreign('parent_id')->references('id')->on('sectors')->onUpdate('cascade')->onDelete('cascade');

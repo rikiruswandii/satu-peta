@@ -1,4 +1,4 @@
-@props(['id', 'data', 'size' => '']) <!-- Tambahkan props 'size' dengan nilai default string kosong -->
+@props(['id', 'data', 'size' => '', 'cancelButtonText' => 'Batal']) <!-- Tambahkan props 'cancelButtonText' dengan nilai default 'Batal' -->
 
 <div class="modal fade" id="{{ $id }}" aria-labelledby="{{ $id }}Label" aria-hidden="true" style="overflow: hidden;">
     <div class="modal-dialog {{ $size ? 'modal-' . $size : '' }}"> <!-- Tambahkan class ukuran modal jika props 'size' diberikan -->
@@ -11,7 +11,7 @@
                 {{ $body }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $cancelButtonText }}</button> <!-- Ganti teks tombol dengan 'cancelButtonText' -->
                 {!! $data['footer'] !!}
             </div>
         </div>

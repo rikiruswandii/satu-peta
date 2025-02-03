@@ -50,7 +50,7 @@
                                 <div class="user-info d-none d-xl-block">
                                     <div
                                         class="user-status user-status-{{ Auth::user()->email_verified_at ? 'verified' : 'unverified' }}">
-                                        {{ Auth::user()->email_verified_at ? 'Verified' : 'Unverified' }}</div>
+                                        {{ Auth::user()->email_verified_at ? 'Terverifikasi' : 'Tak Dikenal' }}</div>
                                     <div class="user-name dropdown-indicator">{{ Auth::user()->name }}</div>
                                 </div>
                             </div>

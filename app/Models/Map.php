@@ -34,7 +34,7 @@ class Map extends Model
     {
         return $this->belongsTo(RegionalAgency::class);
     }
-    
+
     public function sector(): BelongsTo
     {
         return $this->belongsTo(Sector::class);
@@ -51,5 +51,11 @@ class Map extends Model
         'sector_id',
         'name',
         'slug',
+        'can_download',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'can_download' => 'boolean',
     ];
 }

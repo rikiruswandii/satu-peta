@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Download;
 use App\Http\Controllers\Panel\Article;
 use App\Http\Controllers\Panel\Dashboard;
+use App\Http\Controllers\Panel\DatasetsCategory;
+use App\Http\Controllers\Panel\Grup;
 use App\Http\Controllers\Panel\Map;
 use App\Http\Controllers\Panel\User\Detail;
 use App\Http\Controllers\Panel\User\Log;
@@ -17,6 +20,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
         Route::get('/dashboard', [Dashboard::class, 'index'])->name('/');
         Route::get('/logs', [Log::class, 'index'])->name('logs');
+        Route::get('/download/{id}', [Download::class, 'download'])->name('download');
 
         Route::prefix('users')->group(function () {
             Route::get('/', [Users::class, 'index'])->name('users');
@@ -54,20 +58,30 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
             Route::post('/category-update/{id}', [Article::class, 'category_update'])->name('category.update');
             Route::delete('/category-destroy', [Article::class, 'category_destroy'])->name('category.destroy');
         });
-        
+
         Route::prefix('maps')->group(function () {
             Route::get('/', [Map::class, 'index'])->name('maps');
-            Route::get('/create', [Map::class, 'create'])->name('maps.create');
             Route::post('/store', [Map::class, 'store'])->name('maps.store');
-            Route::get('/edit/{id}', [Map::class, 'edit'])->name('maps.edit');
-            Route::post('/update/{id}', [Map::class, 'update'])->name('maps.update');
+            Route::post('/update', [Map::class, 'update'])->name('maps.update');
             Route::delete('/destroy', [Map::class, 'destroy'])->name('maps.destroy');
-            Route::post('/regional-agency-store', [Map::class, 'regional_agency_store'])->name('regional.agency.store');
-            Route::post('/regional-agency-update/{id}', [Map::class, 'regional_agency_update'])->name('regional.agency.update');
-            Route::delete('/regional-agency-destroy', [Map::class, 'regional_agency_destroy'])->name('regional.agency.destroy');
-            Route::post('/sector-store', [Map::class, 'sector_store'])->name('sector.store');
-            Route::post('/sector-update/{id}', [Map::class, 'sector_update'])->name('sector.update');
-            Route::delete('/sector-destroy', [Map::class, 'sector_destroy'])->name('sector.destroy');
+            Route::post('/activated', [Map::class, 'activate'])->name('maps.activate');
+            Route::get('maps/{map}/download/{id}', [Map::class, 'download'])->name('maps.download');
+        });
+
+        //grup
+        Route::prefix('groups')->group(function () {
+            Route::get('/', [Grup::class, 'index'])->name('groups');
+            Route::post('/store', [Grup::class, 'store'])->name('groups.store');
+            Route::post('/update', [Grup::class, 'update'])->name('groups.update');
+            Route::delete('/destroy', [Grup::class, 'destroy'])->name('groups.destroy');
+        });
+
+        //dataset categories
+        Route::prefix('datasets')->group(function () {
+            Route::get('/', [DatasetsCategory::class, 'index'])->name('datasets');
+            Route::post('/store', [DatasetsCategory::class, 'store'])->name('datasets.store');
+            Route::post('/update', [DatasetsCategory::class, 'update'])->name('datasets.update');
+            Route::delete('/destroy', [DatasetsCategory::class, 'destroy'])->name('datasets.destroy');
         });
     }
 );

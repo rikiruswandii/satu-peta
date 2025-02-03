@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class Map extends Controller
 {
     public function index(): View
     {
-        $maps = ModelMap::with('regional_agency', 'sector')->latest()->get();
+        $maps = ModelMap::with('regional_agency', 'sector', 'documents')->latest()->get();
         $regional_agencies = RegionalAgency::all();
         $sectors = Sector::all();
         $count = ModelMap::count();
@@ -26,7 +27,7 @@ class Map extends Controller
         $prefix = 'maps';
         $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.geospatials.map', compact('prefix', 'maps', 'regional_agencies','sectors', 'count', 'title', 'description'));
+        return view('panel.geospatials.map', compact('prefix', 'maps', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
     }
 
     public function create(): View
@@ -46,6 +47,7 @@ class Map extends Controller
 
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
+            'can_download' => 'boolean',
             'regional_agency_id' => 'required|exists:regional_agencies,id',
             'sector_id' => 'required|exists:sectors,id',
             'name' => 'required|string|max:80',
@@ -88,6 +90,7 @@ class Map extends Controller
                 // Simpan artikel
                 $data = ModelMap::create([
                     'user_id' => $request->user_id,
+                    'can_download' => $request->boolean('can_download') ? 1 : 0,
                     'regional_agency_id' => $request->regional_agency_id,
                     'sector_id' => $request->sector_id,
                     'name' => $request->name,
@@ -154,7 +157,7 @@ class Map extends Controller
         return view('panel.geospatials.partials.edit', compact('data', 'regional_agencies', 'sectors', 'title', 'description'));
     }
 
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
         // Log data yang diterima dari request
         \Log::info('Data yang diterima:', $request->all());
@@ -173,8 +176,7 @@ class Map extends Controller
         }
 
         try {
-            $id = Crypt::decrypt($id);
-            $data = ModelMap::with('documents')->find($id);
+            $data = ModelMap::with('documents')->find($request->id);
 
             if ($request->filled('file')) {
                 \Log::info('File terdeteksi dalam request.');
@@ -297,156 +299,85 @@ class Map extends Controller
         }
     }
 
-
-    public function regional_agency_store(Request $request): RedirectResponse
+    public function activate(Request $request): RedirectResponse
     {
-        // Log data yang diterima dari request
-        \Log::info('Data yang diterima:', $request->all());
-
-        // Validasi input
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255|unique:regional_agencies,name',
-        ]);
-
-        // Log hasil validasi
-        if ($validator->fails()) {
-            \Log::info('Validasi gagal:', $validator->errors()->all());
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
         try {
-            // Buat kategori baru
-            $regional_agency = RegionalAgency::create([
-                'user_id' => $request->user_id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-            ]);
+            // Pastikan request memiliki ID
+            if (!$request->has('id')) {
+                return redirect()->back()->with('error', 'ID peta tidak ditemukan.');
+            }
 
-            // Log keberhasilan pembuatan kategori
-            \Log::info('Perangkat Daerah berhasil ditambahkan:', $regional_agency->toArray());
+            // Dekripsi ID
+            try {
+                $id = Crypt::decrypt($request->id);
+            } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                \Log::error('Gagal dekripsi ID peta.', ['error' => $e->getMessage()]);
+                return redirect()->back()->with('error', 'ID peta tidak valid.');
+            }
 
-            return redirect()->back()->with('success', 'Berhasil menambahkan perangkat daerah: ' . $request->name);
+            // Cari maps beserta dokumen terkait
+            $maps = ModelMap::findOrFail($id);
+
+            // Toggle status is_active
+            $maps->is_active = !$maps->is_active;
+            $message = $maps->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+            $maps->save();
+
+            return redirect()->back()->with('success', "Peta berhasil $message.");
         } catch (\Exception $e) {
-            // Log error jika terjadi exception
-            \Log::error('Gagal menambahkan perangkat daerah:', [
+            \Log::error('Gagal mengubah status peta', [
                 'error' => $e->getMessage(),
-                'data' => $request->all(),
+                'request_data' => $request->all(),
+                'stack_trace' => $e->getTraceAsString(),
             ]);
 
-            return redirect()->back()->with('error', 'Gagal membuat perangkat daerah: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengubah status peta.');
         }
     }
-    
-    public function sector_store(Request $request): RedirectResponse
+
+    public function download(Request $request, $map, $id): Response
     {
-        // Log data yang diterima dari request
-        \Log::info('Data yang diterima:', $request->all());
-
-        // Validasi input
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255|unique:sectors,name',
-        ]);
-
-        // Log hasil validasi
-        if ($validator->fails()) {
-            \Log::info('Validasi gagal:', $validator->errors()->all());
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
         try {
-            // Buat kategori baru
-            $sector = Sector::create([
-                'user_id' => $request->user_id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
+            // Dekripsi ID
+            $map = Crypt::decrypt($map);
+            $id = Crypt::decrypt($id); // Dekripsi ID sebelum digunakan dalam query
+
+            // Cari map berdasarkan ID
+            $data = ModelMap::findOrFail($map);
+
+            if ($data->can_download === false) {
+                return redirect()->back()->with('info', 'Izin diperlukan untuk aksi ini.');
+            }
+
+            // Cari dokumen berdasarkan ID yang telah didekripsi
+            $document = Document::findOrFail($id);
+
+            // Ambil path file dari database
+            $filePath = $document->path;
+            $fileName = $document->name;
+            $mimeType = $document->mime_type;
+
+            // Cek apakah file ada di storage
+            if (!Storage::disk('public')->exists($filePath)) {
+                \Log::error("File tidak ditemukan di path: $filePath");
+                return redirect()->back()->with('error', 'File tidak ditemukan di server.');
+            }
+
+            // Kembalikan response download file
+            return response()->download(Storage::disk('public')->path($filePath), $fileName, [
+                'Content-Type' => $mimeType
             ]);
-
-            // Log keberhasilan pembuatan kategori
-            \Log::info('Sektor berhasil ditambahkan:', $sector->toArray());
-
-            return redirect()->back()->with('success', 'Berhasil menambahkan sektor: ' . $request->name);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            \Log::error("Gagal dekripsi parameter", ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'ID tidak valid.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            \Log::error("Data tidak ditemukan", ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Data tidak ditemukan.');
         } catch (\Exception $e) {
-            // Log error jika terjadi exception
-            \Log::error('Gagal menambahkan sektor:', [
-                'error' => $e->getMessage(),
-                'data' => $request->all(),
-            ]);
-
-            return redirect()->back()->with('error', 'Gagal membuat sektor: ' . $e->getMessage());
+            \Log::error("Gagal mendownload file", ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal mendownload file.');
         }
     }
 
-    public function regional_agency_update(Request $request, $id): RedirectResponse
-    {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255|unique:regional_agencies,name',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        try {
-            $id = Crypt::decrypt($id);
-            $data = RegionalAgency::find($id);
-            $data->slug = Str::slug($request->name);
-
-            $data->fill($request->only(['user_id', 'name']))->save();
-
-            return redirect()->back()->with('success', 'Berhasil menyunting perangkat daerah: ');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menyunting perangkat daerah: ' . $e->getMessage());
-        }
-    }
-    
-    public function sector_update(Request $request, $id): RedirectResponse
-    {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255|unique:sectors,name',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        try {
-            $id = Crypt::decrypt($id);
-            $data = Sector::find($id);
-            $data->slug = Str::slug($request->name);
-
-            $data->fill($request->only(['user_id', 'name']))->save();
-
-            return redirect()->back()->with('success', 'Berhasil menyunting sektor: ');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menyunting sektor: ' . $e->getMessage());
-        }
-    }
-
-    public function regional_agency_destroy(Request $request): RedirectResponse
-    {
-        try {
-            $regional_agency = RegionalAgency::findOrFail($request->id);
-            $regional_agency->delete();
-
-            return redirect()->back()->with('success', 'Perangkat Daerah berhasil dihapus.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus perangkat daerah.');
-        }
-    }
-    
-    public function sector_destroy(Request $request): RedirectResponse
-    {
-        try {
-            $sector = Sector::findOrFail($request->id);
-            $sector->delete();
-
-            return redirect()->back()->with('success', 'Sektor berhasil dihapus.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus sektor.');
-        }
-    }
 }
