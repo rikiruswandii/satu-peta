@@ -3,19 +3,23 @@
     @section('description', $description) <!-- Mengatur deskripsi halaman -->
     @php
         $modalDelete = [
-            'title' => 'Hapus Peta',
+            'title' => 'Hapus Layer',
             'footer' => '<button type="submit" class="btn btn-danger" form="deleteForm">Hapus</button>',
         ];
         $modalAktivasi = [
-            'title' => 'Aktivasi Peta',
+            'title' => 'Aktivasi Layer',
             'footer' => '<button type="submit" class="btn btn-primary" form="aktivasiMapForm">Aktifkan</button>',
         ];
+        $modalDeaktivasi = [
+            'title' => 'Deaktivasi Layer',
+            'footer' => '<button type="submit" class="btn btn-primary" form="deaktivasiMapForm">Deaktivasi</button>',
+        ];
         $modalDetail = [
-            'title' => 'Lihat Peta',
+            'title' => 'Lihat Layer',
             'footer' => '',
         ];
         $modalTambah = [
-            'title' => 'Tambah Peta',
+            'title' => 'Tambah Layer',
             'footer' => '<button type="submit" class="btn btn-primary" form="addMapForm">
     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
     <span>Tambah</span>
@@ -129,11 +133,11 @@
                                                                     <em class="icon ni ni-edit"></em><span>Edit</span>
                                                                 </a></li>
                                                             <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#aktivasiMapModal"
+                                                                    data-bs-target="{{ $row->is_active === false ? '#aktivasiMapModal' : '#deaktivasiMapModal'}}"
                                                                     data-name="{{ $row->name }}"
                                                                     data-id="{{ Crypt::encrypt($row->id) }}">
                                                                     <em
-                                                                        class="icon ni {{ $row->is_active === false ? 'ni-check-round' : 'ni-cross-round' }} "></em><span>{{ $row->is_active === false ? 'Aktif' : 'Nonaktif' }}</span>
+                                                                        class="icon ni {{ $row->is_active === false ? 'ni-check-round' : 'ni-cross-round' }} "></em><span>{{ $row->is_active === false ? 'Aktivasi' : 'Deaktivasi' }}</span>
                                                                 </a></li>
                                                             <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                                     data-bs-target="#deleteMapModal"
@@ -370,7 +374,22 @@
                     <div class="row g-gs">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <span>Apakah Anda yakin ingin mengaktifkan <strong id="name-map-activated"></strong></span>
+                                <span>Apakah Anda yakin ingin mengaktifkan layer <strong id="name-map-activated"></strong></span>
+                            </div>
+                            <input type="hidden" name="id" value="">
+                        </div>
+                    </div>
+                </form>
+            </x-slot>
+        </x-modal>
+        <x-modal :id="'deaktivasiMapModal'" :data="$modalDeaktivasi">
+            <x-slot name="body">
+                <form method="POST" id="deaktivasiMapForm" action="{{ route('maps.activate') }}">
+                    @csrf
+                    <div class="row g-gs">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <span>Apakah Anda yakin ingin menonaktifkan layer <strong id="name-map-deactivated"></strong></span>
                             </div>
                             <input type="hidden" name="id" value="">
                         </div>
@@ -396,6 +415,12 @@
                 $('#aktivasiMapModal').find('input[name="id"]').val(id);
                 var name = $(this).data('name');
                 $('#name-map-activated').text(name);
+            });
+            $(document).on('click', '[data-bs-target="#deaktivasiMapModal"]', function() {
+                var id = $(this).data('id');
+                $('#deaktivasiMapModal').find('input[name="id"]').val(id);
+                var name = $(this).data('name');
+                $('#name-map-deactivated').text(name);
             });
 
             $(document).ready(function() {
