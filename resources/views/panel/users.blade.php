@@ -22,52 +22,19 @@
     </div><!-- .nk-block-head -->
     <div class="card card-bordered card-preview">
         <div class="card-inner">
-            <table class="datatable-init table">
+            <table class="table table-striped" style="width:100%" id="user-table">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>Nama</th>
                         <th>Email</th>
                         <th>Hak Akses</th>
+                        <th>Dibuat</th>
+                        <th>Diperbarui</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $no = 1;
-                    @endphp
-                    @foreach ($data as $d)
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            <td>{{ $d->name }}</td>
-                            <td>{{ $d->email }}</td>
-                            <td>{{ $d->role->name }}</td>
-                            <td>
-                                <div class="drodown">
-                                    <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle"
-                                        data-bs-toggle="dropdown"><em
-                                            class="icon ni ni-more-h rounded-full hover:!bg-color-secondary hover:!bg-opacity-30 hover:!text-gray-500"></em></a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <ul class="link-list-opt no-bdr">
-                                            <li><a href="{{ route('user.detail', ['id' => Crypt::encrypt($d->id)]) }}"><em
-                                                        class="icon ni ni-eye text-blue-500"></em><span>View
-                                                        Details</span></a></li>
-                                            <li class="divider"></li>
-                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                    data-bs-target="#resetPasswordModal"><em
-                                                        class="icon ni ni-shield-star text-color-secondary"></em><span>Reset
-                                                        Pass</span></a></li>
-                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                    data-bs-target="#deleteUserModal" data-id="{{ $d->id }}"
-                                                    data-name="{{ $d->name }}"><em
-                                                        class="icon ni ni-trash text-red-500"></em><span>Delete
-                                                        User</span></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -80,7 +47,7 @@
 
         $modalDelete = [
             'title' => 'Hapus Pengguna',
-            'footer' => '<button type="submit" class="btn btn-danger" form="deleteUserForm">Hapus</button>',
+            'footer' => '<button type="submit" class="btn btn-danger" form="deleteForm">Hapus</button>',
         ];
         $modalReset = [
             'title' => 'Mengatur Ulang kata Sandi',
@@ -148,23 +115,7 @@
             </x-slot>
         </x-modal>
 
-        <x-modal :id="'deleteUserModal'" :data="$modalDelete">
-            <x-slot name="body">
-                <form method="DELETE" id="deleteUserForm" action="{{ route('users.destroy') }}">
-                    @csrf
-
-                    <div class="row g-gs">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <span>Apakah kamu yakin ingin menghapus akun dengan nama : <strong
-                                        id="nameAccount"></strong> ?</span>
-                            </div>
-                            <input type="hidden" name="id" value="">
-                        </div>
-                    </div>
-                </form>
-            </x-slot>
-        </x-modal>
+        @include('panel.partials.delete')
 
         <x-modal :id="'resetPasswordModal'" :data="$modalReset">
             <x-slot name="body">
@@ -176,9 +127,9 @@
                             class="col-md-4 col-form-label text-md-right form-label">{{ __('Alamat Email') }}</label>
 
                         <div class="col-md-6">
-                            <input id="email" type="email"
-                                class="form-control @error('email') is-invalid @enderror" name="email" required
-                                autocomplete="email" autofocus placeholder="Masukkan alamat email..">
+                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
+                                name="email" required autocomplete="email" autofocus
+                                placeholder="Masukkan alamat email..">
 
                             @error('email')
                                 <span class="invalid-feedback" role="alert">
@@ -194,9 +145,51 @@
 
     @push('scripts')
         <script>
-            $(document).on('click', '[data-bs-target="#deleteUserModal"]', function() {
+            $(document).ready(function() {
+                $('#user-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('users.datatable') }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'email',
+                            name: 'email'
+                        },
+                        {
+                            data: 'role.name',
+                            name: 'role.name'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                        {
+                            data: 'updated_at',
+                            name: 'updated_at'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+            });
+
+            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var userId = $(this).data('id');
-                $('#deleteUserModal').find('input[name="id"]').val(userId);
+                $('#deleteMapModal').find('input[name="id"]').val(userId);
 
                 var userName = $(this).data('name');
                 $('#nameAccount').text(userName);

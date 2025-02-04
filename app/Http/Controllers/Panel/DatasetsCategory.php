@@ -9,18 +9,59 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class DatasetsCategory extends Controller
 {
     public function index(): View
     {
-        $sector = Sector::all();
         $count = Sector::count();
         $title = 'Kategori';
         $prefix = 'datasets';
         $description = 'Jelajahi kumpulan kategori dataset informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.datasets', compact('prefix', 'sector', 'count', 'title', 'description'));
+        return view('panel.datasets', compact('prefix', 'count', 'title', 'description'));
+    }
+
+    public function datatable(Request $request)
+    {
+        if ($request->ajax()) {
+            try {
+                $data = Sector::latest()->get();
+
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->editColumn('updated_at', function ($row) {
+                        return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('action', function ($row) {
+                        return '<ul class="preview-list">
+                                                    <li class="preview-item">
+                                                    <a href="javascript:void(0);" class="btn btn-xs btn-dim btn-outline-warning rounded-pill" data-bs-toggle="modal"
+                                                data-bs-target="#editGroupModal"
+                                                data-name="' . $row->name . '"
+                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                                <em class="icon ni ni-edit"></em><span>Edit</span>
+                                            </a>
+                                                    </li>
+                                                    <li class="preview-item">
+                                                    <a href="javascript:void(0);" class="btn btn-xs btn-dim btn-outline-danger rounded-pill" data-bs-toggle="modal"
+                                                data-bs-target="#deleteMapModal"
+                                                data-id="' . Crypt::encrypt($row->id) . '"
+                                                data-name="' . $row->name . '">
+                                                <em class="icon ni ni-trash"></em><span>Delete</span>
+                                            </a>
+                                                    </li>
+                                                </ul>';
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+                return response()->json(['error' => 'Something went wrong'], 500);
+            }
+        }
     }
 
     public function store(Request $request): RedirectResponse

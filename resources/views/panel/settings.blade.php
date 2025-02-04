@@ -170,77 +170,20 @@
                                     </div><!-- .toggle-wrap -->
                                 </div>
                             </div>
-                            <table class="datatable-init table">
+                            <table class="table table-striped" style="width:100%" id="related-links-table">
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Judul</th>
+                                        <th>Nama</th>
                                         <th>URL</th>
                                         <th>Logo</th>
-                                        <th>Tanggal</th>
+                                        <th>Dibuat</th>
+                                        <th>Diperbarui</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $no = 1;
-                                    @endphp
-                                    @foreach ($relatedLinks as $row)
-                                        <tr>
-                                            <td>{{ $no++ }}</td>
-                                            <td>{{ $row->title }}</td>
-                                            <td>{{ $row->url }}</td>
-                                            <td>
-                                                <div class="user-avatar">
-                                                    @if ($row->documents->isNotEmpty())
-                                                        @php
-                                                            $logo = $row->documents->where('type', 'logo')->first();
-                                                        @endphp
-                                                        @if ($logo)
-                                                            <img src="{{ Storage::url($logo->path) }}"
-                                                                alt="Avatar Pengguna">
-                                                        @else
-                                                            <img src="{{ asset('assets/images/default.png') }}"
-                                                                alt="Avatar Default">
-                                                        @endif
-                                                    @else
-                                                        <img src="{{ asset('assets/images/default.png') }}"
-                                                            alt="Avatar Default">
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td>{{ $row->created_at }}</td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-icon btn-trigger dropdown-toggle"
-                                                        data-bs-toggle="dropdown">
-                                                        <em
-                                                            class="icon ni ni-more-h rounded-full hover:bg-color-secondary hover:bg-opacity-30 hover:text-gray-500"></em>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#updateModal"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}"
-                                                                    data-name="{{ $row->title }}"
-                                                                    data-url="{{ $row->url }}">
-                                                                    <em
-                                                                        class="icon ni ni-edit"></em><span>Sunting</span>
-                                                                </a></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#deleteMapModal"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}"
-                                                                    data-name="{{ $row->title }}">
-                                                                    <em
-                                                                        class="icon ni ni-trash"></em><span>Delete</span>
-                                                                </a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -332,6 +275,48 @@
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $('#related-links-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('related.link.datatable') }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'title',
+                            name: 'title'
+                        },
+                        {
+                            data: 'url',
+                            name: 'url'
+                        },
+                        {
+                            data: 'logo',
+                            name: 'logo'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                        {
+                            data: 'updated_at',
+                            name: 'updated_at'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+            });
+
             $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var userId = $(this).data('id');
                 $('#deleteMapModal').find('input[name="id"]').val(userId);

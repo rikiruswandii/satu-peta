@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class Settings extends Controller
 {
@@ -32,6 +34,69 @@ class Settings extends Controller
         $description = $title . ' page!';
 
         return view('panel.settings', compact('relatedLinks', 'data', 'tautan', 'prefix', 'title', 'description'));
+    }
+
+    public function datatable(Request $request)
+    {
+        if ($request->ajax()) {
+            try {
+                $data = RelatedLink::with('documents')->latest()->get();
+
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->editColumn('created_at', function ($row) {
+                        return Carbon::parse($row->created_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->editColumn('updated_at', function ($row) {
+                        return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('logo', function ($row) {
+                        if ($row->documents->isNotEmpty()) {
+                            $logo = '<div class="user-avatar sq">';
+                            foreach ($row->documents as $document) {
+                                if ($document->path) {
+                                    $logo .= '<img src="' . Storage::url($document->path) . '" alt="Avatar Pengguna">';
+                                } else {
+                                    $logo .= '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+                                }
+                            }
+                            $logo .= '</div>';
+                            return $logo;
+                        }
+                        return '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+                    })
+                    ->addColumn('action', function ($row) {
+                        return '<div class="dropdown">
+                                <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                                    <em class="icon ni ni-more-h rounded-full"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#updateModal"
+                                                data-id="' . Crypt::encrypt($row->id) . '"
+                                                data-name="' . $row->title . '"
+                                                data-url="' . $row->url . '"
+                                                >
+                                                <em class="icon ni ni-edit"></em><span>Edit</span>
+                                            </a></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#deleteMapModal"
+                                                data-id="' . Crypt::encrypt($row->id) . '"
+                                                data-name="' . $row->name . '">
+                                                <em class="icon ni ni-trash"></em><span>Delete</span>
+                                            </a></li>
+                                    </ul>
+                                </div>
+                            </div>';
+                    })
+                    ->rawColumns(['action','logo'])
+                    ->make(true);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+                return response()->json(['error' => 'Something went wrong'], 500);
+            }
+        }
     }
 
     public function update(Request $request): RedirectResponse

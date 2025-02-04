@@ -12,19 +12,79 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class Article extends Controller
 {
     public function index(): View
     {
-        $articles = ModelsArticle::with('category')->latest()->get();
         $categories = Category::all();
         $count = ModelsArticle::count();
         $title = 'Artikel';
         $prefix = 'articles';
         $description = 'Jelajahi kumpulan artikel informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.news.article', compact('prefix', 'articles', 'categories', 'count', 'title', 'description'));
+        return view('panel.news.article', compact('prefix', 'categories', 'count', 'title', 'description'));
+    }
+
+    public function datatable(Request $request)
+    {
+        if ($request->ajax()) {
+            try {
+                $data = ModelsArticle::with('category')->latest()->get();
+
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->editColumn('updated_at', function ($row) {
+                        return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->editColumn('created_at', function ($row) {
+                        return Carbon::parse($row->created_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('thumbnail', function ($row) {
+                        if ($row->documents->isNotEmpty()) {
+                            $thumbnail = '<div class="user-avatar sq">';
+                            foreach ($row->documents as $document) {
+                                if ($document->path) {
+                                    $thumbnail .= '<img src="' . Storage::url($document->path) . '" alt="Avatar Pengguna">';
+                                } else {
+                                    $thumbnail .= '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+                                }
+                            }
+                            $thumbnail .= '</div>';
+                            return $thumbnail;
+                        }
+                        return '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+                    })
+                    ->addColumn('action', function ($row) {
+                        return '<div class="dropdown">
+                                <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                                    <em class="icon ni ni-more-h rounded-full"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                        <li><a href="'. route('articles.edit', ['id' => Crypt::encrypt($row->id)]).'"
+                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                                <em class="icon ni ni-edit"></em><span>Edit</span>
+                                            </a></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#deleteMapModal"
+                                                data-id="' . Crypt::encrypt($row->id) . '"
+                                                data-name="' . $row->name . '">
+                                                <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
+                                            </a></li>
+                                    </ul>
+                                </div>
+                            </div>';
+                    })
+                    ->rawColumns(['action', 'thumbnail'])
+                    ->make(true);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+                return response()->json(['error' => 'Something went wrong'], 500);
+            }
+        }
     }
 
     public function create(): View

@@ -44,7 +44,7 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="datatable-init table">
+                            <table class="table table-striped" style="width:100%" id="groups-table">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -54,42 +54,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $no = 1;
-                                    @endphp
-                                    @foreach ($regional_agencies as $row)
-                                        <tr>
-                                            <td>{{ $no++ }}</td>
-                                            <td>{{ $row->name }}</td>
-                                            <td>{{ $row->updated_at }}</td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-icon btn-trigger dropdown-toggle"
-                                                        data-bs-toggle="dropdown">
-                                                        <em class="icon ni ni-more-h rounded-full"></em>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#editGroupModal"
-                                                                    data-name="{{ $row->name }}"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}">
-                                                                    <em class="icon ni ni-edit"></em><span>Edit</span>
-                                                                </a></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#deleteMapModal"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}"
-                                                                    data-name="{{ $row->name }}">
-                                                                    <em
-                                                                        class="icon ni ni-trash text-red-500"></em><span>Delete</span>
-                                                                </a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -159,6 +123,37 @@
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $('#groups-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('groups.datatable') }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'updated_at',
+                            name: 'updated_at'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+            });
+
+
             $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var userId = $(this).data('id');
                 $('#deleteMapModal').find('input[name="id"]').val(userId);

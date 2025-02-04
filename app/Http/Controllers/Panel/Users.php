@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class Users extends Controller
 {
@@ -21,54 +22,62 @@ class Users extends Controller
         $roles = Role::all();
         $title = 'List User';
         $description = $title . ' page!';
-        $data = User::with('role')
-            ->latest()
-            ->where('email', '!=', 'mikeumikeudeh@gmail.com')
-            ->get();
+        $prefix = 'users';
 
-        return view('panel.users', compact('data','count', 'roles', 'title', 'description'));
+        return view('panel.users', compact('prefix','count', 'roles', 'title', 'description'));
     }
 
-    public function getDataTable(Request $request)
+    public function datatable(Request $request)
     {
         if ($request->ajax()) {
             try {
-                \Log::info('Memulai proses pengambilan data pengguna.');
-
                 $data = User::with('role')
-                ->latest()
-                    ->where('email', '!=', 'mikeumikeudeh@gmail.com')
-                    ->get();
-                \Log::info('Data pengguna berhasil diambil.', ['data_count' => $data->count()]);
+                    ->latest()
+                    ->where('email', '!=', 'mikeumikeudeh@gmail.com')->get();
 
                 return DataTables::of($data)
                     ->addIndexColumn()
+                    ->editColumn('updated_at', function ($row) {
+                        return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->editColumn('created_at', function ($row) {
+                        return Carbon::parse($row->created_at)->translatedFormat('l, d F Y H:i');
+                    })
                     ->addColumn('action', function ($row) {
-                        $actionBtn = '<div class="drodown">
-                                                    <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown"><em class="icon ni ni-more-h rounded-full hover:!bg-color-secondary hover:!bg-opacity-30 hover:!text-gray-500"></em></a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="' . route('user.detail', ['id' => Crypt::encrypt($row->id)]) . '"><em class="icon ni ni-eye text-blue-500"></em><span>View Details</span></a></li>
-                                                            <li class="divider"></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                data-bs-target="#resetPasswordModal"><em class="icon ni ni-shield-star text-color-secondary"></em><span>Reset Pass</span></a></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                data-bs-target="#deleteUserModal" data-id="' . $row->id . '" data-name="' . $row->name . '"><em class="icon ni ni-trash text-red-500"></em><span>Delete User</span></a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>';
-
-                        return $actionBtn;
+                        return '<div class="dropdown">
+                                <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                                    <em class="icon ni ni-more-h rounded-full"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                        <li><a href="' . route('user.detail', ['id' => Crypt::encrypt($row->id)]) . '"
+                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                                <em class="icon ni ni-eye"></em><span>Detail</span>
+                                            </a></li>
+                                            <li class="divider"></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#resetPasswordModal">
+                                                <em class="icon ni ni-shield-star"></em><span>Reset Kata Sandi</span>
+                                            </a></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#deleteMapModal"
+                                                data-id="' . Crypt::encrypt($row->id) . '"
+                                                data-name="' . $row->name . '">
+                                                <em class="icon ni ni-trash"></em><span>Delete</span>
+                                            </a></li>
+                                    </ul>
+                                </div>
+                            </div>';
                     })
                     ->rawColumns(['action'])
                     ->make(true);
             } catch (\Exception $e) {
-                \Log::error('Terjadi kesalahan saat mengambil data pengguna: ' . $e->getMessage());
-
+                \Log::error($e->getMessage());
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
     }
+
 
     public function detail($id)
     {
@@ -156,11 +165,17 @@ class Users extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         try {
-            $user = User::findOrFail($request->id);
+            $id = Crypt::decrypt($request->id);
+            $user = User::findOrFail($id);
+            
+            // Logout pengguna jika mereka sedang login
+            if (Auth::id() == $user->id) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+            
             $user->delete();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
 
             return redirect()->back()->with('success', 'User berhasil dihapus.');
         } catch (\Exception $e) {

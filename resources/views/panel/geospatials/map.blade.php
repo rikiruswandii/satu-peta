@@ -59,7 +59,7 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="datatable-init table">
+                            <table class="table table-striped" style="width:100%" id="maps-table">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -73,85 +73,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $no = 1;
-                                    @endphp
-                                    @foreach ($maps as $row)
-                                        <tr>
-                                            <td>{{ $no++ }}</td>
-                                            <td>{{ $row->name }}</td>
-                                            <td>{{ $row->regional_agency?->name }}</td>
-                                            <td>{{ $row->sector?->name }}</td>
-                                            @if ($row->documents->isNotEmpty())
-                                                @foreach ($row->documents as $document)
-                                                    <td>
-                                                        <a
-                                                            href="{{ route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]) }}">
-                                                            <span class="badge rounded-pill bg-primary"><em
-                                                                    class="icon ni ni-download-cloud"></em>Unduh</span>
-                                                        </a>
-                                                    </td>
-                                                @endforeach
-                                            @else
-                                                <td><span class="badge bg-secondary">Tidak ada dokumen</span></td>
-                                            @endif
-                                            <td>
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input"
-                                                        id="customCheck1"
-                                                        {{ $row->is_active === true ? 'checked' : '' }} disabled>
-                                                    <label class="custom-control-label" for="customCheck1">
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>{{ $row->updated_at }}</td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-icon btn-trigger dropdown-toggle"
-                                                        data-bs-toggle="dropdown">
-                                                        <em class="icon ni ni-more-h rounded-full"></em>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#detailMapModal"
-                                                                    data-regional-agency="{{ $row->regional_agency?->name }}"
-                                                                    data-sector="{{ $row->sector?->name }}"
-                                                                    data-geojson="{{ optional($row->documents)->first()->path ? Storage::url($row->documents->first()->path) : '' }}"
-                                                                    data-name="{{ $row->name }}"
-                                                                    data-id="{{ $row->id }}">
-                                                                    <em class="icon ni ni-eye"></em><span>Lihat</span>
-                                                                </a></li>
-                                                            <li class="divider"></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#editMapModal"
-                                                                    data-regional-agency="{{ $row->regional_agency?->id }}"
-                                                                    data-sector="{{ $row->sector?->id }}"
-                                                                    data-name="{{ $row->name }}"
-                                                                    data-id="{{ $row->id }}">
-                                                                    <em class="icon ni ni-edit"></em><span>Edit</span>
-                                                                </a></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="{{ $row->is_active === false ? '#aktivasiMapModal' : '#deaktivasiMapModal'}}"
-                                                                    data-name="{{ $row->name }}"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}">
-                                                                    <em
-                                                                        class="icon ni {{ $row->is_active === false ? 'ni-check-round' : 'ni-cross-round' }} "></em><span>{{ $row->is_active === false ? 'Aktivasi' : 'Deaktivasi' }}</span>
-                                                                </a></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#deleteMapModal"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}"
-                                                                    data-name="{{ $row->name }}">
-                                                                    <em
-                                                                        class="icon ni ni-trash text-red-500"></em><span>Delete</span>
-                                                                </a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -199,14 +120,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="form-label" for="regional_agency_id">Grup <span
                                         class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
-                                    <select
-                                        class="form-select js-select2 @error('regional_agency_id') is-invalid @enderror"
+                                    <select class="form-select js-select2 @error('regional_agency_id') is-invalid @enderror"
                                         data-search="on" data-dropdown-parent="#addMapModal" name="regional_agency_id"
                                         id="regional_agency_id">
                                         <option value="Pilih Hak Akses" disabled>Pilih Grup</option>
@@ -247,8 +167,10 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="can_download" value="1" class="custom-control-input" id="can_download" {{ old('can_download') ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="can_download">Izinkan unduhan untuk layer ini</label>
+                                    <input type="checkbox" name="can_download" value="1" class="custom-control-input"
+                                        id="can_download" {{ old('can_download') ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="can_download">Izinkan unduhan untuk layer
+                                        ini</label>
                                 </div>
                                 @error('can_download')
                                     <span class="invalid-feedback" role="alert">
@@ -374,7 +296,8 @@
                     <div class="row g-gs">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <span>Apakah Anda yakin ingin mengaktifkan layer <strong id="name-map-activated"></strong></span>
+                                <span>Apakah Anda yakin ingin mengaktifkan layer <strong
+                                        id="name-map-activated"></strong></span>
                             </div>
                             <input type="hidden" name="id" value="">
                         </div>
@@ -389,7 +312,8 @@
                     <div class="row g-gs">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <span>Apakah Anda yakin ingin menonaktifkan layer <strong id="name-map-deactivated"></strong></span>
+                                <span>Apakah Anda yakin ingin menonaktifkan layer <strong
+                                        id="name-map-deactivated"></strong></span>
                             </div>
                             <input type="hidden" name="id" value="">
                         </div>
@@ -397,12 +321,63 @@
                 </form>
             </x-slot>
         </x-modal>
-
         @include('panel.partials.delete')
     @endsection
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $('#maps-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('maps.datatable') }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'regional_agency.name',
+                            name: 'regional_agency.name'
+                        },
+                        {
+                            data: 'sector.name',
+                            name: 'sector.name'
+                        },
+                        {
+                            data: 'download',
+                            name: 'download',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'checkbox',
+                            name: 'checkbox',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'updated_at',
+                            name: 'updated_at'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+            });
+
+
+
             $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var id = $(this).data('id');
                 $('#deleteMapModal').find('input[name="id"]').val(id);

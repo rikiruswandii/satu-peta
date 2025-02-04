@@ -19,11 +19,15 @@ Route::get('/', function () {
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
         Route::get('/dashboard', [Dashboard::class, 'index'])->name('/');
-        Route::get('/logs', [Log::class, 'index'])->name('logs');
-        Route::get('/download/{id}', [Download::class, 'download'])->name('download');
+        Route::get('/download/{id}', action: [Download::class, 'download'])->name('download');
+        Route::prefix('logs')->group(function () {
+            Route::get('/', [Log::class, 'index'])->name('logs');
+            Route::get('/datatable', [Log::class, 'datatable'])->name('logs.datatable');
+        });
 
         Route::prefix('users')->group(function () {
             Route::get('/', [Users::class, 'index'])->name('users');
+            Route::get('/datatable', [Users::class, 'datatable'])->name('users.datatable');
             Route::get('/table', [Users::class, 'getDataTable'])->name('users.table');
             Route::post('/reset', [Users::class, 'reset'])->name('users.reset');
             Route::delete('/destroy', [Users::class, 'destroy'])->name('users.destroy');
@@ -33,6 +37,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
         Route::prefix('user')->group(function () {
             Route::get('/detail/{id}', [Detail::class, 'index'])->name('user.detail');
             Route::get('/log/{id}', [Log::class, 'userLog'])->name('user.log');
+            Route::get('/log/{id}/user', [Log::class, 'datatable_id'])->name('user.datatable');
             Route::post('/update/{id}', [Detail::class, 'update'])->name('user.update');
             Route::post('/photo/{id}', [Detail::class, 'photo'])->name('user.photo');
             Route::post('/change/{id}', [Detail::class, 'change'])->name('user.change');
@@ -41,6 +46,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
 
         Route::prefix('settings')->group(function () {
             Route::get('/', [Settings::class, 'index'])->name('settings');
+            Route::get('/datatable', [Settings::class, 'datatable'])->name('related.link.datatable');
             Route::post('/store', [Settings::class, 'store'])->name('settings.store');
             Route::post('/update', [Settings::class, 'update'])->name('settings.update');
             Route::delete('/destroy', [Settings::class, 'destroy'])->name('settings.destroy');
@@ -49,6 +55,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
 
         Route::prefix('articles')->group(function () {
             Route::get('/', [Article::class, 'index'])->name('articles');
+            Route::get('/datatable', [Article::class, 'datatable'])->name('articles.datatable');
             Route::get('/create', [Article::class, 'create'])->name('articles.create');
             Route::post('/store', [Article::class, 'store'])->name('articles.store');
             Route::get('/edit/{id}', [Article::class, 'edit'])->name('articles.edit');
@@ -61,6 +68,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
 
         Route::prefix('maps')->group(function () {
             Route::get('/', [Map::class, 'index'])->name('maps');
+            Route::get('/datatable', [Map::class, 'datatable'])->name('maps.datatable');
             Route::post('/store', [Map::class, 'store'])->name('maps.store');
             Route::post('/update', [Map::class, 'update'])->name('maps.update');
             Route::delete('/destroy', [Map::class, 'destroy'])->name('maps.destroy');
@@ -71,6 +79,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
         //grup
         Route::prefix('groups')->group(function () {
             Route::get('/', [Grup::class, 'index'])->name('groups');
+            Route::get('/datatable', [Grup::class, 'datatable'])->name('groups.datatable');
             Route::post('/store', [Grup::class, 'store'])->name('groups.store');
             Route::post('/update', [Grup::class, 'update'])->name('groups.update');
             Route::delete('/destroy', [Grup::class, 'destroy'])->name('groups.destroy');
@@ -79,6 +88,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
         //dataset categories
         Route::prefix('datasets')->group(function () {
             Route::get('/', [DatasetsCategory::class, 'index'])->name('datasets');
+            Route::get('/datatable', [DatasetsCategory::class, 'datatable'])->name('datasets.datatable');
             Route::post('/store', [DatasetsCategory::class, 'store'])->name('datasets.store');
             Route::post('/update', [DatasetsCategory::class, 'update'])->name('datasets.update');
             Route::delete('/destroy', [DatasetsCategory::class, 'destroy'])->name('datasets.destroy');

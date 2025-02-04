@@ -32,7 +32,7 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="datatable-init table">
+                            <table class="table table-striped" style="width:100%" id="articles-table">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -45,62 +45,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $no = 1;
-                                    @endphp
-                                    @foreach ($articles as $row)
-                                        <tr>
-                                            <td>{{ $no++ }}</td>
-                                            <td>{{ $row->title }}</td>
-                                            <td>{{ $row->category?->name }}</td>
-                                            <td>
-                                                <div class="user-avatar sq">
-                                                    @if ($row->documents->isNotEmpty())
-                                                        @php
-                                                            $logo = $row->documents->where('documentable_id', $row->id)->first();
-                                                        @endphp
-                                                        @if ($logo)
-                                                            <img src="{{ Storage::url($logo->path) }}"
-                                                                alt="Avatar Pengguna">
-                                                        @else
-                                                            <img src="{{ asset('assets/images/default.png') }}"
-                                                                alt="Avatar Default">
-                                                        @endif
-                                                    @else
-                                                        <img src="{{ asset('assets/images/default.png') }}"
-                                                            alt="Avatar Default">
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td>{{ $row->created_at }}</td>
-                                            <td>{{ $row->updated_at }}</td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-icon btn-trigger dropdown-toggle"
-                                                        data-bs-toggle="dropdown">
-                                                        <em class="icon ni ni-more-h rounded-full"></em>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <ul class="link-list-opt no-bdr">
-                                                            <li><a
-                                                                    href="{{ route('articles.edit', ['id' => Crypt::encrypt($row->id)]) }}">
-                                                                    <em
-                                                                        class="icon ni ni-edit text-color-secondary"></em><span>Edit</span>
-                                                                </a></li>
-                                                            <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                                    data-bs-target="#deleteMapModal"
-                                                                    data-id="{{ Crypt::encrypt($row->id) }}"
-                                                                    data-name="{{ $row->title }}">
-                                                                    <em
-                                                                        class="icon ni ni-trash text-red-500"></em><span>Delete</span>
-                                                                </a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                
                                 </tbody>
                             </table>
                         </div>
@@ -116,6 +61,50 @@
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $('#articles-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('articles.datatable') }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'title',
+                            name: 'title'
+                        },
+                        {
+                            data: 'category.name',
+                            name: 'category.name'
+                        },
+                        {
+                            data: 'thumbnail',
+                            name: 'thumbnail',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                        {
+                            data: 'updated_at',
+                            name: 'updated_at'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+            });
+
             $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var userId = $(this).data('id');
                 $('#deleteMapModal').find('input[name="id"]').val(userId);

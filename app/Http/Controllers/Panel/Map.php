@@ -14,12 +14,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class Map extends Controller
 {
     public function index(): View
     {
-        $maps = ModelMap::with('regional_agency', 'sector', 'documents')->latest()->get();
         $regional_agencies = RegionalAgency::all();
         $sectors = Sector::all();
         $count = ModelMap::count();
@@ -27,18 +28,89 @@ class Map extends Controller
         $prefix = 'maps';
         $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.geospatials.map', compact('prefix', 'maps', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
+        return view('panel.geospatials.map', compact('prefix', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
     }
 
-    public function create(): View
+    public function datatable(Request $request)
     {
-        $regional_agencies = RegionalAgency::all();
-        $sectors = Sector::all();
-        $title = 'Peta';
-        $description = 'Gunakan halaman ini untuk menambahkan peta baru. Isi judul, konten, dan kategori yang sesuai, lalu publikasikan untuk dibaca oleh pengunjung.';
+        if ($request->ajax()) {
+            try {
+                $data = ModelMap::with('regional_agency', 'sector', 'documents')->latest()->get();
 
-        return view('panel.geospatials.partials.create', compact('regional_agencies', 'sectors', 'title', 'description'));
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->editColumn('updated_at', function ($row) {
+                        return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('download', function ($row) {
+                        if ($row->documents->isNotEmpty()) {
+                            $downloadLinks = '';
+                            foreach ($row->documents as $document) {
+                                $downloadLinks .= '<a href="' . route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]) . '" class="badge rounded-pill bg-primary text-light">
+                                <em class="icon ni ni-download-cloud"></em> Unduh
+                            </a><br>';
+                            }
+                            return $downloadLinks;
+                        }
+                        return '<span class="badge bg-secondary">Tidak ada dokumen</span>';
+                    })
+                    ->addColumn('checkbox', function ($row) {
+                        $checked = $row->is_active ? 'checked' : '';
+                        return '<div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck' . $row->id . '" ' . $checked . ' disabled>
+                                <label class="custom-control-label" for="customCheck' . $row->id . '"></label>
+                            </div>';
+                    })
+                    ->addColumn('action', function ($row) {
+                        return '<div class="dropdown">
+                                <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                                    <em class="icon ni ni-more-h rounded-full"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#detailMapModal"
+                                                data-regional-agency="' . optional($row->regional_agency)->name . '"
+                                                data-sector="' . optional($row->sector)->name . '"
+                                                data-geojson="' . (optional($row->documents)->first()->path ? Storage::url($row->documents->first()->path) : '') . '"
+                                                data-name="' . $row->name . '"
+                                                data-id="' . $row->id . '">
+                                                <em class="icon ni ni-eye"></em><span>Lihat</span>
+                                            </a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#editMapModal"
+                                                data-regional-agency="' . optional($row->regional_agency)->id . '"
+                                                data-sector="' . optional($row->sector)->id . '"
+                                                data-name="' . $row->name . '"
+                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                                <em class="icon ni ni-edit"></em><span>Edit</span>
+                                            </a></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="' . ($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal') . '"
+                                                data-name="' . $row->name . '"
+                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                                <em class="icon ni ' . ($row->is_active ? 'ni-cross-round' : 'ni-check-round') . '"></em><span>' . ($row->is_active ? 'Deaktivasi' : 'Aktivasi') . '</span>
+                                            </a></li>
+                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#deleteMapModal"
+                                                data-id="' . Crypt::encrypt($row->id) . '"
+                                                data-name="' . $row->name . '">
+                                                <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
+                                            </a></li>
+                                    </ul>
+                                </div>
+                            </div>';
+                    })
+                    ->rawColumns(['action', 'download', 'checkbox'])
+                    ->make(true);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+                return response()->json(['error' => 'Something went wrong'], 500);
+            }
+        }
     }
+
 
     public function store(Request $request): RedirectResponse
     {
@@ -124,38 +196,6 @@ class Map extends Controller
         \Log::error('Permintaan tidak valid: File harus diunggah.');
         return redirect()->back()->with('error', 'File harus diunggah.');
     }
-    public function edit(Request $request, $id): View
-    {
-        try {
-            // Dekripsi ID
-            $id = Crypt::decrypt($id);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            \Log::error('Gagal dekripsi ID artikel.', ['error' => $e->getMessage()]);
-            abort(404, 'Artikel tidak ditemukan.');
-        }
-
-        // Ambil data artikel
-        $data = ModelMap::findOrFail($id);
-
-        // Ambil semua kategori
-        $regional_agencies = RegionalAgency::all();
-        $sectors = Sector::all();
-
-        // Jika kategori kosong, berikan log peringatan
-        if ($regional_agencies->isEmpty()) {
-            \Log::warning('Tidak ada perangkat daerah yang ditemukan untuk peta.', ['map_id' => $id]);
-        }
-
-        // Jika sectors kosong, berikan log peringatan
-        if ($sectors->isEmpty()) {
-            \Log::warning('Tidak ada perangkat daerah yang ditemukan untuk peta.', ['map_id' => $id]);
-        }
-
-        $title = 'Peta';
-        $description = 'Gunakan halaman ini untuk menyunting peta. Isi nama, perangkat daerah, dan sektor yang sesuai, lalu publikasikan untuk dilihat oleh pengunjung.';
-
-        return view('panel.geospatials.partials.edit', compact('data', 'regional_agencies', 'sectors', 'title', 'description'));
-    }
 
     public function update(Request $request): RedirectResponse
     {
@@ -176,7 +216,8 @@ class Map extends Controller
         }
 
         try {
-            $data = ModelMap::with('documents')->find($request->id);
+            $id = Crypt::decrypt($request->id);
+            $data = ModelMap::with('documents')->find($id);
 
             if ($request->filled('file')) {
                 \Log::info('File terdeteksi dalam request.');

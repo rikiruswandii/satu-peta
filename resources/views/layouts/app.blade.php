@@ -19,9 +19,10 @@
     <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/skins/theme-green.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.bootstrap5.css">
 
     @stack('css')
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="nk-body bg-lighter npc-default has-sidebar ">
@@ -87,6 +88,10 @@
     <script src="{{ asset('assets/js/scripts.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script src="{{ asset('assets/js/editors.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap5.js"></script>
     @stack('scripts')
 </body>
 

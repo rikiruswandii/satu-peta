@@ -23,7 +23,7 @@
         <div class="nk-block">
             <div class="card card-bordered card-preview">
                 <div class="card-inner">
-                    <table class="datatable-init table">
+                    <table class="table table-striped" style="width:100%" id="user-log-table">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -33,21 +33,41 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $no = 1;
-                            @endphp
-                            @foreach ($data as $d)
-                                <tr>
-                                    <td>{{ $no++ }}</td>
-                                    <td>{{ $d->log_name }}</td>
-                                    <td>{{ $d->description }}</td>
-                                    <td>{{ $d->created_at }}</td>
-                                </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div><!-- .card -->
         </div><!-- .nk-block -->
     </div>
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $('#user-log-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('user.datatable', ['id' => $encrypt]) }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'log_name',
+                            name: 'log_name'
+                        },
+                        {
+                            data: 'description',
+                            name: 'description'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                    ]
+                });
+            });
+        </script>
+    @endpush
 </x-user>
