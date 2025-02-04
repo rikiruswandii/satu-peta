@@ -15,6 +15,53 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeoJSON from 'ol/format/GeoJSON';
 import { defaults as defaultControls } from 'ol/control';
 import { defaults as defaultInteractions } from 'ol/interaction';
+import { Style, Fill, Stroke, Circle } from 'ol/style';
+
+//layer styles
+function getStyle(feature) {
+    const geometryType = feature.getGeometry().getType();
+
+    let style;
+    switch (geometryType) {
+        case 'Point':
+            style = new Style({
+                image: new Circle({
+                    radius: 5,
+                    fill: new Fill({ color: '#73EC8B' }),
+                    stroke: new Stroke({ color: 'white', width: 1 })
+                })
+            });
+            break;
+        case 'LineString':
+            style = new Style({
+                stroke: new Stroke({
+                    color: '#73EC8B',
+                    width: 3
+                })
+            });
+            break;
+        case 'Polygon':
+            style = new Style({
+                fill: new Fill({
+                    color: '#73EC8B'
+                }),
+                stroke: new Stroke({
+                    color: 'white',
+                    width: 1
+                })
+            });
+            break;
+        default:
+            style = new Style({
+                stroke: new Stroke({
+                    color: '#73EC8B',
+                    width: 1
+                })
+            });
+    }
+
+    return style;
+}
 
 //openlayer configuration
 function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
@@ -39,7 +86,10 @@ function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
     });
 
     const vectorLayer = new VectorLayer({
-        source: vectorSource
+        source: vectorSource,
+        style: function (feature) {
+            return getStyle(feature); // Menetapkan style dinamis untuk setiap fitur
+        }
     });
 
     map.addLayer(vectorLayer);
