@@ -23,7 +23,7 @@ class MapContainer extends Component
      * @param array $interactions
      * @param string $baseLayerType
      */
-    public function __construct($geoJsonPath, $mapId = 'map', $controls = [], $interactions = [], $baseLayerType = 'osm')
+    public function __construct($geoJsonPath = '', $mapId = 'map', $controls = [], $interactions = [], $baseLayerType = 'osm')
     {
         $this->geoJsonPath = $geoJsonPath;
         $this->mapId = $mapId;

@@ -4,7 +4,7 @@
         <div class="nk-sidebar-brand">
             <a href="{{ route('/') }}" class="logo-link nk-sidebar-logo">
                 <div class="d-flex justify-content-center align-items-center w-100" style="height: 100vh;">
-                    <div class="d-flex justify-content-center align-items-center gap-1">
+                    <div class="d-flex justify-content-center align-items-center">
                         <img class="logo-light logo-img img-fluid me-3" src="{{ asset('assets/images/logo.png') }}"
                             srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo">
                         <img class="logo-dark logo-img img-fluid me-3" src="{{ asset('assets/images/logo.png') }}"
@@ -12,7 +12,7 @@
                         <img class="logo-small logo-img logo-img-small img-fluid me-3"
                             src="{{ asset('assets/images/logo.png') }}"
                             srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo-small">
-                        <h6 class="text-primary">{{ config('app.name', 'Satu Peta') }}</h6>
+                        <h6 class="text-primary me-3">{{ config('app.name', 'Satu Peta') }}</h6>
                     </div>
                 </div>
             </a>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\RelatedLink;
 use App\Settings\GeneralSettings;
 use Closure;
 use Illuminate\Http\Request;
@@ -20,6 +21,14 @@ class ViewShare
     {
         //settings
         View::share('app', app(GeneralSettings::class));
+
+        //related links
+        $links = RelatedLink::where('is_active', true)
+            ->orderBy('order')
+            ->take(5)
+            ->latest()
+            ->get();
+        View::share('links', $links);
 
         //menu guest
         $guest = $this->guestMenus();
@@ -66,10 +75,10 @@ class ViewShare
         $menus = [
             'Ikhtisar' => [
                 [
-                    'route' => '/',
+                    'route' => 'dashboard',
                     'icon' => 'ni ni-home-fill',
                     'text' => 'Dashboard',
-                    'is_active' => request()->routeIs('/'),
+                    'is_active' => request()->routeIs('dashboard'),
                 ],
             ],
             'Master' => [
@@ -92,7 +101,7 @@ class ViewShare
                     'is_active' => request()->routeIs('datasets'),
                 ],
             ],
-            'Informasi' => [
+            'Kelola' => [
                 [
                     'route' => 'articles',
                     'icon' => 'ni ni-article',

@@ -16,6 +16,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { defaults as defaultControls } from 'ol/control';
 import { defaults as defaultInteractions } from 'ol/interaction';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
+import { fromLonLat } from 'ol/proj';
 
 //layer styles
 function getStyle(feature) {
@@ -73,8 +74,8 @@ function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
         target: mapId,
         layers: [baseLayers[baseLayerType] || baseLayers['osm']],
         view: new View({
-            center: [0, 0],
-            zoom: 2
+            center: fromLonLat([107.5244, -6.5799]),
+            zoom: 10
         }),
         controls: defaultControls(controls),
         interactions: defaultInteractions(interactions)
@@ -208,14 +209,24 @@ inputElements.forEach(inputElement => {
     }
 });
 
-$("#success-alert").fadeTo(2000, 500).slideUp(500, function () {
-    $(this).slideUp(500);
+var $jq = jQuery.noConflict();
+$jq(document).ready(function () {
+    if ($jq("#success-alert").length) {
+        $jq("#success-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $(this).slideUp(500);
+        });
+    }
+
+    if ($jq("#error-alert").length) {
+        $jq("#error-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $(this).slideUp(500);
+        });
+    }
+
+    if ($jq("#info-alert").length) {
+        $jq("#info-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $(this).slideUp(500);
+        });
+    }
 });
 
-$("#error-alert").fadeTo(2000, 500).slideUp(500, function () {
-    $(this).slideUp(500);
-});
-
-$("#info-alert").fadeTo(2000, 500).slideUp(500, function () {
-    $(this).slideUp(500);
-});

@@ -74,6 +74,8 @@
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
+                                    <li><a href="/" target="_blank"><em class="icon ni ni-eye"></em><span>Lihat
+                                                Website</span></a></li>
                                     <li><a
                                             href="{{ route('user.detail', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
                                                 class="icon ni ni-user-alt"></em><span>View

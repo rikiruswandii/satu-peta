@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Download;
+use App\Http\Controllers\Guest\Home;
 use App\Http\Controllers\Panel\Article;
 use App\Http\Controllers\Panel\Dashboard;
 use App\Http\Controllers\Panel\DatasetsCategory;
@@ -12,13 +13,11 @@ use App\Http\Controllers\Panel\Users;
 use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [Home::class, 'index'])->name('/');
 
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
-        Route::get('/dashboard', [Dashboard::class, 'index'])->name('/');
+        Route::get('/dashboard', [Dashboard::class, 'index'])->name('dashboard');
         Route::get('/download/{id}', action: [Download::class, 'download'])->name('download');
         Route::prefix('logs')->group(function () {
             Route::get('/', [Log::class, 'index'])->name('logs');
