@@ -1,8 +1,12 @@
-<div id="{{ $mapId }}" style="width: 100%; height: 400px;"></div>
+@props(['height' => '400px'])
+
+<div id="{{ $mapId }}" style="width: 100%; height: {{ $attributes->get('height', $height) }};"></div>
+
 <div id="popup" class="ol-popup">
     <a href="#" id="popup-closer" class="ol-popup-closer"></a>
     <div id="popup-content"></div>
 </div>
+
 
 {{-- @push('scripts')
     <script>

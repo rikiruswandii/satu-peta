@@ -13,10 +13,11 @@ import { OSM, Vector as VectorSource } from 'ol/source';
 import Overlay from 'ol/Overlay.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeoJSON from 'ol/format/GeoJSON';
-import { defaults as defaultControls } from 'ol/control';
-import { defaults as defaultInteractions } from 'ol/interaction';
+import { ZoomSlider, FullScreen, ScaleLine, defaults as defaultControls } from 'ol/control';
+import { DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractions } from 'ol/interaction';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
+import Draw from 'ol/interaction/Draw.js';
 
 //layer styles
 function getStyle(feature) {
@@ -64,8 +65,10 @@ function getStyle(feature) {
     return style;
 }
 
+
+
 //openlayer configuration
-function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
+function initMap(mapId, baseLayerType = 'osm', geoJsonPath, controlOptions = {}, interactionOptions = {}) {
     const baseLayers = {
         osm: new TileLayer({ source: new OSM() }),
     };
@@ -77,8 +80,8 @@ function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
             center: fromLonLat([107.5244, -6.5799]),
             zoom: 10
         }),
-        controls: defaultControls(controls),
-        interactions: defaultInteractions(interactions)
+        controls: createControls(controlOptions),
+        interactions: createInteractions(interactionOptions)
     });
 
     const vectorSource = new VectorSource({
@@ -89,7 +92,7 @@ function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
     const vectorLayer = new VectorLayer({
         source: vectorSource,
         style: function (feature) {
-            return getStyle(feature); // Menetapkan style dinamis untuk setiap fitur
+            return getStyle(feature);
         }
     });
 
@@ -153,6 +156,26 @@ function initMap(mapId, baseLayerType, geoJsonPath, controls, interactions) {
     };
 
     return map;
+}
+
+function createControls(options) {
+    const availableControls = {
+        scale: new ScaleLine({ units: 'imperial' }),
+        fullScreen: new FullScreen(),
+        zoomSlider: new ZoomSlider(),
+    };
+
+    return defaultControls().extend(Object.keys(options).map(key => options[key] ? availableControls[key] : null).filter(Boolean));
+}
+
+function createInteractions(options) {
+    const availableInteractions = {
+        dragPan: new DragPan(),
+        doubleClickZoom: new DoubleClickZoom(),
+        mouseWheelZoom: new MouseWheelZoom(),
+    };
+
+    return defaultInteractions().extend(Object.keys(options).map(key => options[key] ? availableInteractions[key] : null).filter(Boolean));
 }
 
 window.initMap = initMap;

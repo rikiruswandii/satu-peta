@@ -11,11 +11,11 @@
             <div class="collapse navbar-collapse" id="saasboxNav">
                 <ul class="navbar-nav navbar-nav-scroll">
                     <li><a class="link-warning" href="{{ route('/') }}">Home</a></li>
-                    <li><a class="link-warning" href="{{ route('/') }}">Jelajah</a></li>
+                    <li><a class="link-warning" href="{{ route('explorer') }}">Jelajah</a></li>
                     <li><a class="link-warning" href="{{ route('/') }}">Pencarian</a></li>
                 </ul>
                 <!-- Login Button -->
-                <a class="btn btn-warning btn-sm ms-auto mb-3 mb-lg-0" href="{{ route('register') }}">Log In</a>
+                <a class="btn btn-warning btn-sm ms-auto mb-3 mb-lg-0" href="{{ route('login') }}">Log In</a>
             </div>
         </div>
     </nav>

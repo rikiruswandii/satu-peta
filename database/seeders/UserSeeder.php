@@ -32,5 +32,13 @@ class UserSeeder extends Seeder
             'role_id' => $adminRole->id,
             'email_verified_at' => Carbon::now(), // Menambahkan email_verified_at
         ]);
+
+        User::create([
+            'name' => 'Admin',
+            'email' => 'adminspp@gmail.com',
+            'password' => Hash::make(env('DEFAULT_PASSWORD')),
+            'role_id' => $adminRole->id,
+            'email_verified_at' => Carbon::now(), // Menambahkan email_verified_at
+        ]);
     }
 }

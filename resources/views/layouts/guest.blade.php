@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>
+        @yield('title', config('app.name')) - {{ config('app.name') }}
+    </title>
+    <meta name="description" content="@yield('description', 'Deskripsi default')">
 
     <!-- Fav Icon  -->
     <link rel="shortcut icon" href="{{ asset('assets/images/logo.png') }}" type="image/x-icon">
@@ -14,7 +17,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('css/all-css-libraries.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
-    
+
 
     <!-- Scripts -->
     @stack('css')
@@ -26,12 +29,21 @@
     <div class="preloader" id="preloader">
         <div class="spinner-grow text-light" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>
+
+    @if (!request()->routeIs('explorer'))
+        <!-- Footer Area-->
+        @include('guest.partials.header')
+    @else
+        @include('guest.partials.explorer')
+    @endif
+
     <!-- Header Area-->
-    @include('guest.partials.header')
     {{ $slot }}
 </body>
-<!-- Footer Area-->
-@include('guest.partials.footer')
+@if (!request()->routeIs('explorer'))
+    <!-- Footer Area-->
+    @include('guest.partials.footer')
+@endif
 <!-- Scroll To Top -->
 <div id="scrollTopButton"><i class="bi bi-arrow-up-short"></i></div>
 <!-- All JavaScript Files-->
