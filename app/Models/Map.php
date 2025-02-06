@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Map extends Model
+{
+    use HasFactory, LogsActivity, SoftDeletes;
+
+    protected static $logName = 'maps_activity';
+
+    protected static $logAttributes = ['user_id', 'name'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(static::$logAttributes)
+            ->useLogName(static::$logName);
+    }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function regional_agency(): BelongsTo
+    {
+        return $this->belongsTo(RegionalAgency::class);
+    }
+
+    public function sector(): BelongsTo
+    {
+        return $this->belongsTo(Sector::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    protected $fillable = [
+        'user_id',
+        'regional_agency_id',
+        'sector_id',
+        'name',
+        'slug',
+        'can_download',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'can_download' => 'boolean',
+    ];
+}
