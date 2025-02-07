@@ -30,7 +30,7 @@
         <div class="spinner-grow text-light" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>
 
-    @if (!request()->routeIs('explorer'))
+    @if (!request()->routeIs('explorer') && !request()->routeIs('search'))
         <!-- Footer Area-->
         @include('guest.partials.header')
     @else
