@@ -45,14 +45,14 @@
                         <div class="accordion" id="accordionExample">
                             @if ($data->isNotEmpty())
                                 <div class="accordion" id="accordionExample">
-                                    @foreach ($data as $index => $row)
+                                    @foreach ($data as $index => $regionalAgency)
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading{{ $index }}">
                                                 <button class="accordion-button collapsed text-success" type="button"
                                                     data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}"
                                                     aria-expanded="false" aria-controls="collapse{{ $index }}">
-                                                    <i
-                                                        class="bi bi-card-image me-2"></i>{{ $row->sector?->name ?? 'Tidak Ada Sektor' }}
+                                                    <i class="bi bi-card-image me-2"></i>
+                                                    {{ $regionalAgency->name ?? 'Tidak Ada Regional Agency' }}
                                                 </button>
                                             </h2>
                                             <div id="collapse{{ $index }}" class="accordion-collapse collapse"
@@ -60,19 +60,19 @@
                                                 data-bs-parent="#accordionExample">
                                                 <div class="accordion-body">
                                                     <ul class="list-group overflow-y-auto">
-                                                        @forelse ($row->documents as $document)
-                                                            <li class="list-group-item">
-                                                                <a href="javascript:void(0);" id="activateLayerButton"
-                                                                    data-geojson="{{ $document->path ? Storage::url($document->path) : '' }}"
-                                                                    data-name="{{ $row->name }}"
-                                                                    class="d-flex text-nowrap">
-                                                                    <i
-                                                                        class="bi bi-plus me-2"></i>{{ $row->name ?? 'Tidak Ada Nama' }}
-                                                                </a>
-                                                            </li>
-                                                        @empty
-                                                            <li class="list-group-item text-muted">Tidak ada dokumen.</li>
-                                                        @endforelse
+                                                        @foreach ($regionalAgency->map as $map)
+                                                            @foreach ($map->documents as $document)
+                                                                <li class="list-group-item">
+                                                                    <a href="javascript:void(0);" id="activateLayerButton"
+                                                                        data-geojson="{{ $document->path ? Storage::url($document->path) : '' }}"
+                                                                        data-name="{{ $map->name }}"
+                                                                        class="d-flex text-nowrap">
+                                                                        <i
+                                                                            class="bi bi-plus me-2"></i>{{ $map->name ?? 'Tidak Ada Nama' }}
+                                                                    </a>
+                                                                </li>
+                                                            @endforeach
+                                                        @endforeach
                                                     </ul>
                                                 </div>
                                             </div>
@@ -84,6 +84,7 @@
                                     <i class="bi bi-exclamation-triangle-fill"></i> Data tidak tersedia.
                                 </div>
                             @endif
+
                         </div>
                     </div>
                 </div>
