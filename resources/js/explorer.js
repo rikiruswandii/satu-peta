@@ -23,41 +23,40 @@ $m(document).ready(function () {
         mouseWheelZoom: false
     })
 
-    // Inisialisasi sortable menggunakan jQuery UI
     $m("#layerList").sortable({
-        update: function () {
-            updateLayerOrder();
+    update: function () {
+        updateLayerOrder();
+    }
+});
+
+// Fungsi untuk memperbarui urutan layer berdasarkan list
+function updateLayerOrder() {
+    let layerOrder = [];
+    $m("#layerList li").each(function () {
+        let layerId = $m(this).data("layer-id");
+        let layer = mapInstance.getLayers().getArray().find(l => l.get("id") === layerId);
+        if (layer) {
+            layerOrder.push(layer);
         }
     });
 
-    // Fungsi untuk memperbarui urutan layer berdasarkan list
-    function updateLayerOrder() {
-        let layerOrder = [];
-        $m("#layerList li").each(function () {
-            let layerId = $m(this).data("layer-id");
-            let layer = mapInstance.getLayers().getArray().find(l => l.get("id") === layerId);
-            if (layer) {
-                layerOrder.push(layer);
-            }
-        });
+    // Atur ulang urutan layer
+    layerOrder.forEach((layer, index) => {
+        layer.setZIndex(index);
+    });
+}
 
-        // Atur ulang urutan layer
-        layerOrder.forEach((layer, index) => {
-            layer.setZIndex(index);
-        });
-    }
+// Tambahkan layer ke daftar dan beri fungsi drag-and-drop
+function addLayerToList(layer, name) {
+    let layerId = `layer-${Date.now()}`;
+    layer.set("id", layerId);
 
-    // Tambahkan layer ke daftar dan beri fungsi drag-and-drop
-    function addLayerToList(layer, name) {
-        let layerId = `layer-${Date.now()}`;
-        layer.set("id", layerId);
-
-        let listItem = `<li data-layer-id="${layerId}" class="list-group-item">${name}</li>`;
-        $m("#layerList").append(listItem);
-    }
+    let listItem = `<li data-layer-id="${layerId}" class="list-group-item">${name}</li>`;
+    $m("#layerList").append(listItem);
+}
 
     // Saat tombol diklik, tambahkan layer baru dan masukkan ke dalam list
-    $m("#activateLayerButton").on("click", function () {
+    $m(".list-group-item a").on("click", function () {
         let path = $m(this).data("geojson");
         let name = $m(this).data("name");
         console.log("GeoJSON Path:", path);
