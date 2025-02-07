@@ -65,7 +65,7 @@ function getStyle(feature) {
     return style;
 }
 
-
+window.getStyle = getStyle;
 
 //openlayer configuration
 function initMap(mapId, baseLayerType = 'osm', geoJsonPath, controlOptions = {}, interactionOptions = {}) {
@@ -147,6 +147,15 @@ function initMap(mapId, baseLayerType = 'osm', geoJsonPath, controlOptions = {},
         }
     };
 
+    map.on('pointermove', function (event) {
+        let hit = map.hasFeatureAtPixel(event.pixel);
+
+        if (hit) {
+            map.getTargetElement().style.cursor = 'pointer';
+        } else {
+            map.getTargetElement().style.cursor = '';
+        }
+    });
 
     map.on('singleclick', displayPopup);
 

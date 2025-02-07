@@ -99,11 +99,7 @@
             </div>
         </div>
         <div class="p-3">
-            <ul class="nav flex-column aside-content mt-3">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#"><i class="bi bi-house"></i> </a>
-                </li>
-            </ul>
+            <ul id="layerList" class="list-group"></ul>
         </div>
     </div>
 
