@@ -51,7 +51,7 @@ function addLayerToList(layer, name) {
     let layerId = `layer-${Date.now()}`;
     layer.set("id", layerId);
 
-    let listItem = `<li data-layer-id="${layerId}" class="list-group-item">${name}</li>`;
+    let listItem = `<li data-layer-id="${layerId}" class="list-group-item" style="cursor:pointer;">${name}</li>`;
     $m("#layerList").append(listItem);
 }
 
