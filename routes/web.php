@@ -3,6 +3,7 @@
 use App\Http\Controllers\Download;
 use App\Http\Controllers\Guest\Explorer;
 use App\Http\Controllers\Guest\Home;
+use App\Http\Controllers\Guest\Search;
 use App\Http\Controllers\Panel\Article;
 use App\Http\Controllers\Panel\Dashboard;
 use App\Http\Controllers\Panel\DatasetsCategory;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ Home::class, 'index'])->name('/');
 Route::get('/explorer', [ Explorer::class, 'index'])->name('explorer');
+Route::get('/search', [Search::class, 'index'])->name('search');
 
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {

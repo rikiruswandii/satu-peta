@@ -21,4 +21,7 @@
             });
         </script>
     @endpush
+    @push('js')
+        
+    @endpush
 </x-guest-layout>

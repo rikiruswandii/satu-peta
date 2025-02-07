@@ -77,8 +77,7 @@
                     <div class="section-heading mb-0">
                         <h6>Dataset Peta</h6>
                         <h2>Jelajahi Peta Terbaru Kami</h2>
-                        <p>Temukan berbagai dataset peta terbaru yang telah diperbarui dengan informasi terkini dan
-                            detail yang akurat untuk kebutuhan analisis dan visualisasi Anda.</p>
+                        <p>Temukan berbagai dataset peta terbaru yang telah diperbarui dengan informasi terkini dan detail yang akurat untuk kebutuhan analisis dan visualisasi Anda.</p>
                     </div>
                 </div>
                 <div class="col-12 col-sm-4 col-lg-5">
