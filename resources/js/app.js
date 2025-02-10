@@ -8,15 +8,17 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 //openlayer
 import 'ol/ol.css';
+import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import { Map, View } from 'ol';
-import { OSM, Vector as VectorSource } from 'ol/source';
+import { OSM, XYZ, Vector as VectorSource } from 'ol/source';
 import Overlay from 'ol/Overlay.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeoJSON from 'ol/format/GeoJSON';
-import { ZoomSlider, FullScreen, ScaleLine, defaults as defaultControls } from 'ol/control';
+import { ZoomSlider, FullScreen, ScaleLine, defaults as defaultControls, Control} from 'ol/control';
 import { DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractions } from 'ol/interaction';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
+import LayerSwitcher from 'ol-layerswitcher';
 import Draw from 'ol/interaction/Draw.js';
 
 //layer styles
@@ -67,15 +69,110 @@ function getStyle(feature) {
 
 window.getStyle = getStyle;
 
+// Daftar basemap dengan URL thumbnail sesuai
+const baseMaps = {
+    'OpenStreetMap': new TileLayer({
+        source: new OSM(),
+        visible: true,
+        title: 'OpenStreetMap',
+        thumbnail: 'https://a.tile.openstreetmap.org/2/2/2.png'
+    }),
+    'Carto Light': new TileLayer({
+        source: new XYZ({
+            url: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{scale}.png'
+        }),
+        visible: false,
+        title: 'Carto Light',
+        thumbnail: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/2/2/2.png'
+    })
+};
+
+// Fungsi Membuat Custom Control untuk Basemap
+class BasemapControl extends Control {
+    constructor(opt_options) {
+        const options = opt_options || {};
+        const element = document.createElement('div');
+        element.className = 'ol-basemap-control ol-unselectable ol-control';
+
+        // Elemen UI
+        element.innerHTML = `
+            <div class="card basemap-container hidden">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-map"></i> Pilih Basemap</span>
+                    <button class="btn btn-sm btn-light toggle-basemap"><i class="bi bi-eye"></i></button>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        ${Object.keys(baseMaps).map(layer => `
+                            <div class="col-4">
+                                <div class="basemap-item ${baseMaps[layer].getVisible() ? 'active' : ''}" data-layer="${layer}">
+                                    <img src="${baseMaps[layer].get('thumbnail')}" alt="${layer}" data-toggle="tooltip" data-placement="bottom" title="${layer}">
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Tombol Floating untuk Menampilkan Basemap Control
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'btn btn-success btn-sm basemap-toggle-btn';
+        toggleButton.innerHTML = '<i class="bi bi-layers"></i>';
+        document.body.appendChild(toggleButton);
+
+        super({
+            element: element,
+            target: options.target
+        });
+
+        // Event Klik Thumbnail untuk Mengubah Basemap
+        element.querySelectorAll('.basemap-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const selectedLayer = this.getAttribute('data-layer');
+
+                Object.values(baseMaps).forEach(layer => {
+                    layer.setVisible(layer.get('title') === selectedLayer);
+                });
+
+                // Highlight basemap aktif
+                element.querySelectorAll('.basemap-item').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Event Toggle Basemap (Sembunyikan & Munculkan)
+        element.querySelector('.toggle-basemap').addEventListener('click', function () {
+            const container = element.querySelector('.basemap-container');
+            container.classList.toggle('hidden');
+
+            if (container.classList.contains('hidden')) {
+                this.innerHTML = '<i class="bi bi-eye"></i>';
+                toggleButton.classList.remove('hidden'); // Munculkan tombol floating dengan transisi
+            } else {
+                this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                toggleButton.classList.add('hidden'); // Sembunyikan tombol floating dengan transisi
+            }
+        });
+
+        // Event untuk Memunculkan Kembali Basemap Control
+        toggleButton.addEventListener('click', function () {
+            const container = element.querySelector('.basemap-container');
+            container.classList.remove('hidden');
+            element.querySelector('.toggle-basemap').innerHTML = '<i class="bi bi-eye-slash"></i>';
+            this.classList.add('hidden'); // Sembunyikan tombol floating dengan transisi
+        });
+
+    }
+}
+
+
 //openlayer configuration
 function initMap(mapId, baseLayerType = 'osm', geoJsonPath, controlOptions = {}, interactionOptions = {}) {
-    const baseLayers = {
-        osm: new TileLayer({ source: new OSM() }),
-    };
 
     const map = new Map({
         target: mapId,
-        layers: [baseLayers[baseLayerType] || baseLayers['osm']],
+        layers: Object.values(baseMaps),
         view: new View({
             center: fromLonLat([107.5244, -6.5799]),
             zoom: 10
@@ -172,6 +269,7 @@ function createControls(options) {
         scale: new ScaleLine({ units: 'imperial' }),
         fullScreen: new FullScreen(),
         zoomSlider: new ZoomSlider(),
+        basemap: new BasemapControl()
     };
 
     return defaultControls().extend(Object.keys(options).map(key => options[key] ? availableControls[key] : null).filter(Boolean));

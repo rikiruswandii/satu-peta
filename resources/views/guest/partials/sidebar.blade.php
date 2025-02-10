@@ -104,9 +104,8 @@
     </div>
 
     <!-- Toggle Sidebar Button -->
-    <div class="toggle-btn rounded shadow-lg border-0 p-2 text-success cursor-pointer d-flex jutify-content-center align-items-center"
-        id="toggleSidebar">
-        <i class="bi bi-list" style="cursor: pointer;"></i>
+    <div class="toggle-btn rounded shadow-lg border-0 p-2 text-success cursor-pointer d-flex jutify-content-center align-items-center">
+        <i id="toggleSidebar" class="bi bi-list" style="cursor: pointer;"></i>
         <form action="" method="get">
             <div class="d-flex jutify-content-center align-items-center">
                 <input type="text" class="ms-2 border-0 p-1" name="search-from-aside" id="search-from-aside" placeholder="cari..">

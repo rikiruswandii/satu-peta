@@ -6,18 +6,24 @@ var $m = jQuery.noConflict();
 $m(document).ready(function () {
     const sidebar = $m("#sidebar");
     const content = $m("#main-content");
-    const toggleButtons = $m("#toggleSidebar, #anotherToggle");
+    const toggleBtn = $m(".toggle-btn, #anotherToggle"); // Ambil elemen pembungkus toggle
+    const toggleIcon = $m("#toggleSidebar"); // Ambil ikon di dalam toggle
 
-    toggleButtons.on("click", function () {
+    toggleBtn.on("click", function (e) {
+        // Pastikan hanya ikon yang menjadi pemicu, bukan elemen lain di dalam toggle-btn
+        if (!$m(e.target).is("i")) return;
+
         sidebar.toggleClass("closed");
         content.toggleClass("shifted");
-        toggleButtons.toggleClass("closed");
+        toggleBtn.toggleClass("closed"); // Pastikan toggle-btn ikut berubah
+        toggleIcon.toggleClass("bi-list bi-arrow-bar-right"); // Ganti ikon agar lebih intuitif
     });
 
     let mapInstance = initMap('explorerMapId', 'osm', '', {
         scale: true,
         fullScreen: true,
-        zoomSlider: true
+        zoomSlider: true,
+        basemap: true
     }, {
         dragPan: true,
         mouseWheelZoom: false
