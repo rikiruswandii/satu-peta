@@ -19,11 +19,12 @@ $m(document).ready(function () {
         toggleIcon.toggleClass("bi-list bi-arrow-bar-right"); // Ganti ikon agar lebih intuitif
     });
 
-    let mapInstance = initMap('explorerMapId', 'osm', '', {
+    let map = initMap('explorerMapId', '', {
         scale: true,
         fullScreen: true,
         zoomSlider: true,
-        basemap: true
+        basemap: true,
+        draw: true
     }, {
         dragPan: true,
         mouseWheelZoom: false
@@ -40,7 +41,7 @@ function updateLayerOrder() {
     let layerOrder = [];
     $m("#layerList li").each(function () {
         let layerId = $m(this).data("layer-id");
-        let layer = mapInstance.getLayers().getArray().find(l => l.get("id") === layerId);
+        let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
         if (layer) {
             layerOrder.push(layer);
         }
@@ -82,7 +83,7 @@ function addLayerToList(layer, name) {
             }
         });
 
-        mapInstance.addLayer(vectorLayer);
+        map.addLayer(vectorLayer);
         addLayerToList(vectorLayer, name);
 
         // Setelah layer ditambahkan, update urutan berdasarkan list
