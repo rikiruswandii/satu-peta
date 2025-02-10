@@ -34,11 +34,15 @@
         <!-- Footer Area-->
         @include('guest.partials.header')
     @else
-        @include('guest.partials.explorer')
+        @include('guest.partials.nav')
     @endif
 
     <!-- Header Area-->
     {{ $slot }}
+
+    <!-- modal -->
+    @yield('modal')
+    <!-- .modal -->
 </body>
 @if (!request()->routeIs('explorer'))
     <!-- Footer Area-->
