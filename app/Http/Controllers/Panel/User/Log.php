@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Panel\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\View\View;
 use Spatie\Activitylog\Models\Activity;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class Log extends Controller
@@ -19,7 +19,7 @@ class Log extends Controller
 
         $header = 'Users';
         $title = 'Log Aktivitas';
-        $description = $title . ' page!';
+        $description = $title.' page!';
         $data = Activity::select('activity_log.*', 'users.name as causer_name')
             ->leftJoin('users', 'activity_log.causer_id', '=', 'users.id')
             ->where('causer_id', '!=', 2)
@@ -44,10 +44,12 @@ class Log extends Controller
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
     }
+
     public function datatable_id(Request $request, $id)
     {
         if ($request->ajax()) {
@@ -66,6 +68,7 @@ class Log extends Controller
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
@@ -84,7 +87,7 @@ class Log extends Controller
 
         // Menentukan judul dan deskripsi
         $title = 'Log Aktivitas';
-        $description = $title . ' page!';
+        $description = $title.' page!';
 
         // Mengambil data aktivitas user
         $data = Activity::where('causer_id', $user->id) // Menggunakan ID user
@@ -95,5 +98,4 @@ class Log extends Controller
         // Mengirim data ke view
         return view('panel.user.log', compact('data', 'count', 'user', 'title', 'description', 'id'))->with('encrypt', $id);
     }
-
 }

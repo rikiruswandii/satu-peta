@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Article as ModelsArticle;
 use App\Models\Category;
 use App\Models\Document;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
 class Article extends Controller
@@ -23,7 +23,7 @@ class Article extends Controller
         $count = ModelsArticle::count();
         $title = 'Artikel';
         $prefix = 'articles';
-        $description = 'Jelajahi kumpulan artikel informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
+        $description = 'Jelajahi kumpulan artikel informatif dan terpercaya seputar '.env('APP_NAME', 'Satu Peta Purwakarta').'. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
         return view('panel.news.article', compact('prefix', 'categories', 'count', 'title', 'description'));
     }
@@ -47,15 +47,17 @@ class Article extends Controller
                             $thumbnail = '<div class="user-avatar sq">';
                             foreach ($row->documents as $document) {
                                 if ($document->path) {
-                                    $thumbnail .= '<img src="' . Storage::url($document->path) . '" alt="Avatar Pengguna">';
+                                    $thumbnail .= '<img src="'.Storage::url($document->path).'" alt="Avatar Pengguna">';
                                 } else {
-                                    $thumbnail .= '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+                                    $thumbnail .= '<img src="'.asset('assets/images/default.png').'" alt="Avatar Default">';
                                 }
                             }
                             $thumbnail .= '</div>';
+
                             return $thumbnail;
                         }
-                        return '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+
+                        return '<img src="'.asset('assets/images/default.png').'" alt="Avatar Default">';
                     })
                     ->addColumn('action', function ($row) {
                         return '<div class="dropdown">
@@ -64,14 +66,14 @@ class Article extends Controller
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <ul class="link-list-opt no-bdr">
-                                        <li><a href="'. route('articles.edit', ['id' => Crypt::encrypt($row->id)]).'"
-                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                        <li><a href="'.route('articles.edit', ['id' => Crypt::encrypt($row->id)]).'"
+                                                data-id="'.Crypt::encrypt($row->id).'">
                                                 <em class="icon ni ni-edit"></em><span>Edit</span>
                                             </a></li>
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#deleteMapModal"
-                                                data-id="' . Crypt::encrypt($row->id) . '"
-                                                data-name="' . $row->name . '">
+                                                data-id="'.Crypt::encrypt($row->id).'"
+                                                data-name="'.$row->name.'">
                                                 <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
                                             </a></li>
                                     </ul>
@@ -82,6 +84,7 @@ class Article extends Controller
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
@@ -111,6 +114,7 @@ class Article extends Controller
 
         if ($validator->fails()) {
             \Log::warning('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -129,13 +133,14 @@ class Article extends Controller
                 \Log::info("Path sementara file: $temporaryPath");
                 \Log::info("Path lengkap file: $fullpath");
 
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file dari lokasi sementara ke folder final
-                $newFilePath = 'uploads/thumbnails/' . basename($temporaryPath);
+                $newFilePath = 'uploads/thumbnails/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
                 \Log::info("File berhasil dipindahkan ke: $newFilePath");
@@ -171,12 +176,15 @@ class Article extends Controller
             }
         } catch (\Exception $e) {
             \Log::error('Gagal membuat artikel', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal membuat artikel: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Gagal membuat artikel: '.$e->getMessage());
         }
 
         \Log::error('Permintaan tidak valid: File harus diunggah.');
+
         return redirect()->back()->with('error', 'File harus diunggah.');
     }
+
     public function edit(Request $request, $id): View
     {
         try {
@@ -204,8 +212,6 @@ class Article extends Controller
         return view('panel.news.partials.edit', compact('data', 'categories', 'title', 'description'));
     }
 
-
-
     public function update(Request $request, $id): RedirectResponse
     {
         // Log data yang diterima dari request
@@ -221,6 +227,7 @@ class Article extends Controller
 
         if ($validator->fails()) {
             \Log::warning('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -242,13 +249,14 @@ class Article extends Controller
                 \Log::info("Path sementara file: $temporaryPath");
                 \Log::info("Path lengkap file: $fullpath");
 
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file ke folder tujuan
-                $newFilePath = 'uploads/thumbnails/' . basename($temporaryPath);
+                $newFilePath = 'uploads/thumbnails/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
 
@@ -295,10 +303,12 @@ class Article extends Controller
             }
         } catch (\Exception $e) {
             \Log::error('Gagal membuat artikel', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal membuat artikel: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Gagal membuat artikel: '.$e->getMessage());
         }
 
         \Log::error('Permintaan tidak valid: File harus diunggah.');
+
         return redirect()->back()->with('error', 'File harus diunggah.');
     }
 
@@ -306,7 +316,7 @@ class Article extends Controller
     {
         try {
             // Pastikan request memiliki ID
-            if (!$request->has('id')) {
+            if (! $request->has('id')) {
                 return redirect()->back()->with('error', 'ID artikel tidak ditemukan.');
             }
 
@@ -315,6 +325,7 @@ class Article extends Controller
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                 \Log::error('Gagal dekripsi ID artikel.', ['error' => $e->getMessage()]);
+
                 return redirect()->back()->with('error', 'ID artikel tidak valid.');
             }
 
@@ -349,7 +360,6 @@ class Article extends Controller
         }
     }
 
-
     public function category_store(Request $request): RedirectResponse
     {
         // Log data yang diterima dari request
@@ -358,12 +368,13 @@ class Article extends Controller
         // Validasi input
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
-            'name' => 'required|string|max:255|unique:' . Category::class,
+            'name' => 'required|string|max:255|unique:'.Category::class,
         ]);
 
         // Log hasil validasi
         if ($validator->fails()) {
             \Log::info('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -378,7 +389,7 @@ class Article extends Controller
             // Log keberhasilan pembuatan kategori
             \Log::info('Kategori berhasil dibuat:', $category->toArray());
 
-            return redirect()->back()->with('success', 'Berhasil membuat kategori: ' . $request->name);
+            return redirect()->back()->with('success', 'Berhasil membuat kategori: '.$request->name);
         } catch (\Exception $e) {
             // Log error jika terjadi exception
             \Log::error('Gagal membuat kategori:', [
@@ -386,7 +397,7 @@ class Article extends Controller
                 'data' => $request->all(),
             ]);
 
-            return redirect()->back()->with('error', 'Gagal membuat kategori: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat kategori: '.$e->getMessage());
         }
     }
 
@@ -410,7 +421,7 @@ class Article extends Controller
 
             return redirect()->back()->with('success', 'Berhasil menyunting kategori: ');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menyunting kategori: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menyunting kategori: '.$e->getMessage());
         }
     }
 
@@ -425,5 +436,4 @@ class Article extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus kategori.');
         }
     }
-
 }

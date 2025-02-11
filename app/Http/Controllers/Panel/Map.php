@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Document;
-use App\Models\Sector;
-use App\Models\RegionalAgency;
 use App\Models\Map as ModelMap;
+use App\Models\RegionalAgency;
+use App\Models\Sector;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class Map extends Controller
@@ -26,7 +26,7 @@ class Map extends Controller
         $count = ModelMap::count();
         $title = 'Peta';
         $prefix = 'maps';
-        $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
+        $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar '.env('APP_NAME', 'Satu Peta Purwakarta').'. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
         return view('panel.geospatials.map', compact('prefix', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
     }
@@ -46,19 +46,22 @@ class Map extends Controller
                         if ($row->documents->isNotEmpty()) {
                             $downloadLinks = '';
                             foreach ($row->documents as $document) {
-                                $downloadLinks .= '<a href="' . route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]) . '" class="badge rounded-pill bg-primary text-light">
+                                $downloadLinks .= '<a href="'.route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]).'" class="badge rounded-pill bg-primary text-light">
                                 <em class="icon ni ni-download-cloud"></em> Unduh
                             </a><br>';
                             }
+
                             return $downloadLinks;
                         }
+
                         return '<span class="badge bg-secondary">Tidak ada dokumen</span>';
                     })
                     ->addColumn('checkbox', function ($row) {
                         $checked = $row->is_active ? 'checked' : '';
+
                         return '<div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck' . $row->id . '" ' . $checked . ' disabled>
-                                <label class="custom-control-label" for="customCheck' . $row->id . '"></label>
+                                <input type="checkbox" class="custom-control-input" id="customCheck'.$row->id.'" '.$checked.' disabled>
+                                <label class="custom-control-label" for="customCheck'.$row->id.'"></label>
                             </div>';
                     })
                     ->addColumn('action', function ($row) {
@@ -70,32 +73,32 @@ class Map extends Controller
                                     <ul class="link-list-opt no-bdr">
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#detailMapModal"
-                                                data-regional-agency="' . optional($row->regional_agency)->name . '"
-                                                data-sector="' . optional($row->sector)->name . '"
-                                                data-geojson="' . (optional($row->documents)->first()->path ? Storage::url($row->documents->first()->path) : '') . '"
-                                                data-name="' . $row->name . '"
-                                                data-id="' . $row->id . '">
+                                                data-regional-agency="'.optional($row->regional_agency)->name.'"
+                                                data-sector="'.optional($row->sector)->name.'"
+                                                data-geojson="'.(optional($row->documents)->first()->path ? Storage::url($row->documents->first()->path) : '').'"
+                                                data-name="'.$row->name.'"
+                                                data-id="'.$row->id.'">
                                                 <em class="icon ni ni-eye"></em><span>Lihat</span>
                                             </a></li>
                                         <li class="divider"></li>
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#editMapModal"
-                                                data-regional-agency="' . optional($row->regional_agency)->id . '"
-                                                data-sector="' . optional($row->sector)->id . '"
-                                                data-name="' . $row->name . '"
-                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                                data-regional-agency="'.optional($row->regional_agency)->id.'"
+                                                data-sector="'.optional($row->sector)->id.'"
+                                                data-name="'.$row->name.'"
+                                                data-id="'.Crypt::encrypt($row->id).'">
                                                 <em class="icon ni ni-edit"></em><span>Edit</span>
                                             </a></li>
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                data-bs-target="' . ($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal') . '"
-                                                data-name="' . $row->name . '"
-                                                data-id="' . Crypt::encrypt($row->id) . '">
-                                                <em class="icon ni ' . ($row->is_active ? 'ni-cross-round' : 'ni-check-round') . '"></em><span>' . ($row->is_active ? 'Deaktivasi' : 'Aktivasi') . '</span>
+                                                data-bs-target="'.($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal').'"
+                                                data-name="'.$row->name.'"
+                                                data-id="'.Crypt::encrypt($row->id).'">
+                                                <em class="icon ni '.($row->is_active ? 'ni-cross-round' : 'ni-check-round').'"></em><span>'.($row->is_active ? 'Deaktivasi' : 'Aktivasi').'</span>
                                             </a></li>
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#deleteMapModal"
-                                                data-id="' . Crypt::encrypt($row->id) . '"
-                                                data-name="' . $row->name . '">
+                                                data-id="'.Crypt::encrypt($row->id).'"
+                                                data-name="'.$row->name.'">
                                                 <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
                                             </a></li>
                                     </ul>
@@ -106,11 +109,11 @@ class Map extends Controller
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
     }
-
 
     public function store(Request $request): RedirectResponse
     {
@@ -128,6 +131,7 @@ class Map extends Controller
 
         if ($validator->fails()) {
             \Log::warning('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -146,13 +150,14 @@ class Map extends Controller
                 \Log::info("Path sementara file: $temporaryPath");
                 \Log::info("Path lengkap file: $fullpath");
 
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file dari lokasi sementara ke folder final
-                $newFilePath = 'uploads/maps/' . basename($temporaryPath);
+                $newFilePath = 'uploads/maps/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
                 \Log::info("File berhasil dipindahkan ke: $newFilePath");
@@ -190,10 +195,12 @@ class Map extends Controller
             }
         } catch (\Exception $e) {
             \Log::error('Gagal membuat peta', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal membuat peta: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Gagal membuat peta: '.$e->getMessage());
         }
 
         \Log::error('Permintaan tidak valid: File harus diunggah.');
+
         return redirect()->back()->with('error', 'File harus diunggah.');
     }
 
@@ -209,9 +216,9 @@ class Map extends Controller
             'name' => 'required|string|max:80',
         ]);
 
-
         if ($validator->fails()) {
             \Log::warning('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -233,13 +240,14 @@ class Map extends Controller
                 \Log::info("Path sementara file: $temporaryPath");
                 \Log::info("Path lengkap file: $fullpath");
 
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file ke folder tujuan
-                $newFilePath = 'uploads/maps/' . basename($temporaryPath);
+                $newFilePath = 'uploads/maps/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
 
@@ -286,10 +294,12 @@ class Map extends Controller
             }
         } catch (\Exception $e) {
             \Log::error('Gagal membuat peta', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal membuat peta: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Gagal membuat peta: '.$e->getMessage());
         }
 
         \Log::error('Permintaan tidak valid: File harus diunggah.');
+
         return redirect()->back()->with('error', 'File harus diunggah.');
     }
 
@@ -297,7 +307,7 @@ class Map extends Controller
     {
         try {
             // Pastikan request memiliki ID
-            if (!$request->has('id')) {
+            if (! $request->has('id')) {
                 return redirect()->back()->with('error', 'ID peta tidak ditemukan.');
             }
 
@@ -306,6 +316,7 @@ class Map extends Controller
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                 \Log::error('Gagal dekripsi ID maps.', ['error' => $e->getMessage()]);
+
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
             }
 
@@ -344,7 +355,7 @@ class Map extends Controller
     {
         try {
             // Pastikan request memiliki ID
-            if (!$request->has('id')) {
+            if (! $request->has('id')) {
                 return redirect()->back()->with('error', 'ID peta tidak ditemukan.');
             }
 
@@ -353,6 +364,7 @@ class Map extends Controller
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                 \Log::error('Gagal dekripsi ID peta.', ['error' => $e->getMessage()]);
+
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
             }
 
@@ -360,7 +372,7 @@ class Map extends Controller
             $maps = ModelMap::findOrFail($id);
 
             // Toggle status is_active
-            $maps->is_active = !$maps->is_active;
+            $maps->is_active = ! $maps->is_active;
             $message = $maps->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
             $maps->save();
@@ -400,25 +412,28 @@ class Map extends Controller
             $mimeType = $document->mime_type;
 
             // Cek apakah file ada di storage
-            if (!Storage::disk('public')->exists($filePath)) {
+            if (! Storage::disk('public')->exists($filePath)) {
                 \Log::error("File tidak ditemukan di path: $filePath");
+
                 return redirect()->back()->with('error', 'File tidak ditemukan di server.');
             }
 
             // Kembalikan response download file
             return response()->download(Storage::disk('public')->path($filePath), $fileName, [
-                'Content-Type' => $mimeType
+                'Content-Type' => $mimeType,
             ]);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            \Log::error("Gagal dekripsi parameter", ['error' => $e->getMessage()]);
+            \Log::error('Gagal dekripsi parameter', ['error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'ID tidak valid.');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            \Log::error("Data tidak ditemukan", ['error' => $e->getMessage()]);
+            \Log::error('Data tidak ditemukan', ['error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Data tidak ditemukan.');
         } catch (\Exception $e) {
-            \Log::error("Gagal mendownload file", ['error' => $e->getMessage()]);
+            \Log::error('Gagal mendownload file', ['error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal mendownload file.');
         }
     }
-
 }

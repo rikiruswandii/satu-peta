@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\RelatedLink;
 use App\Settings\GeneralSettings;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class Settings extends Controller
@@ -31,7 +31,7 @@ class Settings extends Controller
             ->get();
         $prefix = 'settings';
         $title = 'Settings';
-        $description = $title . ' page!';
+        $description = $title.' page!';
 
         return view('panel.settings', compact('relatedLinks', 'data', 'tautan', 'prefix', 'title', 'description'));
     }
@@ -55,15 +55,17 @@ class Settings extends Controller
                             $logo = '<div class="user-avatar sq">';
                             foreach ($row->documents as $document) {
                                 if ($document->path) {
-                                    $logo .= '<img src="' . Storage::url($document->path) . '" alt="Avatar Pengguna">';
+                                    $logo .= '<img src="'.Storage::url($document->path).'" alt="Avatar Pengguna">';
                                 } else {
-                                    $logo .= '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+                                    $logo .= '<img src="'.asset('assets/images/default.png').'" alt="Avatar Default">';
                                 }
                             }
                             $logo .= '</div>';
+
                             return $logo;
                         }
-                        return '<img src="' . asset("assets/images/default.png") . '" alt="Avatar Default">';
+
+                        return '<img src="'.asset('assets/images/default.png').'" alt="Avatar Default">';
                     })
                     ->addColumn('action', function ($row) {
                         return '<div class="dropdown">
@@ -74,26 +76,27 @@ class Settings extends Controller
                                     <ul class="link-list-opt no-bdr">
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#updateModal"
-                                                data-id="' . Crypt::encrypt($row->id) . '"
-                                                data-name="' . $row->title . '"
-                                                data-url="' . $row->url . '"
+                                                data-id="'.Crypt::encrypt($row->id).'"
+                                                data-name="'.$row->title.'"
+                                                data-url="'.$row->url.'"
                                                 >
                                                 <em class="icon ni ni-edit"></em><span>Edit</span>
                                             </a></li>
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#deleteMapModal"
-                                                data-id="' . Crypt::encrypt($row->id) . '"
-                                                data-name="' . $row->name . '">
+                                                data-id="'.Crypt::encrypt($row->id).'"
+                                                data-name="'.$row->name.'">
                                                 <em class="icon ni ni-trash"></em><span>Delete</span>
                                             </a></li>
                                     </ul>
                                 </div>
                             </div>';
                     })
-                    ->rawColumns(['action','logo'])
+                    ->rawColumns(['action', 'logo'])
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
@@ -130,7 +133,7 @@ class Settings extends Controller
         try {
             if ($request->hasFile('logo')) {
                 if ($this->setting->logo) {
-                    Storage::disk('public')->delete('logos/' . $this->setting->logo);
+                    Storage::disk('public')->delete('logos/'.$this->setting->logo);
                 }
 
                 $file = $request->file('logo');
@@ -139,7 +142,7 @@ class Settings extends Controller
 
                 $stored = $file->storeAs('logos', $fileName, 'public');
 
-                if (!$stored) {
+                if (! $stored) {
                     return redirect()->back()->withErrors('errorr', 'Gagal menyimpan file!');
                 }
 
@@ -156,10 +159,10 @@ class Settings extends Controller
 
             return redirect()->back()->with('success', 'Pengaturan berhasil diperbarui!');
         } catch (\Exception $e) {
-            \Log::info('error : ' . $e->getMessage());
+            \Log::info('error : '.$e->getMessage());
 
             // \Log::info('info : ' . $request->all());
-            return redirect()->back()->withErrors(['error', 'Pengaturan gagal diperbarui.' . $e->getMessage()]);
+            return redirect()->back()->withErrors(['error', 'Pengaturan gagal diperbarui.'.$e->getMessage()]);
         }
     }
 
@@ -172,7 +175,6 @@ class Settings extends Controller
     //             'string',
     //         ]
     //     );
-
 
     //     if ($validator->fails()) {
     //         return redirect()->back()->withErrors($validator)->withInput();
@@ -208,6 +210,7 @@ class Settings extends Controller
 
         if ($validator->fails()) {
             \Log::info('Validasi gagal: ', $validator->errors()->toArray());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -234,13 +237,14 @@ class Settings extends Controller
                 \Log::info('Path lengkap file sementara: ', ['fullpath' => $fullpath]);
 
                 // Cek jika file sementara ada
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error('File sementara tidak ditemukan: ', ['fullpath' => $fullpath]);
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file dari lokasi sementara ke folder final
-                $newFilePath = 'uploads/logos/' . basename($temporaryPath);
+                $newFilePath = 'uploads/logos/'.basename($temporaryPath);
                 \Log::info('Path baru untuk file: ', ['newFilePath' => $newFilePath]);
 
                 // Menggunakan put untuk menyimpan file ke disk 'public'
@@ -287,12 +291,12 @@ class Settings extends Controller
                 return redirect()->back()->with('success', 'Tautan berhasil dibuat tanpa logo.');
             }
         } catch (\Exception $e) {
-            \Log::error('Gagal membuat tautan: ' . $e->getMessage(), [
+            \Log::error('Gagal membuat tautan: '.$e->getMessage(), [
                 'request_data' => $request->all(),
                 'stack_trace' => $e->getTraceAsString(),
             ]);
 
-            return redirect()->back()->with('error', 'Gagal membuat tautan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat tautan: '.$e->getMessage());
         }
     }
 
@@ -309,6 +313,7 @@ class Settings extends Controller
 
         if ($validator->fails()) {
             \Log::info('Validasi gagal: ', $validator->errors()->toArray());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -335,13 +340,14 @@ class Settings extends Controller
                 Log::info("Path sementara file: $temporaryPath");
                 Log::info("Path lengkap file: $fullpath");
 
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file ke folder tujuan
-                $newFilePath = 'uploads/logos/' . basename($temporaryPath);
+                $newFilePath = 'uploads/logos/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
 
@@ -385,13 +391,13 @@ class Settings extends Controller
 
             return redirect()->back()->with('success', 'Tautan berhasil diupdate.');
         } catch (\Exception $e) {
-            \Log::error('Gagal mengupdate tautan: ' . $e->getMessage(), [
+            \Log::error('Gagal mengupdate tautan: '.$e->getMessage(), [
                 'request_data' => $request->all(),
                 'stack_trace' => $e->getTraceAsString(),
             ]);
 
             return back()->withInput()->withErrors([
-                'error' => 'Gagal mengupdate tautan: ' . $e->getMessage(),
+                'error' => 'Gagal mengupdate tautan: '.$e->getMessage(),
             ]);
         }
     }
@@ -410,7 +416,7 @@ class Settings extends Controller
 
             return redirect()->back()->with('success', 'Tautan berhasil dihapus.');
         } catch (\Exception $e) {
-            \Log::error('Gagal hapus tautan: ' . $e->getMessage(), [
+            \Log::error('Gagal hapus tautan: '.$e->getMessage(), [
                 'request_data' => $request->all(),
                 'stack_trace' => $e->getTraceAsString(),
             ]);
