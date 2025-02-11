@@ -46,7 +46,7 @@ class Map extends Controller
                         if ($row->documents->isNotEmpty()) {
                             $downloadLinks = '';
                             foreach ($row->documents as $document) {
-                                $downloadLinks .= '<a href="' . route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]) . '" class="badge rounded-pill bg-primary text-light">
+                                $downloadLinks .= '<a href="'.route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]).'" class="badge rounded-pill bg-primary text-light">
                             <em class="icon ni ni-download-cloud"></em> Unduh
                         </a><br>';
                             }
@@ -60,8 +60,8 @@ class Map extends Controller
                         $checked = $row->is_active ? 'checked' : '';
 
                         return '<div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="customCheck' . $row->id . '" ' . $checked . ' disabled>
-                            <label class="custom-control-label" for="customCheck' . $row->id . '"></label>
+                            <input type="checkbox" class="custom-control-input" id="customCheck'.$row->id.'" '.$checked.' disabled>
+                            <label class="custom-control-label" for="customCheck'.$row->id.'"></label>
                         </div>';
                     })
                     ->addColumn('action', function ($row) {
@@ -69,11 +69,11 @@ class Map extends Controller
                         foreach ($row->documents as $document) {
                             $detailLinks .= '<li><a href="javascript:void(0);" data-bs-toggle="modal"
                                             data-bs-target="#detailMapModal"
-                                            data-regional-agency="' . optional($row->regional_agency)->name . '"
-                                            data-sector="' . optional($row->sector)->name . '"
-                                            data-geojson="' . Storage::url($document->path) . '"
-                                            data-name="' . $row->name . '"
-                                            data-id="' . $row->id . '">
+                                            data-regional-agency="'.optional($row->regional_agency)->name.'"
+                                            data-sector="'.optional($row->sector)->name.'"
+                                            data-geojson="'.Storage::url($document->path).'"
+                                            data-name="'.$row->name.'"
+                                            data-id="'.$row->id.'">
                                             <em class="icon ni ni-eye"></em><span>Lihat</span>
                                         </a></li>';
                         }
@@ -84,26 +84,26 @@ class Map extends Controller
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <ul class="link-list-opt no-bdr">
-                                    ' . $detailLinks . '
+                                    '.$detailLinks.'
                                     <li class="divider"></li>
                                     <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                             data-bs-target="#editMapModal"
-                                            data-regional-agency="' . optional($row->regional_agency)->id . '"
-                                            data-sector="' . optional($row->sector)->id . '"
-                                            data-name="' . $row->name . '"
-                                            data-id="' . Crypt::encrypt($row->id) . '">
+                                            data-regional-agency="'.optional($row->regional_agency)->id.'"
+                                            data-sector="'.optional($row->sector)->id.'"
+                                            data-name="'.$row->name.'"
+                                            data-id="'.Crypt::encrypt($row->id).'">
                                             <em class="icon ni ni-edit"></em><span>Edit</span>
                                         </a></li>
                                     <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="' . ($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal') . '"
-                                            data-name="' . $row->name . '"
-                                            data-id="' . Crypt::encrypt($row->id) . '">
-                                            <em class="icon ni ' . ($row->is_active ? 'ni-cross-round' : 'ni-check-round') . '"></em><span>' . ($row->is_active ? 'Deaktivasi' : 'Aktivasi') . '</span>
+                                            data-bs-target="'.($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal').'"
+                                            data-name="'.$row->name.'"
+                                            data-id="'.Crypt::encrypt($row->id).'">
+                                            <em class="icon ni '.($row->is_active ? 'ni-cross-round' : 'ni-check-round').'"></em><span>'.($row->is_active ? 'Deaktivasi' : 'Aktivasi').'</span>
                                         </a></li>
                                     <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                             data-bs-target="#deleteMapModal"
-                                            data-id="' . Crypt::encrypt($row->id) . '"
-                                            data-name="' . $row->name . '">
+                                            data-id="'.Crypt::encrypt($row->id).'"
+                                            data-name="'.$row->name.'">
                                             <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
                                         </a></li>
                                 </ul>

@@ -18,7 +18,7 @@ class Search extends Controller
             ->groupBy('regional_agencies.id', 'regional_agencies.name')
             ->get();
 
-        $mapsQuery = Map::with("regional_agency", "sector", "documents")->where("is_active", 1);
+        $mapsQuery = Map::with('regional_agency', 'sector', 'documents')->where('is_active', 1);
 
         if ($request->has('regional_agencies')) {
             $mapsQuery->whereIn('regional_agency_id', $request->regional_agencies);
@@ -31,7 +31,7 @@ class Search extends Controller
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $mapsQuery->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'like', '%' . $searchTerm . '%');
+                $query->where('name', 'like', '%'.$searchTerm.'%');
             });
         }
 
@@ -41,11 +41,10 @@ class Search extends Controller
             'title' => 'Pencarian',
             'description' => 'Masukkan kata kunci pencarian anda di sini.',
             'categories' => Sector::all(),
-            'groups' => RegionalAgency::with("map")->get(),
+            'groups' => RegionalAgency::with('map')->get(),
             'maps' => $maps,
             'regionalAgencySum' => $regionalAgencySum,
         ];
-        
 
         return view('guest.search', $data);
     }

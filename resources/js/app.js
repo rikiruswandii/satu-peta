@@ -330,7 +330,6 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
         });
 
         if (feature) {
-            // Ambil properties dari fitur dan buat tabel
             const properties = feature.getProperties();
             let tableHTML = '<table class="table table-sm table-bordered" style="width: 200px; font-size: 0.8rem;">' +
                 '<thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
@@ -344,9 +343,11 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
             tableHTML += '</tbody></table>';
 
             popupContent.innerHTML = tableHTML;
+            popupElement.style.display = 'block'; // Tampilkan popup
             popupOverlay.setPosition(event.coordinate);
         } else {
             popupOverlay.setPosition(undefined);
+            popupElement.style.display = 'none'; // Sembunyikan popup
         }
     };
 
@@ -360,7 +361,20 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
         }
     });
 
-    map.on('singleclick', displayPopup);
+    map.on('singleclick', function (event) {
+        const feature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
+            return feature;
+        });
+
+        if (feature) {
+            displayPopup(event);
+        } else {
+            popupOverlay.setPosition(undefined);
+            popupElement.style.display = 'none';
+        }
+    });
+
+
 
     // Fungsi untuk menutup popup
     popupCloser.onclick = function () {

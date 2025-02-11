@@ -26,16 +26,18 @@ font-family: Verdana, Tahoma, "DejaVu Sans", sans-serif;
 }
 
 .ol-popup {
-position: absolute;
-background-color: white;
-box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-padding: 15px;
-border-radius: 10px;
-border: 1px solid #cccccc;
-bottom: 12px;
-left: -50px;
-min-width: 280px;
+    display: none; /* Sembunyikan popup secara default */
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 280px;
 }
+
 .ol-popup:after, .ol-popup:before {
 top: 100%;
 border: solid transparent;
