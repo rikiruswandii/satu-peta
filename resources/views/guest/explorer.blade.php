@@ -3,7 +3,7 @@
     @section('description', $description) <!-- Mengatur deskripsi halaman -->
     @php
         $modalDataset = [
-            'title' => 'Layer',
+            'title' => 'Tambah Layer',
             'footer' => '',
         ];
     @endphp
@@ -56,8 +56,8 @@
         <x-modal :id="'openModalDataset'" :data="$modalDataset" :showCancelButton="false" :size="'sm'">
             <x-slot name="body">
                 <div class="p-2 d-flex justify-content-center align-items-center">
-                    <input class="border-0 p-1 rounded" type="text" name="search-dataset" id="search-dataset"
-                        placeholder="cari.."><button class="border-0 p-1 rounded" type="submit"><i
+                    <input class="border-0 p-1 rounded-start" type="text" name="search-dataset" id="search-dataset"
+                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="submit"><i
                             class="bi bi-search text-success ms-1"></i></button>
                 </div>
                 <div class="mt-1 row p-2 overflow-x-auto body-dataset" style="max-height: 370px; scrollbar-width: none;">

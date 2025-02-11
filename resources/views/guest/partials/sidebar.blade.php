@@ -119,6 +119,10 @@
             padding: 5px;
             border-radius: 3px;
         }
+
+        input[type=checkbox] {
+            accent-color: #0fac81;
+        }
     </style>
 @endpush
 
@@ -136,9 +140,7 @@
                         class="bi bi-arrow-bar-left"></i></a>
             </div>
         </div>
-        <div class="p-3">
-            <ul id="layerList" class="list-group"></ul>
-        </div>
+        <ul id="layerList" class="list-group list-group-flush"></ul>
     </div>
 
     <!-- Toggle Sidebar Button -->
@@ -147,10 +149,12 @@
         <i id="toggleSidebar" class="bi bi-list" style="cursor: pointer;"></i>
         <form action="" method="get">
             <div class="d-flex jutify-content-center align-items-center">
-                <input type="text" class="ms-2 border-0 p-1 rounded-start" name="search-from-aside" id="search-from-aside"
-                    placeholder="cari..">
-                <button  id="search-btn" class="border-0 p-1 link-success" type="button"><i class="bi bi-search ms-1"></i></button>
-                <button id="close-result-btn" class="border-0 p-1 d-none link-danger rounded-end" type="button"><i class="bi bi-x-circle ms-1 me-1"></i></button>{{-- secara default disembunyikan, dimuncukan ketika result area dimunculkan --}}
+                <input type="text" class="ms-2 border-0 p-1 rounded-start" name="search-from-aside"
+                    id="search-from-aside" placeholder="cari..">
+                <button id="search-btn" class="border-0 p-1 link-success" type="button"><i
+                        class="bi bi-search ms-1"></i></button>
+                <button id="close-result-btn" class="border-0 p-1 d-none link-danger rounded-end" type="button"><i
+                        class="bi bi-x-circle ms-1 me-1"></i></button>{{-- secara default disembunyikan, dimuncukan ketika result area dimunculkan --}}
             </div>
         </form>
     </div>
@@ -159,7 +163,8 @@
     <div class="result-area" id="result-area" style="display: none;">
         <div class="result-area-heading"></div>
         <!-- Result -->
-        <div id="search-results" class="list-group list-group-flush"></div>
+        <div id="search-results" class="list-group list-group-flush">
+        </div>
         <!--... -->
     </div>
 </div>

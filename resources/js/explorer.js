@@ -72,9 +72,21 @@ $m(document).ready(function () {
         let layerId = `layer-${Date.now()}`;
         layer.set("id", layerId);
 
-        let listItem = `<li data-layer-id="${layerId}" class="list-group-item" style="cursor:pointer;">${name}</li>`;
+        let listItem = `
+    <li data-layer-id="${layerId}" class="list-group-item text-success d-flex justify-content-between align-items-center" style="cursor:pointer;font-size:14px;">
+        <div class="d-flex align-items-center gap-2">
+            <input type="checkbox" id="is-active" value="" checked>
+            <span>${name}</span>
+        </div>
+        <div class="d-flex gap-2">
+            <i id="boundToLayer" class="bi bi-aspect-ratio link-secondary"></i>
+            <i id="removeLayer" class="bi bi-x-circle-fill link-danger"></i>
+        </div>
+    </li>`;
+
         $m("#layerList").append(listItem);
     }
+
 
     // Saat tombol diklik, tambahkan layer baru dan masukkan ke dalam list
     $m(".list-group-item a").on("click", function () {
@@ -112,7 +124,7 @@ $m(document).ready(function () {
             color: 'white',
             backgroundColor: '#0fac81'
         });
-        $m('.modal-title').attr('style', 'color: white !important');
+        $m('.modal-title').attr('style', 'color: white !important; font-size: 16px !important;');
         $m('.modal-content').css({
             'background': 'rgba(255, 255, 255, 0.5)',
             'backdrop-filter': 'blur(3px)'
@@ -135,6 +147,35 @@ $m(document).ready(function () {
             handle: ".modal-header"
         });
     });
+
+    $m(document).on("change", "#layerList li #is-active", function () {
+        let layerId = $m(this).closest("li").data("layer-id");
+        let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
+        if (layer) {
+            layer.setVisible($m(this).is(":checked"));
+        }
+    });
+
+    $m(document).on("click", "#layerList li #boundToLayer", function () {
+        let layerId = $m(this).closest("li").data("layer-id");
+        let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
+        if (layer) {
+            let extent = layer.getSource().getExtent();
+            if (extent) {
+                map.getView().fit(extent, { duration: 500 });
+            }
+        }
+    });
+
+    $m(document).on("click", "#layerList li #removeLayer", function () {
+        let layerId = $m(this).closest("li").data("layer-id");
+        let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
+        if (layer) {
+            map.removeLayer(layer);
+        }
+        $m(this).closest("li").remove();
+    });
+
 
     // Sumber data untuk marker
     const vectorSource = new VectorSource();
@@ -208,7 +249,7 @@ $m(document).ready(function () {
                     if (lon === undefined || lat === undefined) return;
 
                     const listItem = $m("<li></li>")
-                        .addClass("list-group-item")
+                        .addClass("list-group-item text-success")
                         .text(name)
                         .css({ cursor: "pointer" })
                         .on("click", function () {
