@@ -390,7 +390,7 @@
                     theme: 'bootstrap-5'
                 });
 
-                initMap('searchMapId', '' , { scale: true, fullScreen: true, zoomSlider: false, basemap:false, draw:false }, { dragPan: false, mouseWheelZoom: false });
+                initMap('searchMapId', '' , { scale: true, fullScreen: true }, {});
             });
         </script>
     @endpush

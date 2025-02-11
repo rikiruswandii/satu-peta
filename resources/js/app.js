@@ -392,30 +392,35 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
 }
 
 // Fungsi untuk membuat kontrol dengan opsi yang dapat diaktifkan atau dinonaktifkan
-function createControls(options, map) {
+function createControls(options = {}, map) {
     const availableControls = {
-        scale: new ScaleLine({ units: 'imperial' }),
-        fullScreen: new FullScreen(),
-        zoomSlider: new ZoomSlider(),
-        basemap: options.basemap ? new BasemapControl({ basemap: true }) : null,
-        draw: map ? new DrawControl({ map }) : null
+        scale: () => new ScaleLine({ units: 'imperial' }),
+        fullScreen: () => new FullScreen(),
+        zoomSlider: () => new ZoomSlider(),
+        basemap: () => new BasemapControl({ basemap: true }),
+        draw: () => map ? new DrawControl({ map }) : null
     };
 
     return defaultControls().extend(
-        Object.keys(options)
-            .map(key => options[key] ? availableControls[key] : null)
+        Object.keys(availableControls)
+            .map(key => options[key] ? availableControls[key]() : null)
             .filter(Boolean)
     );
 }
 
-function createInteractions(options) {
+
+function createInteractions(options = {}) {
     const availableInteractions = {
-        dragPan: new DragPan(),
-        doubleClickZoom: new DoubleClickZoom(),
-        mouseWheelZoom: new MouseWheelZoom(),
+        dragPan: () => new DragPan(),
+        doubleClickZoom: () => new DoubleClickZoom(),
+        mouseWheelZoom: () => new MouseWheelZoom(),
     };
 
-    return defaultInteractions().extend(Object.keys(options).map(key => options[key] ? availableInteractions[key] : null).filter(Boolean));
+    return defaultInteractions().extend(
+        Object.keys(availableInteractions)
+            .map(key => options[key] ? availableInteractions[key]() : null)
+            .filter(Boolean)
+    );
 }
 
 window.initMap = initMap;

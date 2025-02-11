@@ -40,8 +40,7 @@ $m(document).ready(function () {
         basemap: true,
         draw: true
     }, {
-        dragPan: true,
-        mouseWheelZoom: false
+        dragPan: true
     })
 
     $m("#layerList").sortable({
