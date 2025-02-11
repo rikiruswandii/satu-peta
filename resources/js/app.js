@@ -305,9 +305,16 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
     });
 
     // Membuat overlay untuk popup
-    const popupElement = document.getElementById('popup');
-    const popupContent = document.getElementById('popup-content');
-    const popupCloser = document.getElementById('popup-closer');
+    const popupElement = document.createElement('div');
+    popupElement.className = 'ol-popup';
+    const popupContent = document.createElement('div');
+    popupContent.id = `popup-content-${mapId}`;
+    const popupCloser = document.createElement('a');
+    popupCloser.href = '#';
+    popupCloser.className = 'ol-popup-closer';
+
+    popupElement.appendChild(popupCloser);
+    popupElement.appendChild(popupContent);
 
     const popupOverlay = new Overlay({
         element: popupElement,
@@ -316,7 +323,6 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
     });
     map.addOverlay(popupOverlay);
 
-    // Fungsi untuk menampilkan popup saat hover
     // Fungsi untuk menampilkan popup saat hover
     const displayPopup = function (event) {
         const feature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
@@ -330,7 +336,7 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
                 '<thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
 
             for (const key in properties) {
-                if (properties.hasOwnProperty(key)) {
+                if (properties.hasOwnProperty(key) && key !== 'geometry') {
                     tableHTML += `<tr><td>${key}</td><td>${properties[key]}</td></tr>`;
                 }
             }
@@ -359,6 +365,7 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
     // Fungsi untuk menutup popup
     popupCloser.onclick = function () {
         popupOverlay.setPosition(undefined);
+        return false;
     };
 
     return map;
