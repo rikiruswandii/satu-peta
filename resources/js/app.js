@@ -90,7 +90,15 @@ const baseMaps = {
 class BasemapControl extends Control {
     constructor(opt_options) {
         const options = opt_options || {};
+
+        // Panggil super() sebelum mengakses 'this'
         const element = document.createElement('div');
+        super({ element });
+
+        if (!options.basemap) {
+            return; // Jika basemap dinonaktifkan, hentikan eksekusi
+        }
+
         element.className = 'ol-basemap-control ol-unselectable ol-control';
 
         // Elemen UI
@@ -114,16 +122,11 @@ class BasemapControl extends Control {
             </div>
         `;
 
-        // Tombol Floating untuk Menampilkan Basemap Control
+        // Tambahkan tombol floating toggle
         const toggleButton = document.createElement('button');
         toggleButton.className = 'btn btn-success btn-sm basemap-toggle-btn';
         toggleButton.innerHTML = '<i class="bi bi-layers"></i>';
         document.body.appendChild(toggleButton);
-
-        super({
-            element: element,
-            target: options.target
-        });
 
         // Event Klik Thumbnail untuk Mengubah Basemap
         element.querySelectorAll('.basemap-item').forEach(item => {
@@ -147,10 +150,10 @@ class BasemapControl extends Control {
 
             if (container.classList.contains('hidden')) {
                 this.innerHTML = '<i class="bi bi-eye"></i>';
-                toggleButton.classList.remove('hidden'); // Munculkan tombol floating dengan transisi
+                toggleButton.classList.remove('hidden'); // Munculkan tombol floating
             } else {
                 this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-                toggleButton.classList.add('hidden'); // Sembunyikan tombol floating dengan transisi
+                toggleButton.classList.add('hidden'); // Sembunyikan tombol floating
             }
         });
 
@@ -159,11 +162,14 @@ class BasemapControl extends Control {
             const container = element.querySelector('.basemap-container');
             container.classList.remove('hidden');
             element.querySelector('.toggle-basemap').innerHTML = '<i class="bi bi-eye-slash"></i>';
-            this.classList.add('hidden'); // Sembunyikan tombol floating dengan transisi
+            this.classList.add('hidden'); // Sembunyikan tombol floating
         });
 
     }
 }
+
+
+
 
 class DrawControl extends Control {
     constructor(options = {}) {
@@ -391,7 +397,7 @@ function createControls(options, map) {
         scale: new ScaleLine({ units: 'imperial' }),
         fullScreen: new FullScreen(),
         zoomSlider: new ZoomSlider(),
-        basemap: new BasemapControl(),
+        basemap: options.basemap ? new BasemapControl({ basemap: true }) : null,
         draw: map ? new DrawControl({ map }) : null
     };
 
