@@ -19,6 +19,26 @@
                 margin: 0;
                 padding: 10px;
             }
+
+            .btn-login {
+                background: #0fac81;
+                color: #ffffff;
+                padding: 10px;
+                margin: 0;
+                border-radius: 3px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+            }
+
+            .btn-login:hover {
+                background: none;
+                color: #0fac81;
+                border: 5px;
+                border-radius: 3px;
+                border-color: #0fac81;
+                box-shadow: 5px 5px 10px rgba(7, 160, 96, 0.5);
+            }
         </style>
     @endpush
 
