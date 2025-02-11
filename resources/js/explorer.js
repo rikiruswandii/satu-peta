@@ -131,7 +131,7 @@ $m(document).ready(function () {
 
         if (!($m('.modal.in').length)) {
             $m('.modal-dialog').css({
-                top: 0,
+                top: 200,
                 left: 280
             });
         }
