@@ -324,6 +324,31 @@
         @include('panel.partials.delete')
     @endsection
 
+    @push('css')
+        <style>
+            #detailMap {
+                position: relative;
+            }
+
+            .loading-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+            
+            #popup.ol-popup {
+                display: none !important;
+            }
+        </style>
+    @endpush
+
     @push('scripts')
         <script>
             $(document).ready(function() {
@@ -421,33 +446,66 @@
                 modal.find('select[name="regional_agency_id"]').val(regional_agency).trigger('change');
             });
 
+
             $(document).on('click', '[data-bs-target="#detailMapModal"]', function() {
+                var currentMap = null;
                 var path = $(this).data('geojson');
                 var regional_agency = $(this).data('regional-agency');
                 var sector = $(this).data('sector');
                 var name = $(this).data('name');
-                console.log(name); // tidak kosong
-                console.log(regional_agency); // tidak kosong
-                console.log(sector); // tidak kosong
+                console.log(name);
+                console.log(regional_agency);
+                console.log(sector);
 
                 var modal = $('#detailMapModal');
+                if (!modal) {
+                    console.error("Modal tidak ditemukan");
+                    return;
+                }
 
                 modal.find('td[id="map-name"]').html(name);
                 modal.find('td[id="map-regional-agency"]').html(regional_agency);
                 modal.find('td[id="map-sector"]').html(sector);
 
-                // Pastikan nilai path tidak kosong
                 if (!path) {
                     console.error('GeoJSON path tidak ditemukan.');
                     return;
                 }
 
-                // Temukan elemen x-map-container dan perbarui atributnya
                 var mapContainer = $('#detailMapModal').find('x-map-container');
                 mapContainer.attr('geoJsonPath', path);
 
-                // Perbarui peta dengan path baru
-                initMap('detailMap', 'osm', path, [], []);
+                // Hapus peta yang ada jika ada
+                if (currentMap) {
+                    currentMap.setTarget(null);
+                    currentMap = null;
+                }
+
+                // Bersihkan container peta
+                $('#detailMap').empty();
+
+                var mapElement = document.getElementById('detailMap');
+                if (mapElement) {
+                    mapElement.innerHTML = ''; // Kosongkan elemen peta
+
+                    // Tambahkan overlay ke elemen peta
+                    var overlay = document.createElement('div');
+                    overlay.className = 'loading-overlay';
+                    overlay.innerHTML =
+                        '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+                    mapElement.appendChild(overlay);
+
+                    currentMap = initMap('detailMap', path); // Inisialisasi peta baru dengan path GeoJSON
+
+                    // Tunggu hingga peta selesai dimuat
+                    currentMap.once('rendercomplete', function() {
+                        // Hapus overlay setelah peta selesai dimuat
+                        overlay.remove();
+                    });
+                } else {
+                    console.error('Elemen peta tidak ditemukan.');
+                    return;
+                }
             });
         </script>
     @endpush
