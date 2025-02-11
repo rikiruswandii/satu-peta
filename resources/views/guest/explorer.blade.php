@@ -57,10 +57,14 @@
             <x-slot name="body">
                 <div class="p-2 d-flex justify-content-center align-items-center">
                     <input class="border-0 p-1 rounded-start" type="text" name="search-dataset" id="search-dataset"
-                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="submit"><i
+                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn"><i
                             class="bi bi-search text-success ms-1"></i></button>
                 </div>
                 <div class="mt-1 row p-2 overflow-x-auto body-dataset" style="max-height: 370px; scrollbar-width: none;">
+                    <div id="no-results" class="alert alert-warning text-center d-none">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Data tidak ditemukan.
+                    </div>
+
                     <div class="col-12 text-success text-sm">
                         <div class="accordion" id="accordionExample">
                             @if ($data->isNotEmpty())
@@ -117,6 +121,5 @@
         @vite('resources/js/explorer.js')
     @endpush
     @push('js')
-        
     @endpush
 </x-guest-layout>

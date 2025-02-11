@@ -145,6 +145,45 @@ $m(document).ready(function () {
         $m('.modal-dialog').draggable({
             handle: ".modal-header"
         });
+
+        $m("#search-dataset").on("input", function () {
+            let searchText = $m(this).val().toLowerCase();
+            let hasResults = false;
+
+            // Loop melalui setiap accordion item (regional agency)
+            $m(".accordion-item").each(function () {
+                let agencyName = $m(this).find(".accordion-button").text().trim().toLowerCase();
+                let hasVisibleDataset = false;
+
+                // Loop melalui setiap dataset dalam regional agency
+                $m(this).find(".list-group-item").each(function () {
+                    let datasetName = $m(this).text().trim().toLowerCase();
+
+                    // Cek apakah pencarian cocok dengan agency atau dataset
+                    let isMatch = agencyName.includes(searchText) || datasetName.includes(searchText);
+                    $m(this).toggle(isMatch); // Tampilkan/sembunyikan dataset
+
+                    if (isMatch) {
+                        hasVisibleDataset = true;
+                        hasResults = true;
+                    }
+                });
+
+                // Tampilkan/sembunyikan regional agency berdasarkan apakah ada dataset yang cocok
+                $m(this).toggle(hasVisibleDataset || agencyName.includes(searchText));
+
+                if (agencyName.includes(searchText)) {
+                    hasResults = true;
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil
+            if (!hasResults) {
+                $m("#no-results").removeClass("d-none");
+            } else {
+                $m("#no-results").addClass("d-none");
+            }
+        });
     });
 
     $m(document).on("change", "#layerList li #is-active", function () {
