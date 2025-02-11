@@ -1,40 +1,33 @@
-@props(['card_title', 'card_filename', 'card_opd', 'card_id'])
+@props(['card_title', 'card_filename', 'card_opd', 'card_id', 'geojson_path', 'regional_agency', 'sector'])
 
-<div class="col-12 col-md-6 mb-4">
-    <div class="card shop-card">
+<div class="col-12 col-md-6 col-lg-4 mb-4">
+    <div class="card shop-card hover-card">
         <div class="product-img-wrap">
-            <!-- Klik gambar membuka modal map -->
-            <img class="card-img-top" src="img/bg-img/shop1.jpg" alt=""
-                style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal-map-{{ $card_id }}">
-            
-            <!-- Klik ikon membuka modal informasi -->
-            <a class="love-product" href="#" data-bs-toggle="modal" data-bs-target="#modal-info-{{ $card_id }}" 
-                title="Information">
-                <i class="bi bi-info"></i>
-            </a>
+            <div id="map-{{ $card_id }}" class="map-preview detailMapModalTrigger"
+                style="height: 200px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#detailMapModal"
+                data-geojson="{{ $geojson_path }}" data-regional-agency="{{ $regional_agency }}"
+                data-sector="{{ $sector }}" data-name="{{ $card_title }}" data-card-id="{{ $card_id }}">
+            </div>
+            <div class="map-overlay detailMapModalTrigger" data-bs-toggle="modal" data-bs-target="#detailMapModal"
+                data-geojson="{{ $geojson_path }}" data-regional-agency="{{ $regional_agency }}"
+                data-sector="{{ $sector }}" data-name="{{ $card_title }}" data-card-id="{{ $card_id }}">
+                <span class="view-details">Lihat Detail</span>
+            </div>
         </div>
-        <div class="product-meta d-flex align-items-center justify-content-between p-4">
-            <div class="product-name">
-                <h6>{{ $card_title }}</h6>
-                <h6 class="price">{{ $card_filename }}</h6>
-                <h6 class="text-muted">{{ $card_opd }}</h6>
+        <div class="card-content">
+            <div class="card-body">
+                <h5 class="card-title">{{ $card_title }}</h5>
+                <div class="card-info">
+                    <div class="info-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>{{ $card_filename }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-building"></i>
+                        <span>{{ $card_opd }}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal untuk Map -->
-<x-modal :id="'modal-map-' . $card_id" :data="['title' => 'Peta Lokasi: ' . $card_title, 'footer' => '']" :size="'xl'">
-    <x-slot name="body">
-        Peta lokasi untuk <strong>{{ $card_title }}</strong>.
-    </x-slot>
-</x-modal>
-
-<!-- Modal untuk Informasi -->
-<x-modal :id="'modal-info-' . $card_id" :data="['title' => 'Informasi Produk', 'footer' => '']" :size="'lg'">
-    <x-slot name="body">
-        Informasi tambahan untuk kartu <strong>{{ $card_title }}</strong>.  
-        <p>Nama File: {{ $card_filename }}</p>
-        <p>OPD: {{ $card_opd }}</p>
-    </x-slot>
-</x-modal>

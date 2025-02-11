@@ -1,4 +1,4 @@
-@props(['title', 'description'])
+@props(['title'])
 <div class="breadcrumb-wrapper breadcrumb-bg-light">
     <div class="container h-100">
         <div class="row h-100 align-items-center">
@@ -7,7 +7,9 @@
                     <h2 class="breadcrumb-title">{{ $title }}</h2>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center">
-                            <li class="breadcrumb-item">{{ $description }}</li>
+                            <li class="breadcrumb-item">
+                                {{ $body }}
+                            </li>
                         </ol>
                     </nav>
                 </div>
