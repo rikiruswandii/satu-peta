@@ -19,6 +19,139 @@ import { DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractio
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import Draw, { createBox } from 'ol/interaction/Draw';
+import { toPng } from 'html-to-image';
+import jsPDF from 'jspdf';
+
+class ExportControl extends Control {
+    constructor(opt_options) {
+        const options = opt_options || {};
+        if (!options.export) {
+            return;
+        }
+
+        const buttonToggle = document.createElement('button');
+        buttonToggle.innerHTML = '<i class="bi bi-printer-fill"></i>';
+        buttonToggle.title = 'Print';
+        buttonToggle.className = 'export-toggle';
+        buttonToggle.addEventListener('click', () => this.toggleModal());
+
+        const element = document.createElement('div');
+        element.className = 'ol-unselectable ol-control export-control';
+        element.appendChild(buttonToggle);
+
+        super({
+            element: element,
+            target: options.target,
+        });
+
+        this.initModalEvents();
+    }
+
+    toggleModal() {
+        // Simpan pengaturan modal sebelumnya
+        const modalHeaders = document.querySelectorAll('.modal-header');
+        const modalContents = document.querySelectorAll('.modal-content');
+        const modalDialogs = document.querySelectorAll('.modal-dialog');
+
+        const prevModalSettings = [];
+
+        modalHeaders.forEach((header, index) => {
+            prevModalSettings.push({
+                header: header,
+                cursor: header.style.cursor,
+                backgroundColor: header.style.backgroundColor,
+                color: header.style.color
+            });
+
+            // Reset hanya jika modal bukan exportModal
+            if (!header.closest('#exportModal')) {
+                header.style.cursor = '';
+                header.style.backgroundColor = '';
+                header.style.color = '';
+            }
+        });
+
+        modalContents.forEach((content) => {
+            if (!content.closest('#exportModal')) {
+                content.style.background = '';
+                content.style.backdropFilter = '';
+            }
+        });
+
+        modalDialogs.forEach((dialog) => {
+            if (!dialog.closest('#exportModal')) {
+                dialog.classList.remove('draggable'); // Jika ada class draggable
+            }
+        });
+
+        // Tampilkan exportModal
+        const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+        modal.show();
+        this.updatePreviewMap();
+
+        // Kembalikan pengaturan modal setelah exportModal ditutup
+        document.getElementById('exportModal').addEventListener('hidden.bs.modal', () => {
+            prevModalSettings.forEach(setting => {
+                setting.header.style.cursor = setting.cursor;
+                setting.header.style.backgroundColor = setting.backgroundColor;
+                setting.header.style.color = setting.color;
+            });
+
+            modalDialogs.forEach((dialog) => {
+                if (!dialog.closest('#exportModal')) {
+                    dialog.classList.add('draggable'); // Kembalikan class draggable jika sebelumnya ada
+                }
+            });
+        }, { once: true });
+    }
+
+
+    updatePreviewMap() {
+        const mapElement = this.getMap().getTargetElement();
+        toPng(mapElement).then((dataUrl) => {
+            const previewMap = document.getElementById('preview-map');
+            previewMap.src = dataUrl;
+            previewMap.style.display = 'block';
+        }).catch((error) => {
+            console.error('Error generating preview map:', error);
+        });
+    }
+
+    exportMap(format) {
+        const mapElement = this.getMap().getTargetElement();
+        const title = document.getElementById('map-title').value;
+
+        toPng(mapElement).then((dataUrl) => {
+            document.getElementById('preview-map').src = dataUrl;
+            document.getElementById('preview-map').style.display = 'block';
+
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `${title}.png`;
+                link.click();
+            } else if (format === 'pdf') {
+                const pdf = new jsPDF();
+                pdf.text(title, 10, 10);
+                pdf.addImage(dataUrl, 'PNG', 10, 20, 180, 120);
+                pdf.save(`${title}.pdf`);
+            }
+        }).catch((error) => {
+            console.error('Error exporting map:', error);
+        });
+    }
+
+    initModalEvents() {
+        document.getElementById('map-title').addEventListener('input', (e) => {
+            document.getElementById('preview-title').innerText = e.target.value;
+        });
+
+        document.getElementById('export-png').addEventListener('click', () => this.exportMap('png'));
+        document.getElementById('export-pdf').addEventListener('click', () => this.exportMap('pdf'));
+    }
+}
+
+
 
 //layer styles
 function getStyle(feature) {
@@ -124,7 +257,7 @@ class BasemapControl extends Control {
 
         // Tambahkan tombol floating toggle
         const toggleButton = document.createElement('button');
-        toggleButton.className = 'btn btn-success btn-sm basemap-toggle-btn';
+        toggleButton.className = 'basemap-toggle-btn';
         toggleButton.innerHTML = '<i class="bi bi-layers"></i>';
         document.body.appendChild(toggleButton);
 
@@ -398,6 +531,7 @@ function createControls(options = {}, map) {
         fullScreen: () => new FullScreen(),
         zoomSlider: () => new ZoomSlider(),
         basemap: () => new BasemapControl({ basemap: true }),
+        export: () => new ExportControl({ export: true }),
         draw: () => map ? new DrawControl({ map }) : null
     };
 

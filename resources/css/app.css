@@ -26,16 +26,16 @@ font-family: Verdana, Tahoma, "DejaVu Sans", sans-serif;
 }
 
 .ol-popup {
-    display: none; /* Sembunyikan popup secara default */
-    position: absolute;
-    background-color: white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #cccccc;
-    bottom: 12px;
-    left: -50px;
-    min-width: 280px;
+display: none; /* Sembunyikan popup secara default */
+position: absolute;
+background-color: white;
+box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #cccccc;
+bottom: 12px;
+left: -50px;
+min-width: 280px;
 }
 
 .ol-popup:after, .ol-popup:before {
@@ -143,35 +143,31 @@ cursor: pointer;
 
 /* Tombol Floating untuk Memunculkan Kembali Control */
 .basemap-toggle-btn {
-position: absolute;
+position: fixed;
 bottom: 30px;
 right: 8px;
-z-index: 1000;
-border-radius: 50%;
-width: 40px;
-height: 40px;
+width: 24px;
+height: 24px;
+border: none;
+border-radius: 3px;
+background-color: white;
+color: var(--ol-subtle-foreground-color);
 display: flex;
 align-items: center;
 justify-content: center;
-padding: 0;
-font-size: 18px;
-background-color: #0fac81; /* Warna success */
-color: white;
-border: none;
+font-size: 1rem;
 transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 opacity: 1;
 transform: scale(1);
 visibility: visible;
 }
 
 .basemap-toggle-btn:hover {
-background: none;
-color: #0fac81;
-border: 5px;
-border-radius: 100%;
-border-color: #0fac81;
-box-shadow: 5px 5px 10px rgba(7, 160, 96, 0.5);
+    color: black;
+    border: 1px solid black;
 }
+
 
 /* Saat tombol disembunyikan */
 .basemap-toggle-btn.hidden {
@@ -180,3 +176,17 @@ transform: scale(0.8);
 visibility: hidden;
 pointer-events: none;
 }
+
+.export-toggle {
+position: fixed;
+bottom: 60px;
+right: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+font-size: 1.5rem;
+transition: background-color 0.3s ease, transform 0.2s ease !important;
+}
+
+

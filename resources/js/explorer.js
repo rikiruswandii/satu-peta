@@ -38,6 +38,7 @@ $m(document).ready(function () {
         fullScreen: true,
         zoomSlider: true,
         basemap: true,
+        export: true,
         draw: true
     }, {
         dragPan: true
@@ -127,6 +128,12 @@ $m(document).ready(function () {
         $m('.modal-content').css({
             'background': 'rgba(255, 255, 255, 0.5)',
             'backdrop-filter': 'blur(3px)'
+        });
+        $m('.modal-dialog').css({
+            position: 'fixed',
+            width: '100%',
+            margin: 0,
+            padding: '10px'
         });
 
         if (!($m('.modal.in').length)) {

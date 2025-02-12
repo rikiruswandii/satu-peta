@@ -13,7 +13,7 @@
                 position: relative;
             }
 
-            .modal-dialog {
+            #openModalDataset .modal-dialog {
                 position: fixed;
                 width: 100%;
                 margin: 0;
@@ -38,6 +38,16 @@
                 border-radius: 3px;
                 border-color: #0fac81;
                 box-shadow: 5px 5px 10px rgba(7, 160, 96, 0.5);
+            }
+
+            #exportModal .modal-dialog {
+                position: relative;
+                margin: auto;
+            }
+
+            #preview-map {
+                max-height: 300px;
+                object-fit: contain;
             }
         </style>
     @endpush
@@ -114,7 +124,28 @@
                 </div>
             </x-slot>
         </x-modal>
-
+        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="exportModalLabel">Cetak Layer</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="map-title" class="form-label">Judul Peta:</label>
+                        <input type="text" id="map-title" class="form-control" value="Judul Peta">
+                        <div id="preview" class="border border-dashed p-3 mt-3 text-center">
+                            <h3 id="preview-title">Judul Peta</h3>
+                            <img id="preview-map" class="mt-3 w-100" style="display:none; border: 1px solid #ccc;" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="export-png" class="btn btn-outline-success">PNG</button>
+                        <button id="export-pdf" class="btn btn-success">PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endsection
     @push('scripts')
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
