@@ -342,7 +342,7 @@
                 align-items: center;
                 z-index: 1000;
             }
-            
+
             #popup.ol-popup {
                 display: none !important;
             }
@@ -351,8 +351,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#maps-table').DataTable({
+            var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#maps-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('maps.datatable') }}",
@@ -403,42 +404,42 @@
 
 
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var id = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(id);
-                var name = $(this).data('name');
-                $('#nameAccount').text(name);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var id = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(id);
+                var name = $r(this).data('name');
+                $r('#nameAccount').text(name);
             });
 
-            $(document).on('click', '[data-bs-target="#aktivasiMapModal"]', function() {
-                var id = $(this).data('id');
-                $('#aktivasiMapModal').find('input[name="id"]').val(id);
-                var name = $(this).data('name');
-                $('#name-map-activated').text(name);
+            $r(document).on('click', '[data-bs-target="#aktivasiMapModal"]', function() {
+                var id = $r(this).data('id');
+                $r('#aktivasiMapModal').find('input[name="id"]').val(id);
+                var name = $r(this).data('name');
+                $r('#name-map-activated').text(name);
             });
-            $(document).on('click', '[data-bs-target="#deaktivasiMapModal"]', function() {
-                var id = $(this).data('id');
-                $('#deaktivasiMapModal').find('input[name="id"]').val(id);
-                var name = $(this).data('name');
-                $('#name-map-deactivated').text(name);
+            $r(document).on('click', '[data-bs-target="#deaktivasiMapModal"]', function() {
+                var id = $r(this).data('id');
+                $r('#deaktivasiMapModal').find('input[name="id"]').val(id);
+                var name = $r(this).data('name');
+                $r('#name-map-deactivated').text(name);
             });
 
-            $(document).ready(function() {
-                $("#addMapForm").on("submit", function() {
-                    let submitButton = $("button[form='addMapForm']");
+            $r(document).ready(function() {
+                $r("#addMapForm").on("submit", function() {
+                    let submitButton = $r("button[form='addMapForm']");
                     submitButton.prop("disabled", true); // Nonaktifkan tombol saat submit
                     submitButton.find(".spinner-border").show(); // Tampilkan spinner
                     submitButton.find("span:last-child").hide(); // Sembunyikan teks tombol
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#editMapModal"]', function() {
-                var id = $(this).data('id');
-                var regional_agency = $(this).data('regional-agency');
-                var sector = $(this).data('sector');
-                var name = $(this).data('name');
+            $r(document).on('click', '[data-bs-target="#editMapModal"]', function() {
+                var id = $r(this).data('id');
+                var regional_agency = $r(this).data('regional-agency');
+                var sector = $r(this).data('sector');
+                var name = $r(this).data('name');
 
-                var modal = $('#editMapModal');
+                var modal = $r('#editMapModal');
 
                 modal.find('input[name="id"]').val(id);
                 modal.find('input[name="name"]').val(name);
@@ -447,12 +448,12 @@
             });
 
 
-            $(document).on('click', '[data-bs-target="#detailMapModal"]', function() {
+            $r(document).on('click', '[data-bs-target="#detailMapModal"]', function() {
                 var currentMap = null;
-                var path = $(this).data('geojson');
-                var regional_agency = $(this).data('regional-agency');
-                var sector = $(this).data('sector');
-                var name = $(this).data('name');
+                var path = $r(this).data('geojson');
+                var regional_agency = $r(this).data('regional-agency');
+                var sector = $r(this).data('sector');
+                var name = $r(this).data('name');
                 console.log(name);
                 console.log(regional_agency);
                 console.log(sector);
@@ -472,7 +473,7 @@
                     return;
                 }
 
-                var mapContainer = $('#detailMapModal').find('x-map-container');
+                var mapContainer = $r('#detailMapModal').find('x-map-container');
                 mapContainer.attr('geoJsonPath', path);
 
                 // Hapus peta yang ada jika ada
@@ -482,7 +483,7 @@
                 }
 
                 // Bersihkan container peta
-                $('#detailMap').empty();
+                $r('#detailMap').empty();
 
                 var mapElement = document.getElementById('detailMap');
                 if (mapElement) {

@@ -183,7 +183,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
+
                                 </tbody>
                             </table>
                         </div>
@@ -275,8 +275,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#related-links-table').DataTable({
+             var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#related-links-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('related.link.datatable') }}",
@@ -317,19 +318,19 @@
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var userId = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(userId);
+                var userName = $r(this).data('name');
+                $r('#nameAccount').text(userName);
             });
 
-            $(document).on('click', '[data-bs-target="#updateModal"]', function() {
-                var id = $(this).data('id');
-                var url = $(this).data('url');
-                var name = $(this).data('name');
+            $r(document).on('click', '[data-bs-target="#updateModal"]', function() {
+                var id = $r(this).data('id');
+                var url = $r(this).data('url');
+                var name = $r(this).data('name');
 
-                var modal = $('#updateModal');
+                var modal = $r('#updateModal');
 
                 modal.find('input[name="id"]').val(id);
                 modal.find('input[name="title"]').val(name);
