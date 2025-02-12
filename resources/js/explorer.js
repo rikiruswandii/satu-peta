@@ -222,34 +222,8 @@ $m(document).ready(function () {
     });
 
 
-    // Sumber data untuk marker
-    const vectorSource = new VectorSource();
 
-    // Layer untuk marker dengan style khusus
-    const vectorLayer = new VectorLayer({
-        source: vectorSource,
-        style: function (feature) {
-            return getStyle(feature);
-        }
-    });
 
-    // Tambahkan layer marker ke dalam peta
-    map.addLayer(vectorLayer);
-
-    // Fungsi untuk memperbarui marker menggunakan getStyle
-    function updateMarker(lon, lat) {
-        console.log("Menampilkan marker di:", lon, lat);
-
-        // Hapus semua marker lama
-        vectorSource.clear();
-
-        // Tambahkan marker baru
-        const markerFeature = new Feature({
-            geometry: new Point(fromLonLat([lon, lat])),
-        });
-
-        vectorSource.addFeature(markerFeature);
-    }
 
     function searchLocation() {
         const query = $m("#search-from-aside").val().trim();
@@ -303,7 +277,32 @@ $m(document).ready(function () {
                                 zoom: 14,
                                 duration: 1000
                             });
-                            updateMarker(lon, lat);
+
+                            // Sumber data untuk marker
+                            const vectorSource = new VectorSource();
+
+                            // Layer untuk marker dengan style khusus
+                            const vectorLayer = new VectorLayer({
+                                source: vectorSource,
+                                style: function (feature) {
+                                    return getStyle(feature);
+                                }
+                            });
+
+                            // Tambahkan layer marker ke dalam peta
+                            map.addLayer(vectorLayer);
+
+                            // Fungsi untuk memperbarui marker tanpa menghapus yang lama
+
+                            // Buat marker baru dengan ID unik
+                            const markerFeature = new Feature({
+                                geometry: new Point(fromLonLat([lon, lat])),
+                                name: name, // Tambahkan nama untuk referensi
+                            });
+
+                            vectorSource.addFeature(markerFeature);
+                            addLayerToList(vectorLayer, name); // Tambahkan ke daftar layer
+                            updateLayerOrder();
                         });
 
                     resultList.append(listItem);
@@ -311,6 +310,7 @@ $m(document).ready(function () {
             })
             .catch(error => console.error("Error fetching data:", error));
     }
+
 
     $m("#search-from-aside").on("keypress", function (event) {
         if (event.key === "Enter") {

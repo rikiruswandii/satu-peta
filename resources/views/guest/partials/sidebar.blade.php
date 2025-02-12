@@ -73,7 +73,7 @@
         }
 
         .toggle-btn.closed {
-            transform: translateX(-260px);
+            transform: translateX(-280px);
         }
 
         .result-area.closed {
