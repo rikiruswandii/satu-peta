@@ -19,7 +19,11 @@ import { Modify, DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultIn
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import Draw, { createBox } from 'ol/interaction/Draw';
+
+//to png
 import { toPng } from 'html-to-image';
+
+//to pdf
 import jsPDF from 'jspdf';
 
 class ExportControl extends Control {
