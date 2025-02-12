@@ -69,6 +69,11 @@ $m(document).ready(function () {
 
     // Tambahkan layer ke daftar dan beri fungsi drag-and-drop
     function addLayerToList(layer, name) {
+        if ($m("#layerList li").length >= 10) {
+            alert("Maksimal 10 layer yang dapat ditambahkan.");
+            return;
+        }
+
         let layerId = `layer-${Date.now()}`;
         layer.set("id", layerId);
 
@@ -86,6 +91,7 @@ $m(document).ready(function () {
 
         $m("#layerList").append(listItem);
     }
+
 
 
     // Saat tombol diklik, tambahkan layer baru dan masukkan ke dalam list
@@ -220,10 +226,6 @@ $m(document).ready(function () {
         }
         $m(this).closest("li").remove();
     });
-
-
-
-
 
     function searchLocation() {
         const query = $m("#search-from-aside").val().trim();
