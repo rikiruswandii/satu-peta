@@ -16,7 +16,7 @@ class Sector extends Model
 
     protected static $logName = 'sectors_activity';
 
-    protected static $logAttributes = [ 'user_id','name'];
+    protected static $logAttributes = ['user_id', 'name'];
 
     public function getActivitylogOptions(): LogOptions
     {

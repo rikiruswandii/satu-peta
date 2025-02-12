@@ -16,7 +16,7 @@ class RegionalAgency extends Model
 
     protected static $logName = 'region_agencies_activity';
 
-    protected static $logAttributes = [ 'user_id','name'];
+    protected static $logAttributes = ['user_id', 'name'];
 
     public function getActivitylogOptions(): LogOptions
     {

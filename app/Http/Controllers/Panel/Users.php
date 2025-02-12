@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Auth;
 
 class Users extends Controller
 {
@@ -21,10 +21,10 @@ class Users extends Controller
         $count = User::count() - 1;
         $roles = Role::all();
         $title = 'List User';
-        $description = $title . ' page!';
+        $description = $title.' page!';
         $prefix = 'users';
 
-        return view('panel.users', compact('prefix','count', 'roles', 'title', 'description'));
+        return view('panel.users', compact('prefix', 'count', 'roles', 'title', 'description'));
     }
 
     public function datatable(Request $request)
@@ -50,8 +50,8 @@ class Users extends Controller
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <ul class="link-list-opt no-bdr">
-                                        <li><a href="' . route('user.detail', ['id' => Crypt::encrypt($row->id)]) . '"
-                                                data-id="' . Crypt::encrypt($row->id) . '">
+                                        <li><a href="'.route('user.detail', ['id' => Crypt::encrypt($row->id)]).'"
+                                                data-id="'.Crypt::encrypt($row->id).'">
                                                 <em class="icon ni ni-eye"></em><span>Detail</span>
                                             </a></li>
                                             <li class="divider"></li>
@@ -61,8 +61,8 @@ class Users extends Controller
                                             </a></li>
                                         <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                                 data-bs-target="#deleteMapModal"
-                                                data-id="' . Crypt::encrypt($row->id) . '"
-                                                data-name="' . $row->name . '">
+                                                data-id="'.Crypt::encrypt($row->id).'"
+                                                data-name="'.$row->name.'">
                                                 <em class="icon ni ni-trash"></em><span>Delete</span>
                                             </a></li>
                                     </ul>
@@ -73,11 +73,11 @@ class Users extends Controller
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
     }
-
 
     public function detail($id)
     {
@@ -85,7 +85,7 @@ class Users extends Controller
             $decrypt = Crypt::decrypt($id);
             $user = User::findOrFail($decrypt);
             $title = 'Detail User';
-            $description = $title . ' page!';
+            $description = $title.' page!';
 
             return view('users.profile-user', compact('user', 'title', 'description'))->with('encrypt', $id);
         } catch (\Throwable $th) {
@@ -101,7 +101,7 @@ class Users extends Controller
                 'required',
                 'email',
                 function ($attribute, $value, $fail) {
-                    if (!User::where('email', $value)->exists()) {
+                    if (! User::where('email', $value)->exists()) {
                         $fail('The provided email does not match any user in our records.');
                     }
                 },
@@ -126,7 +126,6 @@ class Users extends Controller
 
         return back()->withErrors(['error' => 'No user found with this email address.']);
     }
-
 
     public function store(Request $request): RedirectResponse
     {
@@ -153,7 +152,7 @@ class Users extends Controller
             'role_id' => $request->role_id,
         ]);
 
-        if ($data){
+        if ($data) {
             return redirect()->back()->with([
                 'success' => 'Akun berhasil dibuat.',
             ]);
@@ -167,14 +166,14 @@ class Users extends Controller
         try {
             $id = Crypt::decrypt($request->id);
             $user = User::findOrFail($id);
-            
+
             // Logout pengguna jika mereka sedang login
             if (Auth::id() == $user->id) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
             }
-            
+
             $user->delete();
 
             return redirect()->back()->with('success', 'User berhasil dihapus.');

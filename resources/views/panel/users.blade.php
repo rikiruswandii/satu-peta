@@ -145,8 +145,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#user-table').DataTable({
+             var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#user-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('users.datatable') }}",
@@ -187,12 +188,12 @@
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var userId = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(userId);
 
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+                var userName = $r(this).data('name');
+                $r('#nameAccount').text(userName);
             });
         </script>
     @endpush

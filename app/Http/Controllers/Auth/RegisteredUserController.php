@@ -32,15 +32,15 @@ class RegisteredUserController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         if ($validated->fails()) {
             \Log::info('Validation errors:', $validated->messages()->toArray());
+
             return redirect()->back()->withErrors($validated)->withInput();
         }
-
 
         $user = User::create([
             'name' => $request->name,

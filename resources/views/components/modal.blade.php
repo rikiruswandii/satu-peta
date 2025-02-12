@@ -7,7 +7,7 @@
                 <h5 class="modal-title text-primary" id="{{ $id }}Label">{{ $data['title'] }}</h5>
                 <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
             </div>
-            <div class="modal-body modal-body-md">                
+            <div class="modal-body modal-body-md">
                 {{ $body }}
             </div>
             <div class="modal-footer">

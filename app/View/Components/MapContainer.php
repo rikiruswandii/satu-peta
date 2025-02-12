@@ -9,19 +9,23 @@ use Illuminate\View\Component;
 class MapContainer extends Component
 {
     public $geoJsonPath;
+
     public $mapId;
+
     public $controls;
+
     public $interactions;
+
     public $baseLayerType;
 
     /**
      * Create a new component instance.
      *
-     * @param string $geoJsonPath
-     * @param string $mapId
-     * @param array $controls
-     * @param array $interactions
-     * @param string $baseLayerType
+     * @param  string  $geoJsonPath
+     * @param  string  $mapId
+     * @param  array  $controls
+     * @param  array  $interactions
+     * @param  string  $baseLayerType
      */
     public function __construct($geoJsonPath = '', $mapId = 'map', $controls = [], $interactions = [], $baseLayerType = 'osm')
     {

@@ -33,8 +33,9 @@
     </div><!-- .card -->
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#logs-table').DataTable({
+             var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#logs-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('logs.datatable') }}",

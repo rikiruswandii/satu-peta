@@ -18,6 +18,7 @@ class Home extends Controller
 
         $title = env('APP_NAME', 'Satu Peta Purwakarta');
         $description = 'Website Satu Peta Purwakarta adalah platform informasi geospasial yang menyajikan data peta terintegrasi untuk mendukung pembangunan dan layanan publik di Kabupaten Purwakarta';
+
         return view('guest.index', compact('title', 'description', 'categories', 'groups'));
     }
 

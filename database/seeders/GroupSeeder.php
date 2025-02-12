@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Document;
 use App\Models\RegionalAgency;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
