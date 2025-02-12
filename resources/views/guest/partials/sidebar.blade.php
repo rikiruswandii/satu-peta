@@ -36,7 +36,7 @@
 
         .toggle-btn {
             position: absolute;
-            top: 16px;
+            top: 10px;
             left: 290px;
             z-index: 999;
             width: 270px;
@@ -132,10 +132,10 @@
         <div class="d-flex justify-content-between align-items-center aside-head">
             <strong class="text-light">Daftar Layer</strong>
             <div class="d-flex gap-1">
-                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#openModalDataset"
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#openModalDataset" title="Tambah Layer"
                     class="b-plus d-flex justify-content-center align-items-center"><i class="bi bi-plus"></i></a>
 
-                <a href="#" id="anotherToggle"
+                <a href="#" id="anotherToggle" title="Tutup Sidebar"
                     class="b-arrow-bar-left d-flex justify-content-center align-items-center link-light"><i
                         class="bi bi-arrow-bar-left"></i></a>
             </div>

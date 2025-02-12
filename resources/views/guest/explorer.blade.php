@@ -49,6 +49,18 @@
                 max-height: 300px;
                 object-fit: contain;
             }
+
+            .ol-control.ol-zoom {
+                position: absolute !important;
+                top: auto !important;
+                bottom: 5.7em !important;
+                /* Atur jarak dari bawah */
+                left: auto !important;
+                right: .5em !important;
+                /* Atur jarak dari kanan */
+                z-index: 1000 !important;
+                /* Pastikan tampil di atas */
+            }
         </style>
     @endpush
 
