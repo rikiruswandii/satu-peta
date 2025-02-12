@@ -61,6 +61,7 @@
                 z-index: 1000 !important;
                 /* Pastikan tampil di atas */
             }
+
             .ol-control.ol-zoomslider {
                 position: absolute !important;
                 top: auto !important;
@@ -83,6 +84,12 @@
             <x-map-container geoJsonPath="" mapId="explorerMapId" :height="'91vh'" />
         </div>
     </div>
+    <div id="maxLayerAlert"
+        class="alert alert-warning alert-dismissible fade d-none position-fixed top-0 start-50 translate-middle-x shadow"
+        role="alert" style="z-index: 1050;">
+        <strong>Peringatan!</strong> Maksimal 10 layer yang dapat ditambahkan.
+    </div>
+
 
     @section('modal')
         <!-- Modal -->
