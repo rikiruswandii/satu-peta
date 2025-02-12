@@ -61,6 +61,17 @@
                 z-index: 1000 !important;
                 /* Pastikan tampil di atas */
             }
+            .ol-control.ol-zoomslider {
+                position: absolute !important;
+                top: auto !important;
+                bottom: 9em !important;
+                /* Atur jarak dari bawah */
+                left: auto !important;
+                right: .5em !important;
+                /* Atur jarak dari kanan */
+                z-index: 1000 !important;
+                /* Pastikan tampil di atas */
+            }
         </style>
     @endpush
 
