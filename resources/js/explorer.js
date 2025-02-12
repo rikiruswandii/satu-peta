@@ -234,7 +234,7 @@ $m(document).ready(function () {
 
         console.log("Mencari lokasi:", query);
 
-        fetch(`${import.meta.env.VITE_PHOTON_URL}?q=${encodeURIComponent(query)}&limit=5`)
+        fetch(`${import.meta.env.VITE_PHOTON_URL}?q=${encodeURIComponent(query)}&limit=10`)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 return response.json();
