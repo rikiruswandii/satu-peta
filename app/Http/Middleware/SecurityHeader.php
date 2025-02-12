@@ -29,7 +29,7 @@ class SecurityHeader
             $csp .= "style-src 'self' https://cdn.datatables.net https://fonts.googleapis.com https://cdn.jsdelivr.net http://127.0.0.1:5173 'unsafe-inline'; ";
             $csp .= "img-src 'self' https://photon.komoot.io https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://cartodb-basemaps-a.global.ssl.fastly.net data:; ";
             $csp .= "font-src 'self' data: https://fonts.gstatic.com; ";
-            $csp .= "connect-src 'self' ws://127.0.0.1:5173; ";
+            $csp .= "connect-src 'self' ws://127.0.0.1:5173 https://photon.komoot.io; ";
 
             $response->headers->set('Content-Security-Policy', $csp);
 
