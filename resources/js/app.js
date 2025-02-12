@@ -15,7 +15,7 @@ import Overlay from 'ol/Overlay.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeoJSON from 'ol/format/GeoJSON';
 import { ZoomSlider, FullScreen, ScaleLine, defaults as defaultControls, Control } from 'ol/control';
-import { DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractions } from 'ol/interaction';
+import { Modify, DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractions } from 'ol/interaction';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import Draw, { createBox } from 'ol/interaction/Draw';
@@ -150,8 +150,6 @@ class ExportControl extends Control {
         document.getElementById('export-pdf').addEventListener('click', () => this.exportMap('pdf'));
     }
 }
-
-
 
 //layer styles
 function getStyle(feature) {
@@ -301,9 +299,6 @@ class BasemapControl extends Control {
     }
 }
 
-
-
-
 class DrawControl extends Control {
     constructor(options = {}) {
         const element = document.createElement('div');
@@ -314,7 +309,7 @@ class DrawControl extends Control {
         element.style.borderRadius = '3px';
         element.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
         element.style.display = 'flex';
-        element.style.flexDirection = 'column';  // Mengubah menjadi vertikal
+        element.style.flexDirection = 'column';
         element.style.gap = '1px';
 
         super({ element });
@@ -329,6 +324,7 @@ class DrawControl extends Control {
 
         this.map.addLayer(this.drawLayer);
         this.activeDraw = null;
+        this.modifyInteraction = new Modify({ source: this.drawLayer.getSource() });
 
         const buttons = [
             { type: 'Point', icon: 'bi bi-geo-alt' }, // Marker
@@ -355,6 +351,14 @@ class DrawControl extends Control {
         clearButton.onclick = () => this.clearDrawings();
         element.appendChild(clearButton);
 
+        // Tombol edit
+        this.editButton = document.createElement('button');
+        this.editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+        this.editButton.title = 'Edit Drawings';
+        this.editButton.className = 'btn btn-primary btn-sm';
+        this.editButton.onclick = () => this.toggleEditMode();
+        element.appendChild(this.editButton);
+
         // Tombol untuk mengakhiri draw mode
         this.stopDrawButton = document.createElement('button');
         this.stopDrawButton.innerHTML = '<i class="bi bi-x-circle"></i>';
@@ -370,6 +374,8 @@ class DrawControl extends Control {
             this.map.removeInteraction(this.activeDraw);
             this.activeDraw = null;
         }
+
+        this.map.removeInteraction(this.modifyInteraction);
 
         let geometryFunction = null;
         let drawType = type;
@@ -400,6 +406,14 @@ class DrawControl extends Control {
     clearDrawings() {
         this.drawLayer.getSource().clear();
         this.deactivateDraw();
+    }
+
+    toggleEditMode() {
+        if (this.map.getInteractions().getArray().includes(this.modifyInteraction)) {
+            this.map.removeInteraction(this.modifyInteraction);
+        } else {
+            this.map.addInteraction(this.modifyInteraction);
+        }
     }
 }
 
@@ -541,7 +555,6 @@ function createControls(options = {}, map) {
             .filter(Boolean)
     );
 }
-
 
 function createInteractions(options = {}) {
     const availableInteractions = {
