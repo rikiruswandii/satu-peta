@@ -167,8 +167,50 @@ const baseMaps = {
         visible: false,
         title: 'Carto Light',
         thumbnail: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/2/2/2.png'
+    }),
+    'Carto Dark': new TileLayer({
+        source: new XYZ({
+            url: 'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}{scale}.png'
+        }),
+        visible: false,
+        title: 'Carto Dark',
+        thumbnail: 'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/2/2/2.png'
+    }),
+    'Esri World Street': new TileLayer({
+        source: new XYZ({
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        }),
+        visible: false,
+        title: 'Esri World Street',
+        thumbnail: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/2/2/2'
+    }),
+    'OpenTopoMap': new TileLayer({
+        source: new XYZ({
+            url: 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png'
+        }),
+        visible: false,
+        title: 'OpenTopoMap',
+        thumbnail: 'https://a.tile.opentopomap.org/2/2/2.png'
+    }),
+    'Esri Satellite': new TileLayer({
+        source: new XYZ({
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        }),
+        visible: false,
+        title: 'Esri Satellite',
+        thumbnail: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/2/2/2'
+    }),
+    'Sentinel-2 Cloudless': new TileLayer({
+        source: new XYZ({
+            url: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2021_3857/default/g/{z}/{y}/{x}.jpg'
+        }),
+        visible: false,
+        title: 'Sentinel-2 Cloudless',
+        thumbnail: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2021_3857/default/g/2/2/2.jpg'
     })
 };
+
+
 
 // Fungsi Membuat Custom Control untuk Basemap
 class BasemapControl extends Control {
