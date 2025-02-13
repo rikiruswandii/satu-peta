@@ -5,7 +5,7 @@
             <div class="nk-split-content nk-block-area nk-block-area-column nk-auth-container bg-white">
                 <div class="nk-block nk-block-middle nk-auth-body">
                     <div class="brand-logo pb-5">
-                        <a href="html/index.html" class="logo-link">
+                        <a href="{{ route('/') }}" class="logo-link">
                             {{-- <img class="logo-light logo-img logo-img-lg" src="./images/logo.png"
                                 srcset="./images/logo2x.png 2x" alt="logo">
                             <img class="logo-dark logo-img logo-img-lg" src="./images/logo-dark.png"
