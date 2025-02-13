@@ -88,7 +88,6 @@ $m(document).ready(function () {
         $m("#maxLayerAlert").addClass("d-none").removeClass("show");
         clearTimeout(alertTimeout); // Hentikan timer jika alert ditutup manual
     });
-
     function addLayerToList(layer, name) {
         if ($m("#layerList li").length >= 10) {
             showMaxLayerAlert(); // Menampilkan alert
@@ -101,18 +100,21 @@ $m(document).ready(function () {
         let listItem = `
     <li data-layer-id="${layerId}" class="list-group-item text-success d-flex justify-content-between align-items-center" style="cursor:pointer;font-size:14px;">
         <div class="d-flex align-items-center gap-2">
-            <input type="checkbox" class="is-active" checked>
+            <input type="checkbox" class="is-active" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Checkbox" checked>
             <span>${name}</span>
         </div>
         <div class="d-flex gap-2">
-            <i class="bound-to-layer bi bi-aspect-ratio link-secondary"></i>
-            <i class="remove-layer bi bi-x-circle-fill link-danger"></i>
+            <i class="bound-to-layer bi bi-aspect-ratio link-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Pusatkan"></i>
+            <i class="remove-layer bi bi-x-circle-fill link-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Hapus"></i>
         </div>
     </li>`;
 
+        // Tambahkan elemen ke dalam daftar
         $m("#layerList").append(listItem);
-    }
 
+        // Inisialisasi tooltip setelah elemen masuk ke DOM
+        $m("#layerList [data-bs-toggle='tooltip']").tooltip();
+    }
 
     // Saat tombol diklik, tambahkan layer baru dan masukkan ke dalam list
     $m(".list-group-item a").on("click", function () {

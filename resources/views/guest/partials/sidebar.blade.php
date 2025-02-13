@@ -130,7 +130,7 @@
             opacity: 1;
             /* Pastikan placeholder terlihat jelas */
         }
-        
+
         #search-from-aside,#search-dataset {
             background-color: rgba(142, 160, 7, 0.2) ;
         }
@@ -143,10 +143,10 @@
         <div class="d-flex justify-content-between align-items-center aside-head">
             <strong class="text-warning">Daftar Layer</strong>
             <div class="d-flex gap-1">
-                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#openModalDataset" title="Tambah Layer"
-                    class="b-plus d-flex justify-content-center align-items-center"><i class="bi bi-plus"></i></a>
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#openModalDataset"
+                    class="b-plus d-flex justify-content-center align-items-center"><i  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tambah Layer" class="bi bi-plus"></i></a>
 
-                <a href="#" id="anotherToggle" title="Tutup Sidebar"
+                <a href="#" id="anotherToggle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tutup Sidebar"
                     class="b-arrow-bar-left d-flex justify-content-center align-items-center link-warning"><i
                         class="bi bi-arrow-bar-left"></i></a>
             </div>
@@ -157,7 +157,7 @@
     <!-- Toggle Sidebar Button -->
     <div
         class="toggle-btn rounded shadow-lg border-0 p-2 text-success cursor-pointer d-flex jutify-content-center align-items-center">
-        <i id="toggleSidebar" class="bi bi-list" style="cursor: pointer;"></i>
+        <i id="toggleSidebar" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Toggle Sidebar" class="bi bi-list" style="cursor: pointer;"></i>
         <form action="" method="get">
             <div class="d-flex jutify-content-center align-items-center">
                 <input type="text" class="ms-2 border-0 p-1 rounded-start" name="search-from-aside"
@@ -165,7 +165,7 @@
                 <button id="search-btn" class="border-0 p-1 link-success" type="button"><i
                         class="bi bi-search ms-1"></i></button>
                 <button id="close-result-btn" class="border-0 p-1 d-none link-danger rounded-end" type="button"><i
-                        class="bi bi-x-circle ms-1 me-1"></i></button>{{-- secara default disembunyikan, dimuncukan ketika result area dimunculkan --}}
+                        class="bi bi-x-circle ms-1 me-1" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cari Lokasi"></i></button>{{-- secara default disembunyikan, dimuncukan ketika result area dimunculkan --}}
             </div>
         </form>
     </div>

@@ -137,7 +137,7 @@
             <x-slot name="body">
                 <div class="p-2 d-flex justify-content-center align-items-center">
                     <input class="border-0 p-1 rounded-start" type="text" name="search-dataset" id="search-dataset"
-                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn"><i
+                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cari Layer"><i
                             class="bi bi-search text-success ms-1"></i></button>
                 </div>
                 <div class="mt-1 row p-2 overflow-x-auto body-dataset" style="max-height: 370px; scrollbar-width: none;">

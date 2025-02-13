@@ -36,6 +36,9 @@ class ExportControl extends Control {
         const buttonToggle = document.createElement('button');
         buttonToggle.innerHTML = '<i class="bi bi-printer-fill"></i>';
         buttonToggle.title = 'Print';
+        buttonToggle.setAttribute("data-bs-toggle", "tooltip");
+        buttonToggle.setAttribute("data-bs-placement", "left");
+        var tooltip = new bootstrap.Tooltip(buttonToggle);
         buttonToggle.className = 'export-toggle';
         buttonToggle.addEventListener('click', () => this.toggleModal());
 
@@ -269,6 +272,10 @@ class BasemapControl extends Control {
 
         // Tambahkan tombol floating toggle
         const toggleButton = document.createElement('button');
+        toggleButton.title = 'Basemap';
+        toggleButton.setAttribute("data-bs-toggle", "tooltip");
+        toggleButton.setAttribute("data-bs-placement", "left");
+        var tooltip = new bootstrap.Tooltip(toggleButton);
         toggleButton.className = 'basemap-toggle-btn';
         toggleButton.innerHTML = '<i class="bi bi-layers"></i>';
         document.body.appendChild(toggleButton);
@@ -352,6 +359,9 @@ class DrawControl extends Control {
             const button = document.createElement('button');
             button.innerHTML = `<i class="${icon}"></i>`;
             button.title = `Draw ${type}`;
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            new bootstrap.Tooltip(button);
             button.className = '';
             button.onclick = () => this.activateDraw(type);
             element.appendChild(button);
@@ -361,6 +371,9 @@ class DrawControl extends Control {
         const clearButton = document.createElement('button');
         clearButton.innerHTML = '<i class="bi bi-trash"></i>';
         clearButton.title = 'Clear Drawings';
+        clearButton.setAttribute("data-bs-toggle", "tooltip");
+        clearButton.setAttribute("data-bs-placement", "left");
+        new bootstrap.Tooltip(clearButton);
         clearButton.className = 'btn btn-danger btn-sm';
         clearButton.onclick = () => this.clearDrawings();
         element.appendChild(clearButton);
@@ -369,6 +382,9 @@ class DrawControl extends Control {
         this.editButton = document.createElement('button');
         this.editButton.innerHTML = '<i class="bi bi-pencil"></i>';
         this.editButton.title = 'Edit Drawings';
+        this.editButton.setAttribute("data-bs-toggle", "tooltip");
+        this.editButton.setAttribute("data-bs-placement", "left");
+        new bootstrap.Tooltip(this.editButton);
         this.editButton.className = 'btn btn-primary btn-sm';
         this.editButton.onclick = () => this.toggleEditMode();
         element.appendChild(this.editButton);
@@ -377,6 +393,9 @@ class DrawControl extends Control {
         this.stopDrawButton = document.createElement('button');
         this.stopDrawButton.innerHTML = '<i class="bi bi-x-circle"></i>';
         this.stopDrawButton.title = 'Stop Drawing';
+        this.stopDrawButton.setAttribute("data-bs-toggle", "tooltip");
+        this.stopDrawButton.setAttribute("data-bs-placement", "left");
+        new bootstrap.Tooltip(this.stopDrawButton);
         this.stopDrawButton.className = 'btn btn-warning btn-sm';
         this.stopDrawButton.style.display = 'none';
         this.stopDrawButton.onclick = () => this.deactivateDraw();
@@ -657,5 +676,30 @@ $jq(document).ready(function () {
             $(this).slideUp(500);
         });
     }
+
+    // Tunggu hingga OpenLayers selesai memuat elemen
+    setTimeout(function () {
+        var elements = {
+            ".ol-zoom-in": "Perbesar Peta",
+            ".ol-zoom-out": "Perkecil Peta",
+            ".ol-zoomslider": "Gunakan slider untuk zoom",
+            ".ol-attributes": "Atribut Peta",
+            ".ol-full-screen": "Tampilan Layar Penuh"
+        };
+
+        // Tambahkan atribut tooltip ke setiap elemen
+        $jq.each(elements, function (selector, titleText) {
+            var element = $jq(selector);
+            if (element.length) {
+                element.attr("data-bs-toggle", "tooltip")
+                    .attr("data-bs-placement", "left")
+                    .attr("title", titleText);
+            }
+        });
+
+        // Inisialisasi semua tooltip
+        $jq('[data-bs-toggle="tooltip"]').tooltip();
+    }, 500); // Tunggu 500ms untuk memastikan OpenLayers selesai menambahkan kontrol ke DOM
+
 });
 
