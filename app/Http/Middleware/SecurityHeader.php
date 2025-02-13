@@ -26,10 +26,10 @@ class SecurityHeader
             // Memperbarui Content-Security-Policy
             $csp = "default-src 'self'; ";
             $csp .= "script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://cdn.datatables.net http://127.0.0.1:5173 'unsafe-inline' 'unsafe-eval'; ";
-            $csp .= "style-src 'self' https://cdn.datatables.net https://fonts.googleapis.com https://cdn.jsdelivr.net http://127.0.0.1:5173 'unsafe-inline'; ";
-            $csp .= "img-src 'self' https://photon.komoot.io https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://cartodb-basemaps-a.global.ssl.fastly.net data:; ";
-            $csp .= "font-src 'self' data: https://fonts.gstatic.com; ";
-            $csp .= "connect-src 'self' ws://127.0.0.1:5173 https://photon.komoot.io; ";
+            $csp .= "style-src 'self' 'unsafe-inline' https://cdn.datatables.net https://fonts.googleapis.com https://cdn.jsdelivr.net http://127.0.0.1:5173; ";
+            $csp .= "img-src 'self' data: https://photon.komoot.io https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://cartodb-basemaps-a.global.ssl.fastly.net; ";
+            $csp .= "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; ";
+            $csp .= "connect-src 'self' ws://127.0.0.1:5173 http://127.0.0.1:5173 https://photon.komoot.io https://fonts.googleapis.com https://fonts.gstatic.com https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://cartodb-basemaps-a.global.ssl.fastly.net; ";
 
             $response->headers->set('Content-Security-Policy', $csp);
 
@@ -37,8 +37,9 @@ class SecurityHeader
             $response->headers->set('Expect-CT', 'enforce, max-age=30');
             $response->headers->set('Permissions-Policy', 'autoplay=(self), encrypted-media=(self), fullscreen=(), geolocation=(self), sync-xhr=(self)');
             $response->headers->set('Access-Control-Allow-Origin', '*');
-            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
 
             // Menghapus header yang tidak diinginkan
             $this->removeUnwantedHeaders($response);

@@ -21,7 +21,7 @@ import { fromLonLat } from 'ol/proj';
 import Draw, { createBox } from 'ol/interaction/Draw';
 
 //to png
-import { toPng } from 'html-to-image';
+import domtoimage from 'dom-to-image-more';
 
 //to pdf
 import jsPDF from 'jspdf';
@@ -51,81 +51,30 @@ class ExportControl extends Control {
         this.initModalEvents();
     }
 
-    toggleModal() {
-        // Simpan pengaturan modal sebelumnya
-        const modalHeaders = document.querySelectorAll('.modal-header');
-        const modalContents = document.querySelectorAll('.modal-content');
-        const modalDialogs = document.querySelectorAll('.modal-dialog');
-
-        const prevModalSettings = [];
-
-        modalHeaders.forEach((header, index) => {
-            prevModalSettings.push({
-                header: header,
-                cursor: header.style.cursor,
-                backgroundColor: header.style.backgroundColor,
-                color: header.style.color
-            });
-
-            // Reset hanya jika modal bukan exportModal
-            if (!header.closest('#exportModal')) {
-                header.style.cursor = '';
-                header.style.backgroundColor = '';
-                header.style.color = '';
-            }
-        });
-
-        modalContents.forEach((content) => {
-            if (!content.closest('#exportModal')) {
-                content.style.background = '';
-                content.style.backdropFilter = '';
-            }
-        });
-
-        modalDialogs.forEach((dialog) => {
-            if (!dialog.closest('#exportModal')) {
-                dialog.classList.remove('draggable'); // Jika ada class draggable
-            }
-        });
-
-        // Tampilkan exportModal
+    async toggleModal() {
         const modal = new bootstrap.Modal(document.getElementById('exportModal'));
         modal.show();
-        this.updatePreviewMap();
-
-        // Kembalikan pengaturan modal setelah exportModal ditutup
-        document.getElementById('exportModal').addEventListener('hidden.bs.modal', () => {
-            prevModalSettings.forEach(setting => {
-                setting.header.style.cursor = setting.cursor;
-                setting.header.style.backgroundColor = setting.backgroundColor;
-                setting.header.style.color = setting.color;
-            });
-
-            modalDialogs.forEach((dialog) => {
-                if (!dialog.closest('#exportModal')) {
-                    dialog.classList.add('draggable'); // Kembalikan class draggable jika sebelumnya ada
-                }
-            });
-        }, { once: true });
+        await this.updatePreviewMap();
     }
 
-
-    updatePreviewMap() {
-        const mapElement = this.getMap().getTargetElement();
-        toPng(mapElement).then((dataUrl) => {
+    async updatePreviewMap() {
+        try {
+            const mapElement = this.getMap().getTargetElement();
+            const dataUrl = await domtoimage.toPng(mapElement);
             const previewMap = document.getElementById('preview-map');
             previewMap.src = dataUrl;
             previewMap.style.display = 'block';
-        }).catch((error) => {
+        } catch (error) {
             console.error('Error generating preview map:', error);
-        });
+        }
     }
 
-    exportMap(format) {
-        const mapElement = this.getMap().getTargetElement();
-        const title = document.getElementById('map-title').value;
+    async exportMap(format) {
+        try {
+            const mapElement = this.getMap().getTargetElement();
+            const title = document.getElementById('map-title').value;
+            const dataUrl = await domtoimage.toPng(mapElement);
 
-        toPng(mapElement).then((dataUrl) => {
             document.getElementById('preview-map').src = dataUrl;
             document.getElementById('preview-map').style.display = 'block';
 
@@ -140,9 +89,9 @@ class ExportControl extends Control {
                 pdf.addImage(dataUrl, 'PNG', 10, 20, 180, 120);
                 pdf.save(`${title}.pdf`);
             }
-        }).catch((error) => {
+        } catch (error) {
             console.error('Error exporting map:', error);
-        });
+        }
     }
 
     initModalEvents() {
