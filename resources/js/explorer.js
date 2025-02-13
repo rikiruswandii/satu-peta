@@ -157,7 +157,7 @@ $m(document).ready(function () {
             color: 'white',
             backgroundColor: '#0fac81'
         });
-        $m('.modal-title').attr('style', 'color: white !important; font-size: 16px !important;');
+        $m('.modal-title').attr('style', 'color: #FFC107 !important; font-size: 16px !important;');
         $m('.modal-content').css({
             'background': 'rgba(255, 255, 255, 0.5)',
             'backdrop-filter': 'blur(3px)'

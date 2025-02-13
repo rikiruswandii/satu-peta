@@ -88,7 +88,7 @@
             padding: 5px;
             border: none;
             background: #ffffff;
-            color: #007052;
+            color: #FFC107;
         }
 
         .b-plus:hover {
@@ -123,6 +123,13 @@
         input[type=checkbox] {
             accent-color: #0fac81;
         }
+
+        #search-from-aside::placeholder,#search-dataset::placeholder {
+            color: #0fac81;
+            /* Ganti dengan warna yang diinginkan */
+            opacity: 1;
+            /* Pastikan placeholder terlihat jelas */
+        }
     </style>
 @endpush
 
@@ -130,13 +137,13 @@
     <!-- Sidebar -->
     <div class="sidebar shadow-lg" id="sidebar">
         <div class="d-flex justify-content-between align-items-center aside-head">
-            <strong class="text-light">Daftar Layer</strong>
+            <strong class="text-warning">Daftar Layer</strong>
             <div class="d-flex gap-1">
                 <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#openModalDataset" title="Tambah Layer"
                     class="b-plus d-flex justify-content-center align-items-center"><i class="bi bi-plus"></i></a>
 
                 <a href="#" id="anotherToggle" title="Tutup Sidebar"
-                    class="b-arrow-bar-left d-flex justify-content-center align-items-center link-light"><i
+                    class="b-arrow-bar-left d-flex justify-content-center align-items-center link-warning"><i
                         class="bi bi-arrow-bar-left"></i></a>
             </div>
         </div>

@@ -230,7 +230,7 @@ class BasemapControl extends Control {
         // Elemen UI
         element.innerHTML = `
             <div class="card basemap-container hidden">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-success-new text-warning d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-map"></i> Pilih Basemap</span>
                     <button class="btn btn-sm btn-light toggle-basemap"><i class="bi bi-eye"></i></button>
                 </div>
@@ -333,7 +333,7 @@ class DrawControl extends Control {
             const button = document.createElement('button');
             button.innerHTML = `<i class="${icon}"></i>`;
             button.title = `Draw ${type}`;
-            button.className = 'btn btn-success btn-sm';
+            button.className = '';
             button.onclick = () => this.activateDraw(type);
             element.appendChild(button);
         });
