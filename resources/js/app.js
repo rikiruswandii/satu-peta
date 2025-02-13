@@ -60,7 +60,16 @@ class ExportControl extends Control {
     async updatePreviewMap() {
         try {
             const mapElement = this.getMap().getTargetElement();
+
+            // Sembunyikan semua control OpenLayers termasuk ol-scale-line
+            const controls = mapElement.querySelectorAll('.ol-control, .ol-scale-line');
+            controls.forEach(control => control.style.display = 'none');
+
             const dataUrl = await domtoimage.toPng(mapElement);
+
+            // Kembalikan ol-control setelah tangkapan layar
+            controls.forEach(control => control.style.display = '');
+
             const previewMap = document.getElementById('preview-map');
             previewMap.src = dataUrl;
             previewMap.style.display = 'block';
@@ -73,7 +82,16 @@ class ExportControl extends Control {
         try {
             const mapElement = this.getMap().getTargetElement();
             const title = document.getElementById('map-title').value;
+
+            // Sembunyikan semua kontrol OpenLayers sebelum mengambil screenshot
+            const controls = mapElement.querySelectorAll('.ol-control, .ol-scale-line');
+            controls.forEach(control => control.style.display = 'none');
+
+            // Ambil tangkapan layar peta
             const dataUrl = await domtoimage.toPng(mapElement);
+
+            // Kembalikan tampilan kontrol setelah screenshot selesai
+            controls.forEach(control => control.style.display = '');
 
             document.getElementById('preview-map').src = dataUrl;
             document.getElementById('preview-map').style.display = 'block';
@@ -93,6 +111,7 @@ class ExportControl extends Control {
             console.error('Error exporting map:', error);
         }
     }
+
 
     initModalEvents() {
         document.getElementById('map-title').addEventListener('input', (e) => {
