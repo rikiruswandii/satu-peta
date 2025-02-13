@@ -1,5 +1,4 @@
 <x-auth-layout>
-    <x-auth-session-status class="mb-4" :status="session('status')" />
     <!-- content @s -->
     <div class="nk-content ">
         <div class="nk-split nk-split-page nk-split-md">
@@ -12,11 +11,12 @@
                     </div>
                     <div class="nk-block-head">
                         <div class="nk-block-head-content">
-                            <h5 class="nk-block-title">Atur Ulang Sandi</h5>
+                            <h5 class="nk-block-title">Lupa Sandi</h5>
                             <div class="nk-block-des">
                                 <p>Jika Anda lupa kata sandi, kami akan mengirimkan petunjuk untuk mengatur ulang kata
                                     sandi Anda melalui email.</p>
                             </div>
+                            <x-auth-session-status class="mb-4" :status="session('status')" />
                         </div>
                     </div><!-- .nk-block-head -->
                     <form method="POST" action="{{ route('password.email') }}">
@@ -28,13 +28,13 @@
                             <div class="form-control-wrap">
                                 <input type="text" name="email"
                                     class="form-control form-control-lg @error('email') is-invalid @enderror"
-                                    id="default-01" placeholder="masukkan alamat email.." required>
+                                    id="default-01" placeholder="masukkan alamat email.." value="{{ old('email') }}" required>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
-                            @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
                         </div>
                         <div class="form-group">
                             <button class="btn btn-lg btn-primary btn-block">Kirim Link Reset</button>

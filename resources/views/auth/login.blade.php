@@ -6,10 +6,6 @@
                 <div class="nk-block nk-block-middle nk-auth-body">
                     <div class="brand-logo pb-5">
                         <a href="{{ route('/') }}" class="logo-link">
-                            {{-- <img class="logo-light logo-img logo-img-lg" src="./images/logo.png"
-                                srcset="./images/logo2x.png 2x" alt="logo">
-                            <img class="logo-dark logo-img logo-img-lg" src="./images/logo-dark.png"
-                                srcset="./images/logo-dark2x.png 2x" alt="logo-dark"> --}}
                             <h1>{{ config('app.name', 'Satu Peta Purwakarta') }}</h1>
                         </a>
                     </div>
@@ -69,8 +65,8 @@
                         <!-- Remember Me -->
                         <div class="form-group">
                             <div class="form-check mt-4">
-                                <input class="form-check-input" type="checkbox" value="" id="remember_me"
-                                    name="remember">
+                                <input class="form-check-input text-primary" type="checkbox" id="remember_me"
+                                    name="remember" checked>
                                 <label class="form-check-label" for="remember_me">
                                     {{ __('Ingat saya') }}
                                 </label>
