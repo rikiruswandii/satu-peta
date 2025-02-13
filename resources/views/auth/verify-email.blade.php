@@ -6,7 +6,7 @@
                 <div class="nk-block nk-block-middle nk-auth-body">
                     <div class="brand-logo pb-5">
                         <a href="{{ route('/') }}" class="logo-link">
-                            <h1>{{ config('app.name', 'Satu Peta Purwakarta') }}</h1>
+                            <h1>{{ $app->name }}</h1>
                         </a>
                     </div>
                     <div class="nk-block-head">

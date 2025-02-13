@@ -6,14 +6,14 @@
                 <div class="nk-block nk-block-middle nk-auth-body">
                     <div class="brand-logo pb-5">
                         <a href="{{ route('/') }}" class="logo-link">
-                            <h1>{{ config('app.name', 'Satu Peta Purwakarta') }}</h1>
+                            <h1>{{ $app->name }}</h1>
                         </a>
                     </div>
                     <div class="nk-block-head">
                         <div class="nk-block-head-content">
                             <h5 class="nk-block-title">Masuk</h5>
                             <div class="nk-block-des">
-                                <p>Akses panel {{ config('app.name', 'Satu Peta Purwakarta') }} menggunakan email dan
+                                <p>Akses panel {{ $app->name }} menggunakan email dan
                                     kata sandi Anda.</p>
                             </div>
                             <!-- Session Status -->
@@ -84,7 +84,7 @@
                 </div><!-- .nk-block -->
                 <div class="nk-block nk-auth-footer">
                     <div class="mt-3">
-                        <p>&copy; {{ Date('Y') }} {{ config('app.name', 'Satu Peta Purwakarta') }}. All Rights
+                        <p>&copy; {{ Date('Y') }} {{ $app->name }}. All Rights
                             Reserved.</p>
                     </div>
                 </div><!-- .nk-block -->

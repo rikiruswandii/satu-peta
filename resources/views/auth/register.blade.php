@@ -5,19 +5,15 @@
             <div class="nk-split-content nk-block-area nk-block-area-column nk-auth-container bg-white w-lg-45">
                 <div class="nk-block nk-block-middle nk-auth-body">
                     <div class="brand-logo pb-5">
-                        <a href="html/index.html" class="logo-link">
-                            {{-- <img class="logo-light logo-img logo-img-lg" src="./images/logo.png"
-                                srcset="./images/logo2x.png 2x" alt="logo">
-                            <img class="logo-dark logo-img logo-img-lg" src="./images/logo-dark.png"
-                                srcset="./images/logo-dark2x.png 2x" alt="logo-dark"> --}}
-                            <h1>{{ config('app.name', 'Satu Peta Purwakarta') }}</h1>
+                        <a href="{{ route('/') }}" class="logo-link">
+                            <h1>{{ $app->name }}</h1>
                         </a>
                     </div>
                     <div class="nk-block-head">
                         <div class="nk-block-head-content">
                             <h5 class="nk-block-title">Register</h5>
                             <div class="nk-block-des">
-                                <p>Buat akun baru {{ config('app.name', 'Satu Peta Purwakarta') }}</p>
+                                <p>Buat akun baru {{ $app->name }}</p>
                             </div>
                             <!-- Session Status -->
                             <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -97,7 +93,7 @@
                 </div><!-- .nk-block -->
                 <div class="nk-block nk-auth-footer">
                     <div class="mt-3">
-                        <p>&copy; {{ Date('Y') }} {{ config('app.name', 'Satu Peta Purwakarta') }}. All Rights
+                        <p>&copy; {{ Date('Y') }} {{ $app->name}}. All Rights
                             Reserved.</p>
                     </div>
                 </div><!-- nk-block -->
