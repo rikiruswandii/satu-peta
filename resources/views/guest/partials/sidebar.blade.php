@@ -125,10 +125,14 @@
         }
 
         #search-from-aside::placeholder,#search-dataset::placeholder {
-            color: #0fac81;
+            color: #007052;
             /* Ganti dengan warna yang diinginkan */
             opacity: 1;
             /* Pastikan placeholder terlihat jelas */
+        }
+        
+        #search-from-aside,#search-dataset {
+            background-color: rgba(142, 160, 7, 0.2) ;
         }
     </style>
 @endpush
