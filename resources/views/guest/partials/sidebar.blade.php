@@ -132,7 +132,7 @@
         }
 
         #search-from-aside,#search-dataset {
-            background-color: rgba(142, 160, 7, 0.2) ;
+            background-color: rgba(15, 172, 129, 0.2);
         }
     </style>
 @endpush
