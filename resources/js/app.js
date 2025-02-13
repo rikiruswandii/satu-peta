@@ -256,12 +256,12 @@ class BasemapControl extends Control {
                     <span><i class="bi bi-map"></i> Pilih Basemap</span>
                     <button class="btn btn-sm btn-light toggle-basemap"><i class="bi bi-eye"></i></button>
                 </div>
-                <div class="card-body">
+                <div class="card-body-basemap">
                     <div class="row g-2">
                         ${Object.keys(baseMaps).map(layer => `
                             <div class="col-4">
                                 <div class="basemap-item ${baseMaps[layer].getVisible() ? 'active' : ''}" data-layer="${layer}">
-                                    <img src="${baseMaps[layer].get('thumbnail')}" alt="${layer}" data-toggle="tooltip" data-placement="bottom" title="${layer}">
+                                    <img src="${baseMaps[layer].get('thumbnail')}" alt="${layer}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${layer}">
                                 </div>
                             </div>
                         `).join('')}

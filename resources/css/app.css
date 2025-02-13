@@ -98,6 +98,8 @@ visibility: visible;
 position: absolute; /* Agar tidak mengganggu tata letak saat tersembunyi */
 right: 8px;
 bottom: 30px;
+background: rgba(255, 255, 255, 0.5) !important;
+backdrop-filter: blur(3px) !important;
 }
 
 .basemap-container.hidden {
@@ -119,6 +121,7 @@ transition: 0.3s;
 .basemap-item img {
 width: 100%;
 border-radius: 5px;
+box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
 .basemap-item p {
@@ -164,10 +167,9 @@ visibility: visible;
 }
 
 .basemap-toggle-btn:hover {
-    color: black;
-    border: 1px solid black;
+color: black;
+border: 1px solid black;
 }
-
 
 /* Saat tombol disembunyikan */
 .basemap-toggle-btn.hidden {
@@ -191,33 +193,31 @@ transition: background-color 0.3s ease, transform 0.2s ease !important;
 
 /* Ubah warna latar belakang dan teks tooltip */
 .tooltip-inner {
-    background-color: rgba(255, 193, 7, 0.5) !important; /* Warna latar belakang */
-    color: #007052 !important; /* Warna teks */
-    font-size: 12px; /* Ukuran font */
-    font-weight: bold; /* Ketebalan font */
-    border-radius: 8px; /* Membuat sudut lebih melengkung */
-    padding: 8px 12px; /* Spasi dalam tooltip */
+background-color: rgba(255, 193, 7, 0.5) !important; /* Warna latar belakang */
+color: #007052 !important; /* Warna teks */
+font-size: 12px; /* Ukuran font */
+font-weight: bold; /* Ketebalan font */
+border-radius: 8px; /* Membuat sudut lebih melengkung */
+padding: 8px 12px; /* Spasi dalam tooltip */
 }
 
 /* Ubah warna panah tooltip */
 .bs-tooltip-top .tooltip-arrow::before,
 .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
-    border-top-color: rgba(255, 193, 7, 0.5) !important;
+border-top-color: rgba(255, 193, 7, 0.5) !important;
 }
 
 .bs-tooltip-bottom .tooltip-arrow::before,
 .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
-    border-bottom-color: rgba(255, 193, 7, 0.5) !important;
+border-bottom-color: rgba(255, 193, 7, 0.5) !important;
 }
 
 .bs-tooltip-start .tooltip-arrow::before,
 .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
-    border-left-color: rgba(255, 193, 7, 0.5) !important;
+border-left-color: rgba(255, 193, 7, 0.5) !important;
 }
 
 .bs-tooltip-end .tooltip-arrow::before,
 .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
-    border-right-color: rgba(255, 193, 7, 0.5) !important;
+border-right-color: rgba(255, 193, 7, 0.5) !important;
 }
-
-

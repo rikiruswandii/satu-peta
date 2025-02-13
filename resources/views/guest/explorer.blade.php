@@ -113,6 +113,9 @@
             .bg-success-new {
                 background-color: #0fac81 !important;
             }
+            .card-body-basemap {
+                padding: 8px;
+            }
         </style>
     @endpush
 
