@@ -96,8 +96,8 @@ transform: translateY(0);
 transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 visibility: visible;
 position: absolute; /* Agar tidak mengganggu tata letak saat tersembunyi */
-right: 8px;
-bottom: 30px;
+right: 0;
+bottom: 45px;
 background: rgba(255, 255, 255, 0.5) !important;
 backdrop-filter: blur(3px) !important;
 }
