@@ -10,26 +10,27 @@ class Article extends Controller
 {
     public function index(Request $request)
     {
-        $articles = ModelsArticle::with("category", "documents");
+        $articles = ModelsArticle::with('category', 'documents');
 
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
-            $articles->where('title', 'like', '%' . $searchTerm . '%');
+            $articles->where('title', 'like', '%'.$searchTerm.'%');
         }
 
         $articles = $articles->latest()->paginate(9);
 
         $data = [
             'title' => 'Artikel',
-            'description' => 'Lihat Artikel terbaru dan informasi yang diterbitkan di ' . config('app.name') . '.',
+            'description' => 'Lihat Artikel terbaru dan informasi yang diterbitkan di '.config('app.name').'.',
             'articles' => $articles,
         ];
-        
+
         return view('guest.article.articles', $data);
     }
+
     public function show($article_slug)
     {
-        $article = ModelsArticle::with("category", "documents")->where('slug', $article_slug)->first();
+        $article = ModelsArticle::with('category', 'documents')->where('slug', $article_slug)->first();
 
         $latest_article = ModelsArticle::latest()
             ->where('slug', '!=', $article_slug)

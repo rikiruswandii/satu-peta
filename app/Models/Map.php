@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Map extends Model
 {
@@ -17,6 +17,7 @@ class Map extends Model
     protected static $logName = 'maps_activity';
 
     protected static $logAttributes = ['user_id', 'name'];
+
     protected $with = ['sector'];
 
     public function getActivitylogOptions(): LogOptions

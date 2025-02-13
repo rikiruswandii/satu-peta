@@ -27,12 +27,12 @@ class Dashboard extends Controller
             'city' => $location['city'] ?? '-',
             'region' => $location['region'] ?? '-',
             'country' => $location['country'] ?? '-',
-            'os' => $os . ' ' . $this->agent->version($os),
-            'browser' => $browser . ' ' . $this->agent->version($browser),
+            'os' => $os.' '.$this->agent->version($os),
+            'browser' => $browser.' '.$this->agent->version($browser),
         ];
 
         $title = 'Dashboard';
-        $description = $title . ' page!';
+        $description = $title.' page!';
 
         return view('panel.dashboard', compact('data', 'title', 'description'));
     }

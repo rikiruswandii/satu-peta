@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use proj4php\Proj4php;
-use proj4php\Proj;
 use proj4php\Point;
+use proj4php\Proj;
+use proj4php\Proj4php;
 
 class Search extends Controller
 {
@@ -32,7 +32,7 @@ class Search extends Controller
             ->latest('sectors.created_at')
             ->get();
 
-        $mapsQuery = Map::with("regional_agency", "sector", "documents")->where("is_active", 1);
+        $mapsQuery = Map::with('regional_agency', 'sector', 'documents')->where('is_active', 1);
 
         if ($request->has('regional_agencies')) {
             $mapsQuery->whereIn('regional_agency_id', $request->regional_agencies);
@@ -45,7 +45,7 @@ class Search extends Controller
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $mapsQuery->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'like', '%' . $searchTerm . '%');
+                $query->where('name', 'like', '%'.$searchTerm.'%');
             });
         }
 
@@ -61,23 +61,21 @@ class Search extends Controller
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $mapsQuery->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'like', '%' . $searchTerm . '%');  // Mencocokkan berdasarkan nama map
+                $query->where('name', 'like', '%'.$searchTerm.'%');  // Mencocokkan berdasarkan nama map
             });
         }
 
         // Menyelesaikan query dengan paginasi
         $maps = $mapsQuery->paginate(9);
 
-
         $data = [
             'title' => 'Pencarian',
             'description' => 'Masukkan kata kunci pencarian anda di sini.',
             'categories' => Sector::all(),
-            'groups' => RegionalAgency::with("map")->get(),
+            'groups' => RegionalAgency::with('map')->get(),
             'maps' => $maps,
             'regionalAgencySum' => $regionalAgencySum,
         ];
-        
 
         return view('guest.search', $data);
     }
@@ -85,15 +83,15 @@ class Search extends Controller
     public function getMapsByViewport(Request $request)
     {
         // Inisialisasi proj4php
-        $proj4 = new Proj4php();
+        $proj4 = new Proj4php;
 
         // Definisikan proyeksi
-        $proj4->addDef("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
-        $proj4->addDef("EPSG:3857", "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs");
+        $proj4->addDef('EPSG:4326', '+proj=longlat +datum=WGS84 +no_defs');
+        $proj4->addDef('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs');
 
         // Buat objek proyeksi
-        $projWGS84 = new Proj("EPSG:4326", $proj4);    // lat/long
-        $projMercator = new Proj("EPSG:3857", $proj4);  // web mercator
+        $projWGS84 = new Proj('EPSG:4326', $proj4);    // lat/long
+        $projMercator = new Proj('EPSG:3857', $proj4);  // web mercator
 
         $minLat = $request->input('minLat');
         $maxLat = $request->input('maxLat');
@@ -114,16 +112,17 @@ class Search extends Controller
         $maxLngConverted = is_object($pointMax) && property_exists($pointMax, 'x') ? floatval($pointMax->x) : null;
 
         if ($minLatConverted === null || $maxLatConverted === null || $minLngConverted === null || $maxLngConverted === null) {
-            Log::error("Konversi koordinat gagal");
+            Log::error('Konversi koordinat gagal');
+
             return response()->json(['error' => 'Konversi koordinat gagal'], 400);
         }
 
         // Log koordinat yang sudah dikonversi
-        Log::info("Converted coordinates (WGS84):", [
+        Log::info('Converted coordinates (WGS84):', [
             'minLat' => $minLatConverted,
             'maxLat' => $maxLatConverted,
             'minLng' => $minLngConverted,
-            'maxLng' => $maxLngConverted
+            'maxLng' => $maxLngConverted,
         ]);
 
         // Query database dengan koordinat yang sudah dikonversi
@@ -134,7 +133,7 @@ class Search extends Controller
             $minLatConverted,
             $maxLatConverted,
             $minLngConverted,
-            $maxLngConverted
+            $maxLngConverted,
         ])
             ->whereNull('deleted_at')
             ->with(['regional_agency', 'sector', 'documents'])
@@ -157,14 +156,14 @@ class Search extends Controller
                 'data_geojson_path' => $map->documents->first() ? Storage::url($map->documents->first()->path) : '',
                 'data_title' => $map->name,
                 'data_regional_agency' => $map->regional_agency->name,
-                'data_sector' => $map->sector->name
+                'data_sector' => $map->sector->name,
             ])->render();
         }
 
         return response()->json([
             'html' => $html,
             'pagination' => $maps->links()->toHtml(),
-            'maps' => $maps // Include the raw data for additional processing if needed
+            'maps' => $maps, // Include the raw data for additional processing if needed
         ]);
     }
 }

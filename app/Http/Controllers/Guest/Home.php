@@ -10,23 +10,21 @@ use App\Models\Sector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
-use Illuminate\Support\Collection;
 
 class Home extends Controller
 {
-
     public function index(): View
     {
         // Mengambil data dari database
         $categories = Sector::select('id', 'name')->get();
         $groups = RegionalAgency::select('id', 'name')->get();
-        $maps = Map::with("regional_agency", "sector", "documents")
+        $maps = Map::with('regional_agency', 'sector', 'documents')
             ->where('is_active', 1)
             ->latest()
             ->take(4)
             ->get();
 
-        $news = Article::with("category", "documents")->latest()->take(3)->get();
+        $news = Article::with('category', 'documents')->latest()->take(3)->get();
 
         // Mengambil data dari API TPP
         $opdResponse = Http::get('https://tpp.purwakartakab.go.id/api/opd?key=developerganteng');
@@ -38,8 +36,6 @@ class Home extends Controller
 
         return view('guest.index', compact('title', 'description', 'categories', 'groups', 'maps', 'opdData', 'news'));
     }
-
-
 
     public function search(Request $request)
     {

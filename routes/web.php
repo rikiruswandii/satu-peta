@@ -16,8 +16,8 @@ use App\Http\Controllers\Panel\Users;
 use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ Home::class, 'index'])->name('/');
-Route::get('/explorer', [ Explorer::class, 'index'])->name('explorer');
+Route::get('/', [Home::class, 'index'])->name('/');
+Route::get('/explorer', [Explorer::class, 'index'])->name('explorer');
 Route::get('/search', [Search::class, 'index'])->name('search');
 Route::get('/get-maps-by-viewport', [Search::class, 'getMapsByViewport'])->name('get-maps-by-viewport');
 Route::get('article/list', [GuestArticle::class, 'index'])->name('article.list');
@@ -83,7 +83,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
             Route::get('maps/{map}/download/{id}', [Map::class, 'download'])->name('maps.download');
         });
 
-        //grup
+        // grup
         Route::prefix('groups')->group(function () {
             Route::get('/', [Grup::class, 'index'])->name('groups');
             Route::get('/datatable', [Grup::class, 'datatable'])->name('groups.datatable');
@@ -92,7 +92,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
             Route::delete('/destroy', [Grup::class, 'destroy'])->name('groups.destroy');
         });
 
-        //dataset categories
+        // dataset categories
         Route::prefix('datasets')->group(function () {
             Route::get('/', [DatasetsCategory::class, 'index'])->name('datasets');
             Route::get('/datatable', [DatasetsCategory::class, 'datatable'])->name('datasets.datatable');
@@ -103,5 +103,4 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     }
 );
 
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
