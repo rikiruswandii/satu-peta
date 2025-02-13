@@ -10,9 +10,10 @@
         <!-- Navbar Nav -->
         <div class="collapse navbar-collapse" id="saasboxNav">
             <ul class="navbar-nav navbar-nav-scroll">
-                <li class="ms-2"><a class="link-success" href="{{ route('/') }}">Home</a></li>
+                <li class="ms-2"><a class="link-success" href="{{ route('/') }}">Beranda</a></li>
                 <li class="ms-2"><a class="link-success" href="{{ route('explorer') }}">Jelajah</a></li>
                 <li class="ms-2"><a class="link-success" href="{{ route('search') }}">Pencarian</a></li>
+                <li class="ms-2"><a class="link-success" href="{{ route('article.list') }}">Artikel</a></li>
             </ul>
             <!-- Login Button -->
             <a class="btn btn-success btn-sm ms-auto mb-3 mb-lg-0" href="{{ route('login') }}">Log In</a>

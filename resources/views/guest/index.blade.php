@@ -262,6 +262,50 @@
         </div>
     </div>
     <div class="mb-120 d-block"></div>
+    <div class="saasbox-news-area news2">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-sm-9 col-lg-7 col-xxl-6">
+                    <div class="section-heading text-center">
+                        <h6>Artikel Terbaru</h6>
+                        <h2>Berita Terbaru Kami</h2>
+                        <p>Website ini menyediakan informasi dan artikel terkait kepentingan publik. {{ config('app.name') }} mendukung pelayanan publik yang transparan dan akuntabel.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center g-4 g-md-5 g-lg-4 g-xl-5">
+                <!-- Blog Card -->
+                @foreach ($news as $value)
+                    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+                        <div class="card blog-card border-0">
+                            <a class="image-wrap d-block" href="{{ route('article.show', $value->slug) }}"
+                                style="width:100%; height: 200px; object-fit: cover;">
+                                <img src="{{ Storage::url($value->documents->first()->path) }}" alt="">
+                            </a>
+                            <div class="card-body px-4 pb-0">
+                                <a class="badge bg-primary text-white mb-1"
+                                    href="{{ route('article.show', $value->slug) }}">{{ $value->category->name }}</a>
+                                <a class="post-title d-block mb-3" href="{{ route('article.show', $value->slug) }}">
+                                    {{ Str::limit($value->title, 40, '...') }}
+                                </a>
+                                <div class="post-meta">
+                                    <span class="text-muted fz-14">
+                                        <i
+                                            class="bi bi-clock me-2"></i>{{ \Carbon\Carbon::parse($value->created_at)->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+
+            </div>
+        </div>
+    </div>
+    <div class="mb-120 d-block"></div>
 
     <!-- Group Area-->
 

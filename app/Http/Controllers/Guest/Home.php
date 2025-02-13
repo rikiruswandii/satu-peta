@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
+use App\Models\Article;
 use App\Models\Map;
 use App\Models\RegionalAgency;
 use App\Models\Sector;
@@ -15,10 +16,17 @@ class Home extends Controller
     {
         $categories = Sector::select('id', 'name')->get();
         $groups = RegionalAgency::select('id', 'name')->get();
+        $maps = Map::with("regional_agency", "sector", "documents")
+            ->where('is_active', 1)
+            ->latest()
+            ->take(4)
+            ->get();
+        $news = Article::with("category", "documents")->latest()->take(3)->get();
 
         $title = env('APP_NAME', 'Satu Peta Purwakarta');
         $description = 'Website Satu Peta Purwakarta adalah platform informasi geospasial yang menyajikan data peta terintegrasi untuk mendukung pembangunan dan layanan publik di Kabupaten Purwakarta';
-        return view('guest.index', compact('title', 'description', 'categories', 'groups'));
+
+        return view('guest.index', compact('title', 'description', 'categories', 'groups', 'maps', 'opdData', 'news'));
     }
 
     public function search(Request $request)
