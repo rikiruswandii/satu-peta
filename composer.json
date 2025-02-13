@@ -14,6 +14,7 @@
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "proj4php/proj4php": "^2.0",
         "sopamo/laravel-filepond": "^1.4",
         "spatie/laravel-activitylog": "^4.9",
         "spatie/laravel-settings": "^3.4",

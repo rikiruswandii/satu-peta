@@ -4,7 +4,7 @@
     <x-breadcrumb :title="$title">
         <x-slot name="body">
             <form action="{{ route('search') }}" method="get" id="searchForm">
-                <div class="input-group mb-3" style="width: 400px;">
+                <div class="input-group m-3" style="width: 90%;">
                     <input type="text" class="form-control" placeholder="Kata Kunci" aria-label="Kata Kunci"
                         aria-describedby="basic-addon2" name="search" value="{{ request('search') }}"
                         style="height: 20px;">
@@ -12,10 +12,11 @@
                         style="height: 32px">Cari</button>
                 </div>
                 @if (request('regional_agencies'))
-                    @foreach (request('regional_agencies') as $agency)
+                    @foreach ((array) request('regional_agencies') as $agency)
                         <input type="hidden" name="regional_agencies[]" value="{{ $agency }}">
                     @endforeach
                 @endif
+
             </form>
         </x-slot>
     </x-breadcrumb>
@@ -23,34 +24,45 @@
     <div class="shop-with-sidebar">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-sm-5 col-md-4">
+                <div class="col-12 col-sm-4 col-md-3">
                     <div class="shop-sidebar-area mb-5">
                         <div class="shop-widget mb-4 mb-lg-5">
-                            <h5 class="widget-title mb-4">Instansi</h5>
+                            <h5 class="widget-title mb-4">Batas Pencarian</h5>
+                            <x-map-container geoJsonPath="" mapId="viewportLayering" />
                             <form id="filterForm" action="{{ route('search') }}" method="GET">
                                 @if (request('search'))
                                     <input type="hidden" name="search" value="{{ request('search') }}">
                                 @endif
-                                @foreach ($regionalAgencySum as $item)
-                                    <x-map-category :category_name="$item->name" :category_count="$item->total" :category_id="$item->id" />
+
+                                @php
+                                    $groupedBySector = $regionalAgencySum->groupBy('nama_sektor');
+                                @endphp
+
+                                @foreach ($groupedBySector as $namaSektor => $items)
+                                    <h5 class="widget-title my-4">{{ $namaSektor }}</h5>
+
+                                    @foreach ($items as $item)
+                                        <x-map-category :category_name="$item->name" :category_count="$item->total" :category_id="$item->name" />
+                                    @endforeach
                                 @endforeach
                             </form>
                         </div>
+
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-7 col-md-8">
+                <div class="col-12 col-sm-8 col-md-9">
                     <div class="row g-4 g-lg-5">
                         @foreach ($maps as $map)
-                            <x-map-card :id="$map->id" :card_id="$map->id" :card_title="$map->name" :card_opd="$map->regional_agency->name"
-                                :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->sector->name" />
+                            <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-4 mb-4'" :card_id="$map->id" :card_title="$map->name"
+                                :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name"
+                                :sector="$map->sector->name" />
                         @endforeach
                     </div>
                     <!-- Menampilkan link pagination dengan Tailwind CSS -->
                     <div class="mt-4">
                         {{ $maps->links() }}
                     </div>
-
                 </div>
             </div>
         </div>
@@ -178,7 +190,14 @@
                 transform: translateY(0);
             }
 
+            .card {
+                border: 0.5px solid rgb(157, 157, 157);
+            }
+
             .card-content {
+                border-top-left-radius: 25px;
+                border-top-right-radius: 25px;
+                border-top: 0.5px solid rgb(157, 157, 157);
                 background: white;
             }
 

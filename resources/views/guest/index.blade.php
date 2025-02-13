@@ -3,10 +3,10 @@
     @section('description', $description) <!-- Mengatur deskripsi halaman -->
     <div class="welcome-area hero6 bg-white">
         <div class="welcome4-slide-wrap">
-            <!-- Slide Item-->
+            <!-- Slide Item -->
             <div class="welcome4-slide-item" style="background-image: url('./images/carrow1 (1).JPG')">
             </div>
-            <!-- Slide Item-->
+            <!-- Slide Item -->
             <div class="welcome4-slide-item" style="background-image: url('./images/carrow1 (1).JPG')">
             </div>
         </div>
@@ -25,7 +25,7 @@
                 <div class="rounded p-3 m-0 shadow-lg bg-text-gray border-0" id="searchCard"
                     style="background: rgba(255, 255, 255, 0.5) !important;">
                     <div class="card-body">
-                        <form action="#" method="GET">
+                        <form action="{{ route('search') }}" method="GET">
                             <div class="d-flex align-items-center">
                                 <!-- Gear Icon (Trigger Dropdown) -->
                                 <button type="button" class="btn btn-light border me-2" id="dropdownTrigger">
@@ -39,14 +39,14 @@
 
                                     <!-- Pilihan Dataset & Instansi (Hidden by Default) -->
                                     <div id="extraOptions" class="d-flex w-100 d-none">
-                                        <select name="category" class="form-select select2 form-control">
-                                            <option selected>Semua Kategori</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->name }}">{{ $category->name }}</option>
+                                        <select name="sector" class="form-select select2 form-control">
+                                            <option value="" selected disabled>Semua Kategori</option>
+                                            @foreach ($categories as $sector)
+                                                <option value="{{ $sector->name }}">{{ $sector->name }}</option>
                                             @endforeach
                                         </select>
-                                        <select name="agency" class="form-select select2 form-control">
-                                            <option selected>Semua Instansi</option>
+                                        <select name="regional_agencies" class="form-select select2 form-control">
+                                            <option value="" disabled selected>Semua Instansi</option>
                                             @foreach ($groups as $group)
                                                 <option value="{{ $group->name }}">{{ $group->name }}</option>
                                             @endforeach
@@ -77,91 +77,24 @@
                     <div class="section-heading mb-0">
                         <h6>Dataset Peta</h6>
                         <h2>Jelajahi Peta Terbaru Kami</h2>
-                        <p>Temukan berbagai dataset peta terbaru yang telah diperbarui dengan informasi terkini dan detail yang akurat untuk kebutuhan analisis dan visualisasi Anda.</p>
+                        <p>Temukan berbagai dataset peta terbaru yang telah diperbarui dengan informasi terkini dan
+                            detail yang akurat untuk kebutuhan analisis dan visualisasi Anda.</p>
                     </div>
                 </div>
                 <div class="col-12 col-sm-4 col-lg-5">
                     <div class="text-sm-end mt-5 mt-sm-0">
-                        <a class="btn btn-warning" href="dataset-map.html">Lihat Semua</a>
+                        <a class="btn btn-warning" href="{{ route('search') }}">Lihat Semua</a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="d-block mb-80"></div>
-        <div class="container-fluid">
-            <div class="portfolio2-wrapper px-3">
-                <div class="portfolio2-slides">
-                    <div>
-                        <!-- Single Portfolio Area -->
-                        <div class="single-portfolio-area"><img src="img/bg-img/p22.jpg" alt="">
-                            <!-- Ovarlay Content -->
-                            <div class="overlay-content">
-                                <div class="portfolio-title">
-                                    <h6 class="mb-0">Batas Kecamatan</h6>
-                                </div>
-                                <div class="portfolio-links"><a class="portfolio-img-zoom" href="img/bg-img/p22.jpg"><i
-                                            class="bi bi-arrows-fullscreen"></i></a><a
-                                        href="portfolio-details-one.html"><i class="bi bi-link-45deg"></i></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <!-- Single Portfolio Area -->
-                        <div class="single-portfolio-area"><img src="img/bg-img/p23.jpg" alt="">
-                            <!-- Ovarlay Content -->
-                            <div class="overlay-content">
-                                <div class="portfolio-title">
-                                    <h6 class="mb-0">Batas Kelurahan</h6>
-                                </div>
-                                <div class="portfolio-links"><a class="portfolio-img-zoom" href="img/bg-img/p23.jpg"><i
-                                            class="bi bi-arrows-fullscreen"></i></a><a
-                                        href="portfolio-details-one.html"><i class="bi bi-link-45deg"></i></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <!-- Single Portfolio Area -->
-                        <div class="single-portfolio-area"><img src="img/bg-img/p24.jpg" alt="">
-                            <!-- Ovarlay Content -->
-                            <div class="overlay-content">
-                                <div class="portfolio-title">
-                                    <h6 class="mb-0">Batas Desa</h6>
-                                </div>
-                                <div class="portfolio-links"><a class="portfolio-img-zoom" href="img/bg-img/p24.jpg"><i
-                                            class="bi bi-arrows-fullscreen"></i></a><a
-                                        href="portfolio-details-one.html"><i class="bi bi-link-45deg"></i></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <!-- Single Portfolio Area-->
-                        <div class="single-portfolio-area"><img src="img/bg-img/p25.jpg" alt="">
-                            <!-- Ovarlay Content -->
-                            <div class="overlay-content">
-                                <div class="portfolio-title">
-                                    <h6 class="mb-0">Administrasi Desa</h6>
-                                </div>
-                                <div class="portfolio-links"><a class="portfolio-img-zoom" href="img/bg-img/p25.jpg"><i
-                                            class="bi bi-arrows-fullscreen"></i></a><a
-                                        href="portfolio-details-one.html"><i class="bi bi-link-45deg"></i></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <!-- Single Portfolio Area -->
-                        <div class="single-portfolio-area"><img src="img/bg-img/p26.jpg" alt="">
-                            <!-- Ovarlay Content -->
-                            <div class="overlay-content">
-                                <div class="portfolio-title">
-                                    <h6 class="mb-0">Puskesmas</h6>
-                                </div>
-                                <div class="portfolio-links"><a class="portfolio-img-zoom"
-                                        href="img/bg-img/p26.jpg"><i class="bi bi-arrows-fullscreen"></i></a><a
-                                        href="portfolio-details-one.html"><i class="bi bi-link-45deg"></i></a></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="container">
+            <div class="row g-3">
+                @foreach ($maps as $map)
+                    <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 my-4'" :card_id="$map->id" :card_title="$map->name"
+                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->sector->name" />
+                @endforeach
             </div>
         </div>
     </div>
@@ -174,93 +107,58 @@
                 <div class="col-12">
                     <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
-                            <!-- Slide 1 -->
-                            <div class="carousel-item active">
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid"  style="width:80px;height:85px;">
-                                        </div>
+                            @foreach ($opdData->chunk(6) as $index => $opdChunk)
+                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                    <div class="row">
+                                        @foreach ($opdChunk as $partner)
+                                            <div class="col-2 text-center">
+                                                <div class="partner-logo">
+                                                    <img src="{{ asset('assets/images/logo.png') }}" alt=""
+                                                        class="img-fluid" style="width:80px;height:85px;">
+                                                    <p class="mt-2">{{ $partner['name'] }}</p>
+                                                    <!-- Nama tampil di bawah gambar -->
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Slide 2 -->
-                            <div class="carousel-item">
-                                <div class="row">
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid" style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <div class="partner-logo">
-                                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="img-fluid"  style="width:80px;height:85px;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforeach
+
                         </div>
-                        <!-- Controls -->
+
+                        <!-- Tombol Navigasi -->
                         <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel"
                             data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel"
                             data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">
+        <x-slot name="body">
+            <x-map-container geoJsonPath="" mapId="detailMap" />
+            <table class="table">
+                <tr>
+                    <th>Nama</th>
+                    <td id="map-name"></td>
+                </tr>
+                <tr>
+                    <th>Regional Agency</th>
+                    <td id="map-regional-agency"></td>
+                </tr>
+                <tr>
+                    <th>Sector</th>
+                    <td id="map-sector"></td>
+                </tr>
+            </table>
+        </x-slot>
+    </x-modal>
     <div class="mb-120 d-block"></div>
     <div class="saasbox-news-area news2">
         <div class="container">
@@ -406,11 +304,175 @@
                 color: #fff !important;
                 background-color: #0fac81;
             }
+
+            #detailMap {
+                position: relative;
+            }
+
+            .loading-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .active>.page-link,
+            .page-link.active {
+                background-color: #009d6b !important;
+                color: #fff !important;
+                border-color: #009d6b !important;
+            }
+
+            .page-link {
+                color: #333 !important;
+                border: none;
+                border-radius: 4px;
+                padding: 0.5rem 1rem;
+                margin: 0.25rem;
+                transition: background-color 0.3s ease;
+            }
+
+            .basemap-toggle-btn {
+                display: none !important;
+            }
+
+            #popup.ol-popup {
+                display: none !important;
+            }
+
+            .hover-card {
+                border: none;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .hover-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+            }
+
+            .map-container {
+                position: relative;
+                height: 200px;
+                overflow: hidden;
+            }
+
+            .map-preview {
+                width: 100%;
+                height: 100%;
+                cursor: pointer;
+            }
+
+            .map-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .hover-card:hover .map-overlay {
+                opacity: 1;
+            }
+
+            .view-details {
+                color: white;
+                background: rgba(0, 157, 107, 0.9);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 500;
+                transform: translateY(20px);
+                transition: transform 0.3s ease;
+            }
+
+            .hover-card:hover .view-details {
+                transform: translateY(0);
+            }
+
+            .card {
+                border: 0.5px solid rgb(157, 157, 157);
+            }
+
+            .card-content {
+                border-top-left-radius: 25px;
+                border-top-right-radius: 25px;
+                border-top: 0.5px solid rgb(157, 157, 157);
+                background: white;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #2c3e50;
+                margin-bottom: 1rem;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .card-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .info-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+
+            .info-item i {
+                color: #009d6b;
+                font-size: 1rem;
+            }
+
+            .info-item span {
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            @media (max-width: 768px) {
+                .card-title {
+                    font-size: 1rem;
+                }
+
+                .info-item {
+                    font-size: 0.85rem;
+                }
+            }
         </style>
     @endpush
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+        @vite('resources/js/search.js')
         <script>
             var $jq = jQuery.noConflict();
             $jq(document).ready(function() {
@@ -433,7 +495,7 @@
                     width: '100%',
                     theme: 'bootstrap-5'
                 });
-
+                
                 initMap('searchMapId', 'osm', '' , { scale: true, fullScreen: true, zoomSlider: false }, { dragPan: false, mouseWheelZoom: false });
             });
         </script>
