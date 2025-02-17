@@ -123,8 +123,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#groups-table').DataTable({
+             var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#groups-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('groups.datatable') }}",
@@ -154,27 +155,27 @@
             });
 
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var userId = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(userId);
+                var userName = $r(this).data('name');
+                $r('#nameAccount').text(userName);
             });
 
-            $(document).ready(function() {
-                $("#addRegionalAgencyForm").on("submit", function() {
-                    let submitButton = $("button[form='addRegionalAgencyForm']");
+            $r(document).ready(function() {
+                $r("#addRegionalAgencyForm").on("submit", function() {
+                    let submitButton = $r("button[form='addRegionalAgencyForm']");
                     submitButton.prop("disabled", true); // Nonaktifkan tombol saat submit
                     submitButton.find(".spinner-border").show(); // Tampilkan spinner
                     submitButton.find("span:last-child").hide(); // Sembunyikan teks tombol
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#editGroupModal"]', function() {
-                var id = $(this).data('id');
-                var name = $(this).data('name');
+            $r(document).on('click', '[data-bs-target="#editGroupModal"]', function() {
+                var id = $r(this).data('id');
+                var name = $r(this).data('name');
 
-                var modal = $('#editGroupModal');
+                var modal = $r('#editGroupModal');
 
                 modal.find('input[name="id"]').val(id);
                 modal.find('input[name="name"]').val(name);

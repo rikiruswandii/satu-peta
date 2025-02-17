@@ -162,6 +162,7 @@ class Map extends Controller
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
+                // Pindahkan file dari lokasi sementara ke folder final
                 $newFilePath = 'uploads/maps/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
@@ -224,6 +225,7 @@ class Map extends Controller
                 return redirect()->back()->with('error', 'File harus diunggah.');
             }
         } catch (\Exception $e) {
+
             \Log::error('Gagal membuat peta', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
 
             return redirect()->back()->with('error', 'Gagal membuat peta: '.$e->getMessage());
@@ -277,6 +279,14 @@ class Map extends Controller
         }
 
         return $coordinates;
+        //     \Log::error('Gagal membuat peta', ['error' => $e->getMessage()]);
+
+        //     return redirect()->back()->with('error', 'Gagal membuat peta: '.$e->getMessage());
+        // }
+
+        // \Log::error('Permintaan tidak valid: File harus diunggah.');
+
+        // return redirect()->back()->with('error', 'File harus diunggah.');
     }
 
     public function update(Request $request): RedirectResponse
@@ -315,7 +325,7 @@ class Map extends Controller
                 \Illuminate\Support\Facades\Log::info("Path lengkap file: $fullpath");
 
                 if (! file_exists($fullpath)) {
-                    \Illuminate\Support\Facades\Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+                    \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
 
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
@@ -418,6 +428,7 @@ class Map extends Controller
             try {
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                
                 \Illuminate\Support\Facades\Log::error('Gagal dekripsi ID maps.', ['error' => $e->getMessage()]);
 
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
@@ -466,6 +477,7 @@ class Map extends Controller
             try {
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                
                 \Illuminate\Support\Facades\Log::error('Gagal dekripsi ID peta.', ['error' => $e->getMessage()]);
 
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
@@ -516,6 +528,7 @@ class Map extends Controller
 
             // Cek apakah file ada di storage
             if (! Storage::disk('public')->exists($filePath)) {
+
                 \Illuminate\Support\Facades\Log::error("File tidak ditemukan di path: $filePath");
 
                 return redirect()->back()->with('error', 'File tidak ditemukan di server.');
@@ -526,6 +539,7 @@ class Map extends Controller
                 'Content-Type' => $mimeType,
             ]);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            
             \Illuminate\Support\Facades\Log::error('Gagal dekripsi parameter', ['error' => $e->getMessage()]);
 
             return redirect()->back()->with('error', 'ID tidak valid.');

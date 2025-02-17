@@ -41,8 +41,9 @@
     </div>
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#user-log-table').DataTable({
+             var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#user-log-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('user.datatable', ['id' => $encrypt]) }}",

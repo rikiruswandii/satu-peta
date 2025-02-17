@@ -45,7 +45,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                
+
                                 </tbody>
                             </table>
                         </div>
@@ -61,8 +61,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#articles-table').DataTable({
+             var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#articles-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('articles.datatable') }}",
@@ -105,11 +106,11 @@
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var userId = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(userId);
+                var userName = $r(this).data('name');
+                $r('#nameAccount').text(userName);
             });
         </script>
     @endpush

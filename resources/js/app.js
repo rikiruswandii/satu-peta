@@ -15,10 +15,145 @@ import Overlay from 'ol/Overlay.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import GeoJSON from 'ol/format/GeoJSON';
 import { ZoomSlider, FullScreen, ScaleLine, defaults as defaultControls, Control } from 'ol/control';
-import { DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractions } from 'ol/interaction';
+import { Modify, DoubleClickZoom, MouseWheelZoom, DragPan, defaults as defaultInteractions } from 'ol/interaction';
 import { Style, Fill, Stroke, Circle } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import Draw, { createBox } from 'ol/interaction/Draw';
+
+//to png
+import { toPng } from 'html-to-image';
+
+//to pdf
+import jsPDF from 'jspdf';
+
+class ExportControl extends Control {
+    constructor(opt_options) {
+        const options = opt_options || {};
+        if (!options.export) {
+            return;
+        }
+
+        const buttonToggle = document.createElement('button');
+        buttonToggle.innerHTML = '<i class="bi bi-printer-fill"></i>';
+        buttonToggle.title = 'Print';
+        buttonToggle.className = 'export-toggle';
+        buttonToggle.addEventListener('click', () => this.toggleModal());
+
+        const element = document.createElement('div');
+        element.className = 'ol-unselectable ol-control export-control';
+        element.appendChild(buttonToggle);
+
+        super({
+            element: element,
+            target: options.target,
+        });
+
+        this.initModalEvents();
+    }
+
+    toggleModal() {
+        // Simpan pengaturan modal sebelumnya
+        const modalHeaders = document.querySelectorAll('.modal-header');
+        const modalContents = document.querySelectorAll('.modal-content');
+        const modalDialogs = document.querySelectorAll('.modal-dialog');
+
+        const prevModalSettings = [];
+
+        modalHeaders.forEach((header, index) => {
+            prevModalSettings.push({
+                header: header,
+                cursor: header.style.cursor,
+                backgroundColor: header.style.backgroundColor,
+                color: header.style.color
+            });
+
+            // Reset hanya jika modal bukan exportModal
+            if (!header.closest('#exportModal')) {
+                header.style.cursor = '';
+                header.style.backgroundColor = '';
+                header.style.color = '';
+            }
+        });
+
+        modalContents.forEach((content) => {
+            if (!content.closest('#exportModal')) {
+                content.style.background = '';
+                content.style.backdropFilter = '';
+            }
+        });
+
+        modalDialogs.forEach((dialog) => {
+            if (!dialog.closest('#exportModal')) {
+                dialog.classList.remove('draggable'); // Jika ada class draggable
+            }
+        });
+
+        // Tampilkan exportModal
+        const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+        modal.show();
+        this.updatePreviewMap();
+
+        // Kembalikan pengaturan modal setelah exportModal ditutup
+        document.getElementById('exportModal').addEventListener('hidden.bs.modal', () => {
+            prevModalSettings.forEach(setting => {
+                setting.header.style.cursor = setting.cursor;
+                setting.header.style.backgroundColor = setting.backgroundColor;
+                setting.header.style.color = setting.color;
+            });
+
+            modalDialogs.forEach((dialog) => {
+                if (!dialog.closest('#exportModal')) {
+                    dialog.classList.add('draggable'); // Kembalikan class draggable jika sebelumnya ada
+                }
+            });
+        }, { once: true });
+    }
+
+
+    updatePreviewMap() {
+        const mapElement = this.getMap().getTargetElement();
+        toPng(mapElement).then((dataUrl) => {
+            const previewMap = document.getElementById('preview-map');
+            previewMap.src = dataUrl;
+            previewMap.style.display = 'block';
+        }).catch((error) => {
+            console.error('Error generating preview map:', error);
+        });
+    }
+
+    exportMap(format) {
+        const mapElement = this.getMap().getTargetElement();
+        const title = document.getElementById('map-title').value;
+
+        toPng(mapElement).then((dataUrl) => {
+            document.getElementById('preview-map').src = dataUrl;
+            document.getElementById('preview-map').style.display = 'block';
+
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `${title}.png`;
+                link.click();
+            } else if (format === 'pdf') {
+                const pdf = new jsPDF();
+                pdf.text(title, 10, 10);
+                pdf.addImage(dataUrl, 'PNG', 10, 20, 180, 120);
+                pdf.save(`${title}.pdf`);
+            }
+        }).catch((error) => {
+            console.error('Error exporting map:', error);
+        });
+    }
+
+    initModalEvents() {
+        document.getElementById('map-title').addEventListener('input', (e) => {
+            document.getElementById('preview-title').innerText = e.target.value;
+        });
+
+        document.getElementById('export-png').addEventListener('click', () => this.exportMap('png'));
+        document.getElementById('export-pdf').addEventListener('click', () => this.exportMap('pdf'));
+    }
+}
 
 //layer styles
 function getStyle(feature) {
@@ -90,7 +225,15 @@ const baseMaps = {
 class BasemapControl extends Control {
     constructor(opt_options) {
         const options = opt_options || {};
+
+        // Panggil super() sebelum mengakses 'this'
         const element = document.createElement('div');
+        super({ element });
+
+        if (!options.basemap) {
+            return; // Jika basemap dinonaktifkan, hentikan eksekusi
+        }
+
         element.className = 'ol-basemap-control ol-unselectable ol-control';
 
         // Elemen UI
@@ -114,16 +257,11 @@ class BasemapControl extends Control {
             </div>
         `;
 
-        // Tombol Floating untuk Menampilkan Basemap Control
+        // Tambahkan tombol floating toggle
         const toggleButton = document.createElement('button');
-        toggleButton.className = 'btn btn-success btn-sm basemap-toggle-btn';
+        toggleButton.className = 'basemap-toggle-btn';
         toggleButton.innerHTML = '<i class="bi bi-layers"></i>';
         document.body.appendChild(toggleButton);
-
-        super({
-            element: element,
-            target: options.target
-        });
 
         // Event Klik Thumbnail untuk Mengubah Basemap
         element.querySelectorAll('.basemap-item').forEach(item => {
@@ -147,10 +285,10 @@ class BasemapControl extends Control {
 
             if (container.classList.contains('hidden')) {
                 this.innerHTML = '<i class="bi bi-eye"></i>';
-                toggleButton.classList.remove('hidden'); // Munculkan tombol floating dengan transisi
+                toggleButton.classList.remove('hidden'); // Munculkan tombol floating
             } else {
                 this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-                toggleButton.classList.add('hidden'); // Sembunyikan tombol floating dengan transisi
+                toggleButton.classList.add('hidden'); // Sembunyikan tombol floating
             }
         });
 
@@ -159,7 +297,7 @@ class BasemapControl extends Control {
             const container = element.querySelector('.basemap-container');
             container.classList.remove('hidden');
             element.querySelector('.toggle-basemap').innerHTML = '<i class="bi bi-eye-slash"></i>';
-            this.classList.add('hidden'); // Sembunyikan tombol floating dengan transisi
+            this.classList.add('hidden'); // Sembunyikan tombol floating
         });
 
     }
@@ -175,7 +313,7 @@ class DrawControl extends Control {
         element.style.borderRadius = '3px';
         element.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
         element.style.display = 'flex';
-        element.style.flexDirection = 'column';  // Mengubah menjadi vertikal
+        element.style.flexDirection = 'column';
         element.style.gap = '1px';
 
         super({ element });
@@ -190,6 +328,7 @@ class DrawControl extends Control {
 
         this.map.addLayer(this.drawLayer);
         this.activeDraw = null;
+        this.modifyInteraction = new Modify({ source: this.drawLayer.getSource() });
 
         const buttons = [
             { type: 'Point', icon: 'bi bi-geo-alt' }, // Marker
@@ -216,6 +355,14 @@ class DrawControl extends Control {
         clearButton.onclick = () => this.clearDrawings();
         element.appendChild(clearButton);
 
+        // Tombol edit
+        this.editButton = document.createElement('button');
+        this.editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+        this.editButton.title = 'Edit Drawings';
+        this.editButton.className = 'btn btn-primary btn-sm';
+        this.editButton.onclick = () => this.toggleEditMode();
+        element.appendChild(this.editButton);
+
         // Tombol untuk mengakhiri draw mode
         this.stopDrawButton = document.createElement('button');
         this.stopDrawButton.innerHTML = '<i class="bi bi-x-circle"></i>';
@@ -231,6 +378,8 @@ class DrawControl extends Control {
             this.map.removeInteraction(this.activeDraw);
             this.activeDraw = null;
         }
+
+        this.map.removeInteraction(this.modifyInteraction);
 
         let geometryFunction = null;
         let drawType = type;
@@ -261,6 +410,14 @@ class DrawControl extends Control {
     clearDrawings() {
         this.drawLayer.getSource().clear();
         this.deactivateDraw();
+    }
+
+    toggleEditMode() {
+        if (this.map.getInteractions().getArray().includes(this.modifyInteraction)) {
+            this.map.removeInteraction(this.modifyInteraction);
+        } else {
+            this.map.addInteraction(this.modifyInteraction);
+        }
     }
 }
 
@@ -330,7 +487,6 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
         });
 
         if (feature) {
-            // Ambil properties dari fitur dan buat tabel
             const properties = feature.getProperties();
             let tableHTML = '<table class="table table-sm table-bordered" style="width: 200px; font-size: 0.8rem;">' +
                 '<thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
@@ -344,9 +500,11 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
             tableHTML += '</tbody></table>';
 
             popupContent.innerHTML = tableHTML;
+            popupElement.style.display = 'block'; // Tampilkan popup
             popupOverlay.setPosition(event.coordinate);
         } else {
             popupOverlay.setPosition(undefined);
+            popupElement.style.display = 'none'; // Sembunyikan popup
         }
     };
 
@@ -360,7 +518,20 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
         }
     });
 
-    map.on('singleclick', displayPopup);
+    map.on('singleclick', function (event) {
+        const feature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
+            return feature;
+        });
+
+        if (feature) {
+            displayPopup(event);
+        } else {
+            popupOverlay.setPosition(undefined);
+            popupElement.style.display = 'none';
+        }
+    });
+
+
 
     // Fungsi untuk menutup popup
     popupCloser.onclick = function () {
@@ -372,30 +543,35 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
 }
 
 // Fungsi untuk membuat kontrol dengan opsi yang dapat diaktifkan atau dinonaktifkan
-function createControls(options, map) {
+function createControls(options = {}, map) {
     const availableControls = {
-        scale: new ScaleLine({ units: 'imperial' }),
-        fullScreen: new FullScreen(),
-        zoomSlider: new ZoomSlider(),
-        basemap: new BasemapControl(),
-        draw: map ? new DrawControl({ map }) : null
+        scale: () => new ScaleLine({ units: 'imperial' }),
+        fullScreen: () => new FullScreen(),
+        zoomSlider: () => new ZoomSlider(),
+        basemap: () => new BasemapControl({ basemap: true }),
+        export: () => new ExportControl({ export: true }),
+        draw: () => map ? new DrawControl({ map }) : null
     };
 
     return defaultControls().extend(
-        Object.keys(options)
-            .map(key => options[key] ? availableControls[key] : null)
+        Object.keys(availableControls)
+            .map(key => options[key] ? availableControls[key]() : null)
             .filter(Boolean)
     );
 }
 
-function createInteractions(options) {
+function createInteractions(options = {}) {
     const availableInteractions = {
-        dragPan: new DragPan(),
-        doubleClickZoom: new DoubleClickZoom(),
-        mouseWheelZoom: new MouseWheelZoom(),
+        dragPan: () => new DragPan(),
+        doubleClickZoom: () => new DoubleClickZoom(),
+        mouseWheelZoom: () => new MouseWheelZoom(),
     };
 
-    return defaultInteractions().extend(Object.keys(options).map(key => options[key] ? availableInteractions[key] : null).filter(Boolean));
+    return defaultInteractions().extend(
+        Object.keys(availableInteractions)
+            .map(key => options[key] ? availableInteractions[key]() : null)
+            .filter(Boolean)
+    );
 }
 
 window.initMap = initMap;

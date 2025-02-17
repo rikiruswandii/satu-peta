@@ -495,8 +495,13 @@
                     width: '100%',
                     theme: 'bootstrap-5'
                 });
+// <<<<<<< HEAD
                 
                 initMap('searchMapId', 'osm', '' , { scale: true, fullScreen: true, zoomSlider: false }, { dragPan: false, mouseWheelZoom: false });
+// =======
+
+//                 initMap('searchMapId', '' , { scale: true, fullScreen: true }, {});
+// >>>>>>> origin/main
             });
         </script>
     @endpush

@@ -16,7 +16,7 @@
                 <li class="ms-2"><a class="link-success" href="{{ route('article.list') }}">Artikel</a></li>
             </ul>
             <!-- Login Button -->
-            <a class="btn btn-success btn-sm ms-auto mb-3 mb-lg-0" href="{{ route('login') }}">Log In</a>
+            <a class="btn-login ms-auto mb-3 mb-lg-0" href="{{ route('login') }}">Log In</a>
         </div>
     </div>
 </nav>
