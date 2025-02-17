@@ -70,47 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                     });
 
-                    var pointStyle = new Style({
-
-                        image: new CircleStyle({
-
-                            radius: 5,
-                            fill: new Fill({
-
-                                color: '#73EC8B'
-                            }),
-                            stroke: new Stroke({
-
-                                color: 'black',
-                                width: 1
-                            })
-                        })
-                    });
-
-                    // Style untuk LineString
-                    var lineStyle = new Style({
-
-                        stroke: new Stroke({
-
-                            color: '#FF5733',
-                            width: 2
-                        })
-                    });
-
                     var vectorLayer = new VectorLayer({
                         source: vectorSource,
                         style: function (feature) {
-                            var geometryType = feature.getGeometry().getType();
-                            if (geometryType === 'Point') {
-                                return pointStyle;
-                            } else if (geometryType === 'LineString') {
-                                return lineStyle;
-                            }
-                            return new Style({
-                                fill: new Fill({
-                                    color: '#73EC8B'
-                                })
-                            });
+                            return getStyle(feature);
                         }
                     });
 
@@ -328,13 +291,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch(path);
             return await response.json();
         } catch (error) {
-            
+
             return null;
         }
     }
 
     function addVectorLayer(map, features) {
-        
+
         if (!features) return;
 
         const vectorSource = new ol.source.Vector({
@@ -345,15 +308,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const vectorLayer = new ol.layer.Vector({
             source: vectorSource,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: 'rgba(0, 255, 0, 0.2)'
-                }),
-                stroke: new ol.style.Stroke({
-                    color: '#00ff00',
-                    width: 2
-                })
-            })
+            style: function (feature) {
+                return getStyle(feature);
+            }
         });
 
         map.addLayer(vectorLayer);
