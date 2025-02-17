@@ -6,7 +6,7 @@
                type="checkbox" 
                name="regional_agencies[]"
                value="{{ $category_id }}"
-               {{ in_array($category_id, request('regional_agencies', [])) ? 'checked' : '' }}>
+               {{ in_array($category_id, (array) request('regional_agencies', [])) ? 'checked' : '' }}>
         <label class="form-check-label" for="customCheck{{ $category_id }}">
             {{ $category_name }}
             <span class="ms-2">({{ $category_count }})</span>
