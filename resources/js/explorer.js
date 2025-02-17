@@ -67,26 +67,54 @@ $m(document).ready(function () {
         });
     }
 
-    // Tambahkan layer ke daftar dan beri fungsi drag-and-drop
+    let alertTimeout; // Variabel untuk menyimpan timer
+
+    function showMaxLayerAlert() {
+        let alertBox = $m("#maxLayerAlert");
+
+        alertBox.removeClass("d-none").addClass("show"); // Tampilkan alert
+
+        // Hapus timer sebelumnya jika masih berjalan
+        clearTimeout(alertTimeout);
+
+        // Set timer baru untuk menyembunyikan alert setelah 3 detik
+        alertTimeout = setTimeout(() => {
+            alertBox.addClass("d-none").removeClass("show");
+        }, 3000);
+    }
+
+    // Event listener untuk tombol close di alert
+    $m(document).on("click", "#maxLayerAlert .close", function () {
+        $m("#maxLayerAlert").addClass("d-none").removeClass("show");
+        clearTimeout(alertTimeout); // Hentikan timer jika alert ditutup manual
+    });
     function addLayerToList(layer, name) {
+        if ($m("#layerList li").length >= 10) {
+            showMaxLayerAlert(); // Menampilkan alert
+            return;
+        }
+
         let layerId = `layer-${Date.now()}`;
         layer.set("id", layerId);
 
         let listItem = `
     <li data-layer-id="${layerId}" class="list-group-item text-success d-flex justify-content-between align-items-center" style="cursor:pointer;font-size:14px;">
         <div class="d-flex align-items-center gap-2">
-            <input type="checkbox" id="is-active" value="" checked>
+            <input type="checkbox" class="is-active" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Checkbox" checked>
             <span>${name}</span>
         </div>
         <div class="d-flex gap-2">
-            <i id="boundToLayer" class="bi bi-aspect-ratio link-secondary"></i>
-            <i id="removeLayer" class="bi bi-x-circle-fill link-danger"></i>
+            <i class="bound-to-layer bi bi-aspect-ratio link-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Pusatkan"></i>
+            <i class="remove-layer bi bi-x-circle-fill link-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Hapus"></i>
         </div>
     </li>`;
 
+        // Tambahkan elemen ke dalam daftar
         $m("#layerList").append(listItem);
-    }
 
+        // Inisialisasi tooltip setelah elemen masuk ke DOM
+        $m("#layerList [data-bs-toggle='tooltip']").tooltip();
+    }
 
     // Saat tombol diklik, tambahkan layer baru dan masukkan ke dalam list
     $m(".list-group-item a").on("click", function () {
@@ -95,7 +123,13 @@ $m(document).ready(function () {
         console.log("GeoJSON Path:", path);
 
         if (!path) {
-            alert("GeoJSON path tidak tersedia");
+            showMaxLayerAlert("GeoJSON path tidak tersedia!");
+            return;
+        }
+
+        // Cek apakah sudah mencapai batas maksimal 10 layer
+        if ($m("#layerList li").length >= 10) {
+            showMaxLayerAlert("Maksimal 10 layer yang dapat ditambahkan!");
             return;
         }
 
@@ -117,6 +151,7 @@ $m(document).ready(function () {
     });
 
 
+
     // Fungsi untuk menampilkan modal
     $m(document).on('click', '[data-bs-target="#openModalDataset"]', function () {
         $m('.modal-header').css({
@@ -124,7 +159,7 @@ $m(document).ready(function () {
             color: 'white',
             backgroundColor: '#0fac81'
         });
-        $m('.modal-title').attr('style', 'color: white !important; font-size: 16px !important;');
+        $m('.modal-title').attr('style', 'color: #FFC107 !important; font-size: 16px !important;');
         $m('.modal-content').css({
             'background': 'rgba(255, 255, 255, 0.5)',
             'backdrop-filter': 'blur(3px)'
@@ -193,7 +228,7 @@ $m(document).ready(function () {
         });
     });
 
-    $m(document).on("change", "#layerList li #is-active", function () {
+    $m("#layerList").on("change", ".is-active", function () {
         let layerId = $m(this).closest("li").data("layer-id");
         let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
         if (layer) {
@@ -201,7 +236,7 @@ $m(document).ready(function () {
         }
     });
 
-    $m(document).on("click", "#layerList li #boundToLayer", function () {
+    $m("#layerList").on("click", ".bound-to-layer", function () {
         let layerId = $m(this).closest("li").data("layer-id");
         let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
         if (layer) {
@@ -212,7 +247,7 @@ $m(document).ready(function () {
         }
     });
 
-    $m(document).on("click", "#layerList li #removeLayer", function () {
+    $m("#layerList").on("click", ".remove-layer", function () {
         let layerId = $m(this).closest("li").data("layer-id");
         let layer = map.getLayers().getArray().find(l => l.get("id") === layerId);
         if (layer) {
@@ -220,9 +255,6 @@ $m(document).ready(function () {
         }
         $m(this).closest("li").remove();
     });
-
-
-
 
 
     function searchLocation() {
@@ -272,6 +304,10 @@ $m(document).ready(function () {
                         .text(name)
                         .css({ cursor: "pointer" })
                         .on("click", function () {
+                            if ($m("#layerList li").length >= 10) {
+                                showMaxLayerAlert("Maksimal 10 marker dapat ditambahkan!");
+                                return;
+                            }
                             map.getView().animate({
                                 center: fromLonLat([lon, lat]),
                                 zoom: 14,

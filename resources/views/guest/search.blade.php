@@ -16,7 +16,6 @@
                         <input type="hidden" name="regional_agencies[]" value="{{ $agency }}">
                     @endforeach
                 @endif
-
             </form>
         </x-slot>
     </x-breadcrumb>
@@ -52,41 +51,53 @@
                 </div>
 
                 <div class="col-12 col-sm-8 col-md-9">
-                    <div class="row g-4 g-lg-5">
-                        @foreach ($maps as $map)
-                            <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-4 mb-4'" :card_id="$map->id" :card_title="$map->name"
+                    <div class="row g-2 g-lg-3">
+                        @forelse ($maps as $map)
+                            <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 mb-4'" :card_id="$map->id" :card_title="$map->name"
                                 :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name"
                                 :sector="$map->sector->name" />
-                        @endforeach
+                        @empty
+                            <!-- SVG image -->
+                            <div class="text-center mb-4">
+                                <img src="{{ asset('images/undraw_friends_xscy.svg') }}" alt=""
+                                    class="mx-auto d-block  w-25 h-auto">
+                                    <h1 class="mb-3">Oops! Data Tidak Tersedia.</h1>
+                                    <p class="lead">Data yang Anda cari saat ini tidak tersedia
+                                        atau belum ditambahkan. Silakan coba lagi nanti.</p>
+                            </div>
+                        @endforelse
                     </div>
-                    <!-- Menampilkan link pagination dengan Tailwind CSS -->
-                    <div class="mt-4">
-                        {{ $maps->links() }}
-                    </div>
+                    @if ($maps->isNotEmpty())
+                        <div class="mt-4">
+                            {{ $maps->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">
-        <x-slot name="body">
-            <x-map-container geoJsonPath="" mapId="detailMap" />
-            <table class="table">
-                <tr>
-                    <th>Nama</th>
-                    <td id="map-name"></td>
-                </tr>
-                <tr>
-                    <th>Regional Agency</th>
-                    <td id="map-regional-agency"></td>
-                </tr>
-                <tr>
-                    <th>Sector</th>
-                    <td id="map-sector"></td>
-                </tr>
-            </table>
-        </x-slot>
-    </x-modal>
+    @section('modal')
+        <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">
+            <x-slot name="body">
+                <x-map-container geoJsonPath="" mapId="detailMap" />
+                <table class="table">
+                    <tr>
+                        <th>Nama</th>
+                        <td id="map-name"></td>
+                    </tr>
+                    <tr>
+                        <th>Regional Agency</th>
+                        <td id="map-regional-agency"></td>
+                    </tr>
+                    <tr>
+                        <th>Sector</th>
+                        <td id="map-sector"></td>
+                    </tr>
+                </table>
+            </x-slot>
+        </x-modal>
+    @endSection()
 
     @push('css')
         <style>

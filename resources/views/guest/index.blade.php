@@ -22,7 +22,7 @@
                     <hr />
                     <strong class="text-center text-light">{{ __('Temukan dataset dengan mudah!') }}</strong>
                 </div>
-                <div class="rounded p-3 m-0 shadow-lg bg-text-gray border-0" id="searchCard"
+                <div class="rounded p-0 m-0 shadow-lg bg-text-gray border-0" id="searchCard"
                     style="background: rgba(255, 255, 255, 0.5) !important;">
                     <div class="card-body">
                         <form action="{{ route('search') }}" method="GET">
@@ -140,25 +140,27 @@
             </div>
         </div>
     </div>
-    <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">
-        <x-slot name="body">
-            <x-map-container geoJsonPath="" mapId="detailMap" />
-            <table class="table">
-                <tr>
-                    <th>Nama</th>
-                    <td id="map-name"></td>
-                </tr>
-                <tr>
-                    <th>Regional Agency</th>
-                    <td id="map-regional-agency"></td>
-                </tr>
-                <tr>
-                    <th>Sector</th>
-                    <td id="map-sector"></td>
-                </tr>
-            </table>
-        </x-slot>
-    </x-modal>
+    @section('modal')
+        <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">
+            <x-slot name="body">
+                <x-map-container geoJsonPath="" mapId="detailMap" />
+                <table class="table">
+                    <tr>
+                        <th>Nama</th>
+                        <td id="map-name"></td>
+                    </tr>
+                    <tr>
+                        <th>Regional Agency</th>
+                        <td id="map-regional-agency"></td>
+                    </tr>
+                    <tr>
+                        <th>Sector</th>
+                        <td id="map-sector"></td>
+                    </tr>
+                </table>
+            </x-slot>
+        </x-modal>
+    @endsection
     <div class="mb-120 d-block"></div>
     <div class="saasbox-news-area news2">
         <div class="container">
@@ -167,7 +169,8 @@
                     <div class="section-heading text-center">
                         <h6>Artikel Terbaru</h6>
                         <h2>Berita Terbaru Kami</h2>
-                        <p>Website ini menyediakan informasi dan artikel terkait kepentingan publik. {{ config('app.name') }} mendukung pelayanan publik yang transparan dan akuntabel.</p>
+                        <p>Website ini menyediakan informasi dan artikel terkait kepentingan publik.
+                            {{ config('app.name') }} mendukung pelayanan publik yang transparan dan akuntabel.</p>
                     </div>
 
                 </div>
@@ -467,6 +470,11 @@
                     font-size: 0.85rem;
                 }
             }
+
+            .position-relative:hover .map-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
         </style>
     @endpush
 
@@ -495,13 +503,11 @@
                     width: '100%',
                     theme: 'bootstrap-5'
                 });
-// <<<<<<< HEAD
-                
-                initMap('searchMapId', 'osm', '' , { scale: true, fullScreen: true, zoomSlider: false }, { dragPan: false, mouseWheelZoom: false });
-// =======
 
-//                 initMap('searchMapId', '' , { scale: true, fullScreen: true }, {});
-// >>>>>>> origin/main
+                initMap('searchMapId', '', {
+                    scale: true,
+                    fullScreen: true
+                }, {});
             });
         </script>
     @endpush

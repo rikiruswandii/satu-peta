@@ -22,7 +22,7 @@
 
             .btn-login {
                 background: #0fac81;
-                color: #ffffff;
+                color: #FFC107;
                 padding: 10px;
                 margin: 0;
                 border-radius: 3px;
@@ -33,11 +33,11 @@
 
             .btn-login:hover {
                 background: none;
-                color: #0fac81;
+                color: #FFC107;
                 border: 5px;
                 border-radius: 3px;
-                border-color: #0fac81;
-                box-shadow: 5px 5px 10px rgba(7, 160, 96, 0.5);
+                border-color: #FFC107;
+                box-shadow: 5px 5px 10px rgba(145, 160, 7, 0.5);
             }
 
             #exportModal .modal-dialog {
@@ -53,7 +53,7 @@
             .ol-control.ol-zoom {
                 position: absolute !important;
                 top: auto !important;
-                bottom: 5.7em !important;
+                bottom: 7.5em !important;
                 /* Atur jarak dari bawah */
                 left: auto !important;
                 right: .5em !important;
@@ -61,16 +61,60 @@
                 z-index: 1000 !important;
                 /* Pastikan tampil di atas */
             }
+
             .ol-control.ol-zoomslider {
                 position: absolute !important;
                 top: auto !important;
-                bottom: 9em !important;
+                bottom: 10.8em !important;
                 /* Atur jarak dari bawah */
                 left: auto !important;
                 right: .5em !important;
                 /* Atur jarak dari kanan */
                 z-index: 1000 !important;
                 /* Pastikan tampil di atas */
+            }
+
+            button.ol-full-screen-false, div.ol-draw-control.ol-unselectable.ol-control button, div.ol-zoom.ol-unselectable.ol-control button, button.export-toggle, button.basemap-toggle-btn, div.ol-scale-line.ol-unselectable {
+                background-color: #0fac81 !important;
+                color: #FFC107 !important;
+            }
+            div.ol-zoomslider.ol-unselectable.ol-control button {
+                background-color: #0fac81 !important;
+                border:  1px #FFC107 solid !important;
+                border-radius:  3px !important;
+            }
+            div.ol-zoomslider.ol-unselectable.ol-control {
+                background-color: rgba(7, 160, 33, 0.2) !important;
+            }
+            div.ol-scale-line.ol-unselectable {
+                background-color: #0fac81 !important;
+                position: absolute !important;
+                top: auto !important;
+                bottom: 1.8em !important;
+                /* Atur jarak dari bawah */
+                left: auto !important;
+                right: .5em !important;
+                /* Atur jarak dari kanan */
+                z-index: 1000 !important;
+                /* Pastikan tampil di atas */
+            }
+            div.ol-scale-line.ol-unselectable div.ol-scale-line-inner {
+                color: #FFC107 !important;
+                border: 1px solid #FFC107 !important;
+                border-top: none !important;
+            }
+            div.ol-attribution.ol-unselectable.ol-control.ol-uncollapsible {
+                background-color: rgba(142, 160, 7, 0.2) !important;
+                color: #FFC107 !important;
+            }
+            div.ol-attribution.ol-unselectable.ol-control.ol-uncollapsible ul > li, div.ol-attribution.ol-unselectable.ol-control.ol-uncollapsible ul > li > a, .toggle-basemap {
+                color: #007052 !important;
+            }
+            .bg-success-new {
+                background-color: #0fac81 !important;
+            }
+            .card-body-basemap {
+                padding: 8px;
             }
         </style>
     @endpush
@@ -83,6 +127,12 @@
             <x-map-container geoJsonPath="" mapId="explorerMapId" :height="'91vh'" />
         </div>
     </div>
+    <div id="maxLayerAlert"
+        class="alert alert-warning alert-dismissible fade d-none position-fixed top-0 start-50 translate-middle-x shadow"
+        role="alert" style="z-index: 1050;">
+        <strong>Peringatan!</strong> Maksimal 10 layer yang dapat ditambahkan.
+    </div>
+
 
     @section('modal')
         <!-- Modal -->
@@ -90,7 +140,7 @@
             <x-slot name="body">
                 <div class="p-2 d-flex justify-content-center align-items-center">
                     <input class="border-0 p-1 rounded-start" type="text" name="search-dataset" id="search-dataset"
-                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn"><i
+                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cari Layer"><i
                             class="bi bi-search text-success ms-1"></i></button>
                 </div>
                 <div class="mt-1 row p-2 overflow-x-auto body-dataset" style="max-height: 370px; scrollbar-width: none;">

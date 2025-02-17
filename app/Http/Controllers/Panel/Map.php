@@ -279,21 +279,13 @@ class Map extends Controller
         }
 
         return $coordinates;
-        //     \Log::error('Gagal membuat peta', ['error' => $e->getMessage()]);
-
-        //     return redirect()->back()->with('error', 'Gagal membuat peta: '.$e->getMessage());
-        // }
-
-        // \Log::error('Permintaan tidak valid: File harus diunggah.');
-
-        // return redirect()->back()->with('error', 'File harus diunggah.');
     }
 
     public function update(Request $request): RedirectResponse
     {
         // \Log data yang diterima dari request
         \Illuminate\Support\Facades\Log::info('Data yang diterima:', $request->all());
-
+   
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'regional_agency_id' => 'required|exists:regional_agencies,id',

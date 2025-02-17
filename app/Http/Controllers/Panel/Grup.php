@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\RegionalAgency;
+use App\Events\OpdSyncRequested;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,27 +37,6 @@ class Grup extends Controller
                     ->editColumn('updated_at', function ($row) {
                         return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
                     })
-                    ->addColumn('action', function ($row) {
-                        return '<ul class="preview-list">
-                                                    <li class="preview-item">
-                                                    <a href="javascript:void(0);" class="btn btn-xs btn-dim btn-outline-warning rounded-pill" data-bs-toggle="modal"
-                                                data-bs-target="#editGroupModal"
-                                                data-name="'.$row->name.'"
-                                                data-id="'.Crypt::encrypt($row->id).'">
-                                                <em class="icon ni ni-edit"></em><span>Edit</span>
-                                            </a>
-                                                    </li>
-                                                    <li class="preview-item">
-                                                    <a href="javascript:void(0);" class="btn btn-xs btn-dim btn-outline-danger rounded-pill" data-bs-toggle="modal"
-                                                data-bs-target="#deleteMapModal"
-                                                data-id="'.Crypt::encrypt($row->id).'"
-                                                data-name="'.$row->name.'">
-                                                <em class="icon ni ni-trash"></em><span>Delete</span>
-                                            </a>
-                                                    </li>
-                                                </ul>';
-                    })
-                    ->rawColumns(['action'])
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
@@ -143,4 +123,26 @@ class Grup extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus grup.');
         }
     }
+
+   public function sync(Request $request)
+{
+    try {
+        // Trigger event atau proses lain
+        event(new OpdSyncRequested());
+
+        // Response JSON yang dibaca AJAX
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sync request telah diproses.'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
 }

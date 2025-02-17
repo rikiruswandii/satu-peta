@@ -21,7 +21,7 @@ import { fromLonLat } from 'ol/proj';
 import Draw, { createBox } from 'ol/interaction/Draw';
 
 //to png
-import { toPng } from 'html-to-image';
+import domtoimage from 'dom-to-image-more';
 
 //to pdf
 import jsPDF from 'jspdf';
@@ -36,6 +36,9 @@ class ExportControl extends Control {
         const buttonToggle = document.createElement('button');
         buttonToggle.innerHTML = '<i class="bi bi-printer-fill"></i>';
         buttonToggle.title = 'Print';
+        buttonToggle.setAttribute("data-bs-toggle", "tooltip");
+        buttonToggle.setAttribute("data-bs-placement", "left");
+        var tooltip = new bootstrap.Tooltip(buttonToggle);
         buttonToggle.className = 'export-toggle';
         buttonToggle.addEventListener('click', () => this.toggleModal());
 
@@ -51,81 +54,48 @@ class ExportControl extends Control {
         this.initModalEvents();
     }
 
-    toggleModal() {
-        // Simpan pengaturan modal sebelumnya
-        const modalHeaders = document.querySelectorAll('.modal-header');
-        const modalContents = document.querySelectorAll('.modal-content');
-        const modalDialogs = document.querySelectorAll('.modal-dialog');
-
-        const prevModalSettings = [];
-
-        modalHeaders.forEach((header, index) => {
-            prevModalSettings.push({
-                header: header,
-                cursor: header.style.cursor,
-                backgroundColor: header.style.backgroundColor,
-                color: header.style.color
-            });
-
-            // Reset hanya jika modal bukan exportModal
-            if (!header.closest('#exportModal')) {
-                header.style.cursor = '';
-                header.style.backgroundColor = '';
-                header.style.color = '';
-            }
-        });
-
-        modalContents.forEach((content) => {
-            if (!content.closest('#exportModal')) {
-                content.style.background = '';
-                content.style.backdropFilter = '';
-            }
-        });
-
-        modalDialogs.forEach((dialog) => {
-            if (!dialog.closest('#exportModal')) {
-                dialog.classList.remove('draggable'); // Jika ada class draggable
-            }
-        });
-
-        // Tampilkan exportModal
+    async toggleModal() {
         const modal = new bootstrap.Modal(document.getElementById('exportModal'));
         modal.show();
-        this.updatePreviewMap();
-
-        // Kembalikan pengaturan modal setelah exportModal ditutup
-        document.getElementById('exportModal').addEventListener('hidden.bs.modal', () => {
-            prevModalSettings.forEach(setting => {
-                setting.header.style.cursor = setting.cursor;
-                setting.header.style.backgroundColor = setting.backgroundColor;
-                setting.header.style.color = setting.color;
-            });
-
-            modalDialogs.forEach((dialog) => {
-                if (!dialog.closest('#exportModal')) {
-                    dialog.classList.add('draggable'); // Kembalikan class draggable jika sebelumnya ada
-                }
-            });
-        }, { once: true });
+        await this.updatePreviewMap();
     }
 
+    async updatePreviewMap() {
+        try {
+            const mapElement = this.getMap().getTargetElement();
 
-    updatePreviewMap() {
-        const mapElement = this.getMap().getTargetElement();
-        toPng(mapElement).then((dataUrl) => {
+            // Sembunyikan semua control OpenLayers termasuk ol-scale-line
+            const controls = mapElement.querySelectorAll('.ol-control, .ol-scale-line');
+            controls.forEach(control => control.style.display = 'none');
+
+            const dataUrl = await domtoimage.toPng(mapElement);
+
+            // Kembalikan ol-control setelah tangkapan layar
+            controls.forEach(control => control.style.display = '');
+
             const previewMap = document.getElementById('preview-map');
             previewMap.src = dataUrl;
             previewMap.style.display = 'block';
-        }).catch((error) => {
+        } catch (error) {
             console.error('Error generating preview map:', error);
-        });
+        }
     }
 
-    exportMap(format) {
-        const mapElement = this.getMap().getTargetElement();
-        const title = document.getElementById('map-title').value;
+    async exportMap(format) {
+        try {
+            const mapElement = this.getMap().getTargetElement();
+            const title = document.getElementById('map-title').value;
 
-        toPng(mapElement).then((dataUrl) => {
+            // Sembunyikan semua kontrol OpenLayers sebelum mengambil screenshot
+            const controls = mapElement.querySelectorAll('.ol-control, .ol-scale-line');
+            controls.forEach(control => control.style.display = 'none');
+
+            // Ambil tangkapan layar peta
+            const dataUrl = await domtoimage.toPng(mapElement);
+
+            // Kembalikan tampilan kontrol setelah screenshot selesai
+            controls.forEach(control => control.style.display = '');
+
             document.getElementById('preview-map').src = dataUrl;
             document.getElementById('preview-map').style.display = 'block';
 
@@ -140,10 +110,11 @@ class ExportControl extends Control {
                 pdf.addImage(dataUrl, 'PNG', 10, 20, 180, 120);
                 pdf.save(`${title}.pdf`);
             }
-        }).catch((error) => {
+        } catch (error) {
             console.error('Error exporting map:', error);
-        });
+        }
     }
+
 
     initModalEvents() {
         document.getElementById('map-title').addEventListener('input', (e) => {
@@ -218,8 +189,50 @@ const baseMaps = {
         visible: false,
         title: 'Carto Light',
         thumbnail: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/2/2/2.png'
+    }),
+    'Carto Dark': new TileLayer({
+        source: new XYZ({
+            url: 'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}{scale}.png'
+        }),
+        visible: false,
+        title: 'Carto Dark',
+        thumbnail: 'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/2/2/2.png'
+    }),
+    'Esri World Street': new TileLayer({
+        source: new XYZ({
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        }),
+        visible: false,
+        title: 'Esri World Street',
+        thumbnail: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/2/2/2'
+    }),
+    'OpenTopoMap': new TileLayer({
+        source: new XYZ({
+            url: 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png'
+        }),
+        visible: false,
+        title: 'OpenTopoMap',
+        thumbnail: 'https://a.tile.opentopomap.org/2/2/2.png'
+    }),
+    'Esri Satellite': new TileLayer({
+        source: new XYZ({
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        }),
+        visible: false,
+        title: 'Esri Satellite',
+        thumbnail: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/2/2/2'
+    }),
+    'Sentinel-2 Cloudless': new TileLayer({
+        source: new XYZ({
+            url: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2021_3857/default/g/{z}/{y}/{x}.jpg'
+        }),
+        visible: false,
+        title: 'Sentinel-2 Cloudless',
+        thumbnail: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2021_3857/default/g/2/2/2.jpg'
     })
 };
+
+
 
 // Fungsi Membuat Custom Control untuk Basemap
 class BasemapControl extends Control {
@@ -239,16 +252,16 @@ class BasemapControl extends Control {
         // Elemen UI
         element.innerHTML = `
             <div class="card basemap-container hidden">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-success-new text-warning d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-map"></i> Pilih Basemap</span>
                     <button class="btn btn-sm btn-light toggle-basemap"><i class="bi bi-eye"></i></button>
                 </div>
-                <div class="card-body">
+                <div class="card-body-basemap">
                     <div class="row g-2">
                         ${Object.keys(baseMaps).map(layer => `
                             <div class="col-4">
                                 <div class="basemap-item ${baseMaps[layer].getVisible() ? 'active' : ''}" data-layer="${layer}">
-                                    <img src="${baseMaps[layer].get('thumbnail')}" alt="${layer}" data-toggle="tooltip" data-placement="bottom" title="${layer}">
+                                    <img src="${baseMaps[layer].get('thumbnail')}" alt="${layer}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${layer}">
                                 </div>
                             </div>
                         `).join('')}
@@ -259,6 +272,10 @@ class BasemapControl extends Control {
 
         // Tambahkan tombol floating toggle
         const toggleButton = document.createElement('button');
+        toggleButton.title = 'Basemap';
+        toggleButton.setAttribute("data-bs-toggle", "tooltip");
+        toggleButton.setAttribute("data-bs-placement", "left");
+        var tooltip = new bootstrap.Tooltip(toggleButton);
         toggleButton.className = 'basemap-toggle-btn';
         toggleButton.innerHTML = '<i class="bi bi-layers"></i>';
         document.body.appendChild(toggleButton);
@@ -342,7 +359,10 @@ class DrawControl extends Control {
             const button = document.createElement('button');
             button.innerHTML = `<i class="${icon}"></i>`;
             button.title = `Draw ${type}`;
-            button.className = 'btn btn-success btn-sm';
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            new bootstrap.Tooltip(button);
+            button.className = '';
             button.onclick = () => this.activateDraw(type);
             element.appendChild(button);
         });
@@ -351,6 +371,9 @@ class DrawControl extends Control {
         const clearButton = document.createElement('button');
         clearButton.innerHTML = '<i class="bi bi-trash"></i>';
         clearButton.title = 'Clear Drawings';
+        clearButton.setAttribute("data-bs-toggle", "tooltip");
+        clearButton.setAttribute("data-bs-placement", "left");
+        new bootstrap.Tooltip(clearButton);
         clearButton.className = 'btn btn-danger btn-sm';
         clearButton.onclick = () => this.clearDrawings();
         element.appendChild(clearButton);
@@ -359,6 +382,9 @@ class DrawControl extends Control {
         this.editButton = document.createElement('button');
         this.editButton.innerHTML = '<i class="bi bi-pencil"></i>';
         this.editButton.title = 'Edit Drawings';
+        this.editButton.setAttribute("data-bs-toggle", "tooltip");
+        this.editButton.setAttribute("data-bs-placement", "left");
+        new bootstrap.Tooltip(this.editButton);
         this.editButton.className = 'btn btn-primary btn-sm';
         this.editButton.onclick = () => this.toggleEditMode();
         element.appendChild(this.editButton);
@@ -367,6 +393,9 @@ class DrawControl extends Control {
         this.stopDrawButton = document.createElement('button');
         this.stopDrawButton.innerHTML = '<i class="bi bi-x-circle"></i>';
         this.stopDrawButton.title = 'Stop Drawing';
+        this.stopDrawButton.setAttribute("data-bs-toggle", "tooltip");
+        this.stopDrawButton.setAttribute("data-bs-placement", "left");
+        new bootstrap.Tooltip(this.stopDrawButton);
         this.stopDrawButton.className = 'btn btn-warning btn-sm';
         this.stopDrawButton.style.display = 'none';
         this.stopDrawButton.onclick = () => this.deactivateDraw();
@@ -594,7 +623,37 @@ inputElements.forEach(inputElement => {
     const pond = FilePond.create(inputElement, {
         labelIdle: `Drag & Drop your file or <span class="filepond--label-action">Browse</span>`,
         allowMultiple: false, // Hanya satu file yang diunggah
-        acceptedFileTypes: ['image/*', 'application/json'], // Hanya file gambar yang diterima
+        acceptedFileTypes: ['image/*', 'application/json', 'application/geo+json', 'application/vnd.geo+json'],
+        fileValidateTypeDetectType: (source, type) => {
+            return new Promise((resolve, reject) => {
+                // Mendapatkan file dari sumber input
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    const fileContent = reader.result;
+
+                    // Menampilkan tipe awal yang diterima oleh FilePond
+                    console.log("Tipe MIME yang diterima oleh FilePond: ", type);
+
+                    // Periksa apakah file adalah geojson berdasarkan kontennya
+                    if (typeof fileContent === 'string' && fileContent.includes('"type": "FeatureCollection"')) {
+                        console.log("File ini terdeteksi sebagai GeoJSON.");
+                        resolve('application/geo+json'); // Deteksi sebagai geojson
+                    } else {
+                        console.log("File ini tidak terdeteksi sebagai GeoJSON.");
+                        resolve(type); // Kembalikan tipe yang ada jika tidak terdeteksi sebagai geojson
+                    }
+                };
+
+                reader.onerror = () => {
+                    console.error("Terjadi kesalahan dalam membaca file.");
+                    reject('File error');
+                };
+
+                // Membaca file sebagai teks
+                reader.readAsText(source);
+            });
+        }
     });
     pond.setOptions({
         server: {
@@ -647,5 +706,30 @@ $jq(document).ready(function () {
             $(this).slideUp(500);
         });
     }
+
+    // Tunggu hingga OpenLayers selesai memuat elemen
+    setTimeout(function () {
+        var elements = {
+            ".ol-zoom-in": "Perbesar Peta",
+            ".ol-zoom-out": "Perkecil Peta",
+            ".ol-zoomslider": "Gunakan slider untuk zoom",
+            ".ol-attributes": "Atribut Peta",
+            ".ol-full-screen": "Tampilan Layar Penuh"
+        };
+
+        // Tambahkan atribut tooltip ke setiap elemen
+        $jq.each(elements, function (selector, titleText) {
+            var element = $jq(selector);
+            if (element.length) {
+                element.attr("data-bs-toggle", "tooltip")
+                    .attr("data-bs-placement", "left")
+                    .attr("title", titleText);
+            }
+        });
+
+        // Inisialisasi semua tooltip
+        $jq('[data-bs-toggle="tooltip"]').tooltip();
+    }, 500); // Tunggu 500ms untuk memastikan OpenLayers selesai menambahkan kontrol ke DOM
+
 });
 
