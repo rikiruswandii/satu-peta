@@ -111,7 +111,7 @@
                                 <span>Masukkan file JSON/geoJSON disini.</span>
                                 <div class="form-control-wrap">
                                     <input type="file" class="filepond @error('file') is-invalid @enderror"
-                                        name="file" id="file" accept="application/json" required>
+                                        name="file" id="file" accept="application/json,application/geo+json,application/vnd.geo+json,.geojson" required>
                                     @error('file')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>

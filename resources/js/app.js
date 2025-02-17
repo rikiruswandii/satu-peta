@@ -623,7 +623,37 @@ inputElements.forEach(inputElement => {
     const pond = FilePond.create(inputElement, {
         labelIdle: `Drag & Drop your file or <span class="filepond--label-action">Browse</span>`,
         allowMultiple: false, // Hanya satu file yang diunggah
-        acceptedFileTypes: ['image/*', 'application/json'], // Hanya file gambar yang diterima
+        acceptedFileTypes: ['image/*', 'application/json', 'application/geo+json', 'application/vnd.geo+json'],
+        fileValidateTypeDetectType: (source, type) => {
+            return new Promise((resolve, reject) => {
+                // Mendapatkan file dari sumber input
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    const fileContent = reader.result;
+
+                    // Menampilkan tipe awal yang diterima oleh FilePond
+                    console.log("Tipe MIME yang diterima oleh FilePond: ", type);
+
+                    // Periksa apakah file adalah geojson berdasarkan kontennya
+                    if (typeof fileContent === 'string' && fileContent.includes('"type": "FeatureCollection"')) {
+                        console.log("File ini terdeteksi sebagai GeoJSON.");
+                        resolve('application/geo+json'); // Deteksi sebagai geojson
+                    } else {
+                        console.log("File ini tidak terdeteksi sebagai GeoJSON.");
+                        resolve(type); // Kembalikan tipe yang ada jika tidak terdeteksi sebagai geojson
+                    }
+                };
+
+                reader.onerror = () => {
+                    console.error("Terjadi kesalahan dalam membaca file.");
+                    reject('File error');
+                };
+
+                // Membaca file sebagai teks
+                reader.readAsText(source);
+            });
+        }
     });
     pond.setOptions({
         server: {

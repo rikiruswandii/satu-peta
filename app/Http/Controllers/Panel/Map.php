@@ -285,7 +285,7 @@ class Map extends Controller
     {
         // \Log data yang diterima dari request
         \Illuminate\Support\Facades\Log::info('Data yang diterima:', $request->all());
-
+   
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'regional_agency_id' => 'required|exists:regional_agencies,id',
