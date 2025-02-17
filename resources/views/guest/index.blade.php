@@ -107,7 +107,7 @@
                 <div class="col-12">
                     <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
-                            @foreach ($opdData->chunk(6) as $index => $opdChunk)
+                            @foreach ($groups->chunk(6) as $index => $opdChunk)
                                 <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                                     <div class="row">
                                         @foreach ($opdChunk as $partner)
@@ -115,7 +115,7 @@
                                                 <div class="partner-logo">
                                                     <img src="{{ asset('assets/images/logo.png') }}" alt=""
                                                         class="img-fluid" style="width:80px;height:85px;">
-                                                    <p class="mt-2">{{ $partner['name'] }}</p>
+                                                    <p class="mt-2">{{ $partner->name }}</p>
                                                     <!-- Nama tampil di bawah gambar -->
                                                 </div>
                                             </div>

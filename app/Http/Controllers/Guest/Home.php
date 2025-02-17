@@ -26,15 +26,11 @@ class Home extends Controller
 
         $news = Article::with('category', 'documents')->latest()->take(3)->get();
 
-        // Mengambil data dari API TPP
-        $opdResponse = Http::get('https://tpp.purwakartakab.go.id/api/opd?key=developerganteng');
-        $opdData = $opdResponse->successful() ? collect($opdResponse->json()['data']) : collect([]);
-
         // Data untuk dikirim ke view
         $title = env('APP_NAME', 'Satu Peta Purwakarta');
         $description = 'Website Satu Peta Purwakarta adalah platform informasi geospasial yang menyajikan data peta terintegrasi untuk mendukung pembangunan dan layanan publik di Kabupaten Purwakarta';
 
-        return view('guest.index', compact('title', 'description', 'categories', 'groups', 'maps', 'opdData', 'news'));
+        return view('guest.index', compact('title', 'description', 'categories', 'groups', 'maps', 'news'));
     }
 
     public function search(Request $request)
