@@ -428,7 +428,7 @@ class Map extends Controller
             try {
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                
+
                 \Illuminate\Support\Facades\Log::error('Gagal dekripsi ID maps.', ['error' => $e->getMessage()]);
 
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
@@ -477,7 +477,7 @@ class Map extends Controller
             try {
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                
+
                 \Illuminate\Support\Facades\Log::error('Gagal dekripsi ID peta.', ['error' => $e->getMessage()]);
 
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
@@ -539,7 +539,7 @@ class Map extends Controller
                 'Content-Type' => $mimeType,
             ]);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            
+
             \Illuminate\Support\Facades\Log::error('Gagal dekripsi parameter', ['error' => $e->getMessage()]);
 
             return redirect()->back()->with('error', 'ID tidak valid.');
