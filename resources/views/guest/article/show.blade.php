@@ -32,7 +32,7 @@
                             <!-- Search Form-->
                             <form class="widget-form" action="{{ route('article.list') }}" method="get">
                                 <input class="form-control" type="search" placeholder="Type your keyword" name="search">
-                                <button type="submit"><i class="bi bi-search"></i></button>
+                                <button type="submit" class="btn bg-success"><i class="bi bi-search"></i></button>
                             </form>
                         </div>
                         <!-- Widget -->

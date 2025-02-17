@@ -37,7 +37,7 @@
                                 </div>
                                 <a class="post-title d-block mb-3" href="blog-details-1.html">{{ Str::limit($value->title, 40, '...') }}</a>
                                 <p>{!! Str::limit($value->content, 100, '...') !!}</p><a
-                                    class="btn btn-primary btn-minimal" href="blog-details-1.html">Selengkapnya...</a>
+                                    class="btn btn-success btn-minimal" href="blog-details-1.html">Selengkapnya...</a>
                             </div>
                         </div>
                     </div>
