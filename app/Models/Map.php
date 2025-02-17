@@ -18,6 +18,8 @@ class Map extends Model
 
     protected static $logAttributes = ['user_id', 'name'];
 
+    protected $with = ['sector'];
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -52,6 +54,8 @@ class Map extends Model
         'name',
         'slug',
         'can_download',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [

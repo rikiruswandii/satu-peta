@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Download;
+use App\Http\Controllers\Guest\Article as GuestArticle;
 use App\Http\Controllers\Guest\Explorer;
 use App\Http\Controllers\Guest\Home;
 use App\Http\Controllers\Guest\Search;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [Home::class, 'index'])->name('/');
 Route::get('/explorer', [Explorer::class, 'index'])->name('explorer');
 Route::get('/search', [Search::class, 'index'])->name('search');
+Route::get('/get-maps-by-viewport', [Search::class, 'getMapsByViewport'])->name('get-maps-by-viewport');
+Route::get('article/list', [GuestArticle::class, 'index'])->name('article.list');
+Route::get('article/{article_slug}', [GuestArticle::class, 'show'])->name('article.show');
 
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {

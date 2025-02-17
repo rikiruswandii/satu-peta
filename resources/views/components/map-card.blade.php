@@ -1,7 +1,7 @@
-@props(['card_title', 'card_filename', 'card_opd', 'card_id', 'geojson_path', 'regional_agency', 'sector'])
+@props(['card_class', 'card_title', 'card_filename', 'card_opd', 'card_id', 'geojson_path', 'regional_agency', 'sector'])
 
-<div class="col-12 col-md-6 col-lg-4 mb-4">
-    <div class="card shop-card hover-card">
+<div class="{{ $card_class }}">
+    <div class="card shop-card hover-card shadow-lg">
         <div class="product-img-wrap">
             <div id="map-{{ $card_id }}" class="map-preview detailMapModalTrigger"
                 style="height: 200px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#detailMapModal"
