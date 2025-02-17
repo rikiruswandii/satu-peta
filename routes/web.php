@@ -87,6 +87,7 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
         Route::prefix('groups')->group(function () {
             Route::get('/', [Grup::class, 'index'])->name('groups');
             Route::get('/datatable', [Grup::class, 'datatable'])->name('groups.datatable');
+            Route::get('/sync', [Grup::class, 'sync'])->name('groups.sync');
             Route::post('/store', [Grup::class, 'store'])->name('groups.store');
             Route::post('/update', [Grup::class, 'update'])->name('groups.update');
             Route::delete('/destroy', [Grup::class, 'destroy'])->name('groups.destroy');

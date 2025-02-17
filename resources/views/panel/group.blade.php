@@ -34,9 +34,13 @@
                         </div><!-- .nk-block-head-content -->
                         <div class="nk-block-head-content">
                             <div class="toggle-wrap nk-block-tools-toggle">
-                                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addRegionalAgencyModal"
-                                    class="btn btn-primary"><em
-                                        class="icon ni ni-plus-round-fill mr-2"></em><span>Tambah</span></a>
+                                <a href="javascript:void(0);" id="syncBtn" class="btn btn-primary">
+                                    <span class="spinner-border spinner-border-sm" id="spinner" role="status"
+                                        aria-hidden="true" style="display: none;"></span>
+                                    <span id="processText" style="display: none;">Proses...</span>
+                                    <em class="icon ni ni-reload-alt mr-2" id="reloadIcon"></em>
+                                    <span id="syncText">Sinkronisasi</span>
+                                </a>
                             </div><!-- .toggle-wrap -->
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
@@ -48,9 +52,8 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Grup</th></th>
+                                        <th>Grup</th>
                                         <th>Diperbarui</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -63,67 +66,9 @@
         </div>
     </div>
 
-    @section('modal')
-        <x-modal :id="'editGroupModal'" :data="$modalEdit">
-            <x-slot name="body">
-                <form id="editGroupForm" method="POST" action="{{ route('groups.update') }}"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="row g-gs">
-                        <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
-                        <input type="hidden" name="id" value="">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="form-label" for="name">Nama</label>
-                                <div class="form-control-wrap">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" id="name" value="{{ old('name') }}" required
-                                        placeholder="Masukkan nama grup..">
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </x-slot>
-        </x-modal>
-
-        <x-modal :id="'addRegionalAgencyModal'" :data="$modalTambahRegionalAgency">
-            <x-slot name="body">
-                <form id="addRegionalAgencyForm" method="POST" action="{{ route('groups.store') }}">
-                    @csrf
-                    <div class="row g-gs">
-                        <div class="col-md-12">
-                            <input type="hidden" name="user_id" id="user_id" value="{{ Auth::user()->id }}">
-                            <div class="form-group">
-                                <label class="form-label" for="name">Nama</label>
-                                <div class="form-control-wrap">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" id="name" value="{{ old('name') }}" required
-                                        placeholder="Masukkan nama grup..">
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </x-slot>
-        </x-modal>
-
-        @include('panel.partials.delete')
-    @endsection
-
     @push('scripts')
         <script>
-             var $r = jQuery.noConflict();
+            var $r = jQuery.noConflict();
             $r(document).ready(function() {
                 $r('#groups-table').DataTable({
                     processing: true,
@@ -143,42 +88,59 @@
                         {
                             data: 'updated_at',
                             name: 'updated_at'
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
                         }
                     ]
                 });
             });
 
-
-            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $r(this).data('id');
-                $r('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $r(this).data('name');
-                $r('#nameAccount').text(userName);
-            });
-
             $r(document).ready(function() {
-                $r("#addRegionalAgencyForm").on("submit", function() {
-                    let submitButton = $r("button[form='addRegionalAgencyForm']");
-                    submitButton.prop("disabled", true); // Nonaktifkan tombol saat submit
-                    submitButton.find(".spinner-border").show(); // Tampilkan spinner
-                    submitButton.find("span:last-child").hide(); // Sembunyikan teks tombol
+                $r('#syncBtn').click(function() {
+                    console.log('Tombol diklik!'); // Debugging
+
+                    // Tampilkan spinner & sembunyikan ikon reload
+                    $r('#spinner, #processText').show();
+                    $r('#reloadIcon, #syncText').hide();
+
+                    // Kirim request AJAX
+                    $r.ajax({
+                        url: '{{ route('groups.sync') }}',
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            console.log('Response:', response); // Debugging
+
+                            // Tampilkan alert sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message || 'Sinkronisasi berhasil.',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function(xhr) {
+                            console.error('AJAX Error:', xhr); // Debugging
+                            let errorMessage = xhr.responseJSON ? xhr.responseJSON.message :
+                                'Terjadi kesalahan.';
+
+                            // Tampilkan alert error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: errorMessage,
+                                timer: 4000,
+                                showConfirmButton: false
+                            });
+                        },
+                        complete: function() {
+                            // Sembunyikan spinner & tampilkan ikon reload
+                            $r('#spinner, #processText').hide();
+                            $r('#reloadIcon, #syncText').show();
+                        }
+                    });
                 });
-            });
-
-            $r(document).on('click', '[data-bs-target="#editGroupModal"]', function() {
-                var id = $r(this).data('id');
-                var name = $r(this).data('name');
-
-                var modal = $r('#editGroupModal');
-
-                modal.find('input[name="id"]').val(id);
-                modal.find('input[name="name"]').val(name);
             });
         </script>
     @endpush
