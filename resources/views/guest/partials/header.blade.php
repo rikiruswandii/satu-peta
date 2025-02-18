@@ -16,7 +16,7 @@
                     <li><a class="link-warning" href="{{ route('article.list') }}">Artikel</a></li>
                 </ul>
                 <!-- Login Button -->
-                <a class="btn btn-warning btn-sm ms-auto mb-3 mb-lg-0" href="{{ route('login') }}">Log In</a>
+                <a class="btn btn-warning ms-auto mb-3 mb-lg-0" href="{{ route('login') }}">Log In</a>
             </div>
         </div>
     </nav>

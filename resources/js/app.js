@@ -4,6 +4,7 @@ import 'filepond/dist/filepond.min.css';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 //openlayer
@@ -174,7 +175,7 @@ function getStyle(feature) {
 
 window.getStyle = getStyle;
 
-// Daftar basemap dengan URL thumbnail sesuai
+//Daftar basemap dengan URL thumbnail sesuai
 const baseMaps = {
     'OpenStreetMap': new TileLayer({
         source: new OSM(),
@@ -612,6 +613,7 @@ FilePond.registerPlugin(
     FilePondPluginFileValidateType,
     FilePondPluginImageExifOrientation,
     FilePondPluginImagePreview,
+    FilePondPluginFileValidateSize,
 );
 
 // Pilih semua elemen input dengan class 'filepond'
@@ -623,7 +625,11 @@ inputElements.forEach(inputElement => {
     const pond = FilePond.create(inputElement, {
         labelIdle: `Drag & Drop your file or <span class="filepond--label-action">Browse</span>`,
         allowMultiple: false, // Hanya satu file yang diunggah
-        acceptedFileTypes: ['image/*', 'application/json', 'application/geo+json', 'application/vnd.geo+json'],
+        acceptedFileTypes: [
+            'image/*',
+            'application/json'
+        ],
+        maxFileSize: '10MB',
         fileValidateTypeDetectType: (source, type) => {
             return new Promise((resolve, reject) => {
                 // Mendapatkan file dari sumber input
@@ -653,8 +659,9 @@ inputElements.forEach(inputElement => {
                 // Membaca file sebagai teks
                 reader.readAsText(source);
             });
-        }
+        },
     });
+
     pond.setOptions({
         server: {
             url: '/filepond/api',

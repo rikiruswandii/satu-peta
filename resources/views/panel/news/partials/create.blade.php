@@ -44,7 +44,7 @@
                                             <label for="content" class="form-label"
                                                 for="content">Konten</label>
                                             <textarea class="summernote-basic @error('content') is-invalid @enderror" id="content" name="content" required></textarea>
-                                            
+
                                             @error('content')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
