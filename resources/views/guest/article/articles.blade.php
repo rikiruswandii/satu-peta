@@ -3,48 +3,7 @@
     @section('description', $description)
 
     @push('css')
-        <style>
-            .single-widget-area .widget-form button {
-                position: absolute !important;
-                -webkit-transition-duration: 500ms !important;
-                transition-duration: 500ms !important;
-                width: 80px !important;
-                height: 50px !important;
-                background-color: #0fac81 !important;
-                color: #ffffff !important;
-                border: none !important;
-                top: 0 !important;
-                right: 0 !important;
-                z-index: 10 !important;
-                cursor: pointer !important;
-                border-radius: 0 6px 6px 0 !important;
-            }
-
-            .saasbox-pagination-area .page-item.active .page-link {
-                background-color: #0fac81 !important;
-                border-color: #0fac81 !important;
-            }
-
-            .btn-login {
-                background: #0fac81;
-                color: #FFC107;
-                padding: 10px;
-                margin: 0;
-                border-radius: 3px;
-                height: 30px;
-                display: flex;
-                align-items: center;
-            }
-
-            .btn-login:hover {
-                background: none;
-                color: #FFC107;
-                border: 5px;
-                border-radius: 3px;
-                border-color: #FFC107;
-                box-shadow: 5px 5px 10px rgba(145, 160, 7, 0.5);
-            }
-        </style>
+        @vite('resources/css/article.css')
     @endpush
 
     <x-breadcrumb :title="$title" :images="['images/carrow1 (1).JPG', 'images/carrow1 (1).JPG', 'images/carrow1 (1).JPG']">
@@ -57,10 +16,10 @@
         <div class="container">
             <div class="row justify-content-center justify-content-lg-between g-md-5">
                 <div class="col-12 col-md-7">
-                    <div class="row g-4 g-lg-5 justify-content-center">
+                    <div class="row g-2 g-lg-4 justify-content-center">
                         @forelse ($articles as $value)
                             <div class="col-12 col-sm-6 col-md-4 col-lg-6">
-                                <div class="card border-0 shadow rounded-3 overflow-hidden h-100">
+                                <div class="card rounded-1 border shadow-sm overflow-hidden h-100">
                                     <div class="image-wrap position-relative">
                                         <a href="{{ route('article.show', $value->slug) }}" class="d-block">
                                             <img src="{{ Storage::url($value->documents->first()->path) }}"
@@ -81,7 +40,7 @@
                                         <p class="text-muted small flex-grow-1">
                                             {!! Str::limit(strip_tags($value->content), 60, '...') !!}
                                         </p>
-                                        <a class="btn btn-outline-success btn-sm rounded-pill mt-auto align-self-start px-2 py-1"
+                                        <a class="btn btn-outline-success btn-sm rounded-2 mt-auto align-self-start px-2 py-1"
                                             href="{{ route('article.show', $value->slug) }}">
                                             Baca <i class="bi bi-arrow-right"></i>
                                         </a>

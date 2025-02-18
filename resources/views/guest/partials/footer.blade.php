@@ -45,10 +45,17 @@
                 <div class="footer-widget-area">
                     <h5 class="mb-4 text-white">Tautan Terkait</h5>
                     <ul class="list-unstyled">
-                        @foreach ($links as $link)
+                        @forelse ($links as $link)
                             <li><a href="{{ $link->url }}" target="_blank"><i
                                         class="bi bi-caret-right"></i>{{ $link->title }}</a></li>
-                        @endforeach
+                        @empty
+                            <!-- SVG image -->
+                            <div class="text-left mb-4 d-flex align-items-start">
+    <img src="{{ asset('images/undraw_link-shortener_9ro5 (1).svg') }}" alt=""
+        class="w-25 h-auto me-3"> <!-- me-3 untuk memberi margin kanan -->
+</div>
+
+                        @endforelse
                     </ul>
                 </div>
             </div>

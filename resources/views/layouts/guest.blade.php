@@ -30,8 +30,8 @@
         <div class="spinner-grow text-light" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>
 
+    <!-- Header Area-->
     @if (!request()->routeIs('explorer') && !request()->routeIs('search') && !request()->routeIs('article.list') && !request()->routeIs('article.show'))
-        <!-- Footer Area-->
         @include('guest.partials.header')
     @else
         @include('guest.partials.nav')
