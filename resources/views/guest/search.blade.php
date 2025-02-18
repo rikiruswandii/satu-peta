@@ -1,28 +1,16 @@
 <x-guest-layout>
     @section('title', $title)
     @section('description', $description)
-    <x-breadcrumb :title="$title">
+    <x-breadcrumb :title="$title" :images="['images/carrow1 (1).JPG', 'images/carrow1 (1).JPG', 'images/carrow1 (1).JPG']">
         <x-slot name="body">
-            <form action="{{ route('search') }}" method="get" id="searchForm">
-                <div class="input-group m-3" style="width: 90%;">
-                    <input type="text" class="form-control" placeholder="Kata Kunci" aria-label="Kata Kunci"
-                        aria-describedby="basic-addon2" name="search" value="{{ request('search') }}"
-                        style="height: 20px;">
-                    <button type="submit" class="input-group-text bg-success text-white" id="basic-addon2"
-                        style="height: 32px">Cari</button>
-                </div>
-                @if (request('regional_agencies'))
-                    @foreach ((array) request('regional_agencies') as $agency)
-                        <input type="hidden" name="regional_agencies[]" value="{{ $agency }}">
-                    @endforeach
-                @endif
-            </form>
+            <li class="breadcrumb-item active" aria-current="page">Pencarian</li>
         </x-slot>
     </x-breadcrumb>
 
+
     <div class="shop-with-sidebar">
         <div class="container">
-            <div class="row">
+            <div class="row justify-content-between align-items-start gx-5">
                 <div class="col-12 col-sm-4 col-md-3">
                     <div class="shop-sidebar-area mb-5">
                         <div class="shop-widget mb-4 mb-lg-5">
@@ -51,7 +39,24 @@
                 </div>
 
                 <div class="col-12 col-sm-8 col-md-9">
-                    <div class="row g-2 g-lg-3">
+                    <div class="row mb-4">
+                        <form action="{{ route('search') }}" method="get" id="searchForm">
+                            <div class="input-group m-3">
+                                <input type="text" class="form-control" placeholder="Kata Kunci"
+                                    aria-label="Kata Kunci" aria-describedby="basic-addon2" name="search"
+                                    value="{{ request('search') }}">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                            @if (request('regional_agencies'))
+                                @foreach ((array) request('regional_agencies') as $agency)
+                                    <input type="hidden" name="regional_agencies[]" value="{{ $agency }}">
+                                @endforeach
+                            @endif
+                        </form>
+                    </div>
+                    <div class="row">
                         @forelse ($maps as $map)
                             <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 mb-4'" :card_id="$map->id" :card_title="$map->name"
                                 :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name"
@@ -61,9 +66,9 @@
                             <div class="text-center mb-4">
                                 <img src="{{ asset('images/undraw_friends_xscy.svg') }}" alt=""
                                     class="mx-auto d-block  w-25 h-auto">
-                                    <h1 class="mb-3">Oops! Data Tidak Tersedia.</h1>
-                                    <p class="lead">Data yang Anda cari saat ini tidak tersedia
-                                        atau belum ditambahkan. Silakan coba lagi nanti.</p>
+                                <h1 class="mb-3">Oops! Data Tidak Tersedia.</h1>
+                                <p class="lead">Data yang Anda cari saat ini tidak tersedia
+                                    atau belum ditambahkan. Silakan coba lagi nanti.</p>
                             </div>
                         @endforelse
                     </div>
