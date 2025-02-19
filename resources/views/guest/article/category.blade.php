@@ -150,7 +150,7 @@
                                     </li>
                                 @else
                                     <li class="page-item">
-                                        <a class="page-link link-success" href="{{ $articles->previousPageUrl() }}"
+                                        <a class="page-link link-success" href="{{ $data['articles']->previousPageUrl() }}"
                                             rel="prev">Prev</a>
                                     </li>
                                 @endif
