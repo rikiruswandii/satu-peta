@@ -1,0 +1,30 @@
+# .gitlab-ci.yml
+
+stages:
+  - build
+  - deploy
+
+variables:
+  STACK_NAME: purwakarta-diskominfo-satu-peta
+
+Build Docker Image:
+  image: docker:latest
+  stage: build
+  before_script:
+    - export DOCKER_IMAGE_NAME=pratamatechsolution/$STACK_NAME
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+  script:
+    - docker build -t "$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA" -t "$DOCKER_IMAGE_NAME:latest" .
+    - docker push "$DOCKER_IMAGE_NAME" --all-tags
+  only:
+    - main
+
+Deploy Stack:
+  image: pratamatechsolution/undeploy:latest
+  stage: deploy
+  variables:
+    DOCKER_COMPOSE_FILE: $CI_PROJECT_DIR/docker-compose.yml
+  script:
+    - /usr/local/bin/deploy.sh
+  only:
+    - main
