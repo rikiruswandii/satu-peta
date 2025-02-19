@@ -26,7 +26,8 @@
                 <div class="footer-widget-area">
                     <h5 class="mb-4 text-white">Hubungi Kami</h5>
                     <p class="lh-base mb-3 text-white">{{ $app->address }}</p>
-                    <p class="mb-0 text-white">Call: <a href="tel:+{{ $app->phone }}"></a>+{{ $app->phone }} <br> Email: <a href="mailto:{{ $app->email }}"></a>{{ $app->email }}</p>
+                    <p class="mb-0 text-white">Call: <a href="tel:+{{ $app->phone }}"></a>+{{ $app->phone }} <br>
+                        Email: <a href="mailto:{{ $app->email }}"></a>{{ $app->email }}</p>
                     <!-- Footer Social Icon -->
                     <div class="footer-social-icon d-flex align-items-center mt-3"><a href="#"
                             data-bs-toggle="tooltip" data-bs-placement="top" title="Facbook"><i
@@ -51,10 +52,9 @@
                         @empty
                             <!-- SVG image -->
                             <div class="text-left mb-4 d-flex align-items-start">
-    <img src="{{ asset('images/undraw_link-shortener_9ro5 (1).svg') }}" alt=""
-        class="w-25 h-auto me-3"> <!-- me-3 untuk memberi margin kanan -->
-</div>
-
+                                <img src="{{ asset('images/undraw_link-shortener_9ro5 (1).svg') }}" alt=""
+                                    class="w-25 h-auto me-3"> <!-- me-3 untuk memberi margin kanan -->
+                            </div>
                         @endforelse
                     </ul>
                 </div>
@@ -66,7 +66,8 @@
             class="copywrite-wrapper bg-white mt-5 rounded-3 d-lg-flex align-items-lg-center justify-content-lg-center">
             <!-- Copywrite Text -->
             <div class="copywrite-text text-center text-lg-start mb-3 mb-lg-0 me-lg-4">
-                <p class="mb-0 text-success"> &copy; {{ Date('Y') }} <strong class="text-warning">{{ $app->name }}</strong>
+                <p class="mb-0 text-success"> &copy; {{ Date('Y') }} <strong
+                        class="text-warning">{{ $app->name }}</strong>
                     All rights reserved. </p>
             </div>
 

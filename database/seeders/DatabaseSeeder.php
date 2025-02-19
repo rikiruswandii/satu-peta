@@ -21,6 +21,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Panggil event OpdSyncRequested setelah seeder selesai
-        event(new OpdSyncRequested());
+        event(new OpdSyncRequested);
     }
 }

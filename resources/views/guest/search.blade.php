@@ -51,7 +51,8 @@
                             </div>
                             @if (request('regional_agencies_checkbox'))
                                 @foreach ((array) request('regional_agencies_checkbox') as $agency)
-                                    <input type="hidden" name="regional_agencies_checkbox[]" value="{{ $agency }}">
+                                    <input type="hidden" name="regional_agencies_checkbox[]"
+                                        value="{{ $agency }}">
                                 @endforeach
                             @endif
                         </form>
@@ -82,7 +83,7 @@
         </div>
     </div>
 
-<div class="mb-120 d-block"></div>
+    <div class="mb-120 d-block"></div>
 
     @section('modal')
         <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">

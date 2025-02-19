@@ -233,54 +233,53 @@ class Map extends Controller
     }
 
     private function extractCoordinates($geojsonData)
-{
-    $coordinates = [
-        'latitude' => [],
-        'longitude' => [],
-    ];
+    {
+        $coordinates = [
+            'latitude' => [],
+            'longitude' => [],
+        ];
 
-    if (isset($geojsonData['features']) && is_array($geojsonData['features'])) {
-        foreach ($geojsonData['features'] as $feature) {
-            if (isset($feature['geometry']['coordinates'])) {
-                $coords = $feature['geometry']['coordinates'];
+        if (isset($geojsonData['features']) && is_array($geojsonData['features'])) {
+            foreach ($geojsonData['features'] as $feature) {
+                if (isset($feature['geometry']['coordinates'])) {
+                    $coords = $feature['geometry']['coordinates'];
 
-                // Jika tipe geometri adalah Point
-                if ($feature['geometry']['type'] == 'Point' && is_array($coords) && count($coords) >= 2) {
-                    // Ambil koordinat dari Point (hanya latitude dan longitude, abaikan altitude)
-                    $coordinates['longitude'][] = floatval($coords[0]); // Longitude
-                    $coordinates['latitude'][] = floatval($coords[1]);  // Latitude
-                }
+                    // Jika tipe geometri adalah Point
+                    if ($feature['geometry']['type'] == 'Point' && is_array($coords) && count($coords) >= 2) {
+                        // Ambil koordinat dari Point (hanya latitude dan longitude, abaikan altitude)
+                        $coordinates['longitude'][] = floatval($coords[0]); // Longitude
+                        $coordinates['latitude'][] = floatval($coords[1]);  // Latitude
+                    }
 
-                // Jika tipe geometri adalah LineString
-                elseif ($feature['geometry']['type'] == 'LineString' && is_array($coords)) {
-                    // Ambil seluruh koordinat dari LineString
-                    foreach ($coords as $coord) {
-                        // Pastikan koordinat valid (dengan mengabaikan nilai ketiga jika ada)
-                        if (is_array($coord) && count($coord) >= 2) {
-                            $coordinates['longitude'][] = floatval($coord[0]); // Longitude
-                            $coordinates['latitude'][] = floatval($coord[1]);  // Latitude
+                    // Jika tipe geometri adalah LineString
+                    elseif ($feature['geometry']['type'] == 'LineString' && is_array($coords)) {
+                        // Ambil seluruh koordinat dari LineString
+                        foreach ($coords as $coord) {
+                            // Pastikan koordinat valid (dengan mengabaikan nilai ketiga jika ada)
+                            if (is_array($coord) && count($coord) >= 2) {
+                                $coordinates['longitude'][] = floatval($coord[0]); // Longitude
+                                $coordinates['latitude'][] = floatval($coord[1]);  // Latitude
+                            }
                         }
                     }
-                }
 
-                // Jika tipe geometri adalah Polygon
-                elseif ($feature['geometry']['type'] == 'Polygon' && is_array($coords) && count($coords) > 0) {
-                    // Ambil seluruh koordinat pertama dari polygon
-                    foreach ($coords[0] as $coord) {
-                        // Pastikan koordinat valid (dengan mengabaikan nilai ketiga jika ada)
-                        if (is_array($coord) && count($coord) >= 2) {
-                            $coordinates['longitude'][] = floatval($coord[0]); // Longitude
-                            $coordinates['latitude'][] = floatval($coord[1]);  // Latitude
+                    // Jika tipe geometri adalah Polygon
+                    elseif ($feature['geometry']['type'] == 'Polygon' && is_array($coords) && count($coords) > 0) {
+                        // Ambil seluruh koordinat pertama dari polygon
+                        foreach ($coords[0] as $coord) {
+                            // Pastikan koordinat valid (dengan mengabaikan nilai ketiga jika ada)
+                            if (is_array($coord) && count($coord) >= 2) {
+                                $coordinates['longitude'][] = floatval($coord[0]); // Longitude
+                                $coordinates['latitude'][] = floatval($coord[1]);  // Latitude
+                            }
                         }
                     }
                 }
             }
         }
+
+        return $coordinates;
     }
-
-    return $coordinates;
-}
-
 
     public function update(Request $request): RedirectResponse
     {

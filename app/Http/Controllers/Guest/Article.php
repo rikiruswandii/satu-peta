@@ -15,7 +15,7 @@ class Article extends Controller
 
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
-            $articles->where('title', 'like', '%' . $searchTerm . '%');
+            $articles->where('title', 'like', '%'.$searchTerm.'%');
         }
 
         $articles = $articles->latest()->paginate(8);
@@ -26,7 +26,7 @@ class Article extends Controller
 
         $data = [
             'title' => 'Artikel',
-            'description' => 'Lihat Artikel terbaru dan informasi yang diterbitkan di ' . config('app.name') . '.',
+            'description' => 'Lihat Artikel terbaru dan informasi yang diterbitkan di '.config('app.name').'.',
             'articles' => $articles,
             'latest_article' => $latest_article,
             'categories' => $categories,
@@ -47,7 +47,7 @@ class Article extends Controller
         $categories = Category::select(['id', 'name', 'slug'])->get();
 
         $data = [
-            'title' => 'Article Detail :' . $article->title,
+            'title' => 'Article Detail :'.$article->title,
             'description' => '',
             'article' => $article,
             'categories' => $categories,
@@ -56,6 +56,7 @@ class Article extends Controller
 
         return view('guest.article.show', $data);
     }
+
     public function category(Request $request, $category_slug)
     {
         // Ambil kategori berdasarkan slug
@@ -68,7 +69,7 @@ class Article extends Controller
         // Jika ada pencarian, filter berdasarkan judul
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
-            $articlesQuery->where('title', 'like', '%' . $searchTerm . '%');
+            $articlesQuery->where('title', 'like', '%'.$searchTerm.'%');
         }
 
         // Ambil artikel dengan pagination
@@ -84,7 +85,7 @@ class Article extends Controller
         $categories = Category::select(['id', 'name', 'slug'])->get();
 
         $data = [
-            'title' => 'Artikel Kategori: ' . $category->name,
+            'title' => 'Artikel Kategori: '.$category->name,
             'description' => '',
             'articles' => $articles, // Sudah dipaginasi
             'categories' => $categories,

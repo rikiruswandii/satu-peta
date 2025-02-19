@@ -736,7 +736,10 @@ $jq(document).ready(function () {
 
         // Inisialisasi semua tooltip
         $jq('[data-bs-toggle="tooltip"]').tooltip();
-    }, 500); // Tunggu 500ms untuk memastikan OpenLayers selesai menambahkan kontrol ke DOM
-
+    }, 500);
+    
+    $jq('.btn-tooltip').on('click', function () {
+        $(this).tooltip('hide'); // Sembunyikan tooltip setelah klik
+    });
 });
 

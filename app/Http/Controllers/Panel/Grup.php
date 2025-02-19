@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Panel;
 
+use App\Events\OpdSyncRequested;
 use App\Http\Controllers\Controller;
 use App\Models\RegionalAgency;
-use App\Events\OpdSyncRequested;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -124,25 +124,22 @@ class Grup extends Controller
         }
     }
 
-   public function sync(Request $request)
-{
-    try {
-        // Trigger event atau proses lain
-        event(new OpdSyncRequested());
+    public function sync(Request $request)
+    {
+        try {
+            // Trigger event atau proses lain
+            event(new OpdSyncRequested);
 
-        // Response JSON yang dibaca AJAX
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Sync request telah diproses.'
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-        ], 500);
+            // Response JSON yang dibaca AJAX
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Sync request telah diproses.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: '.$e->getMessage(),
+            ], 500);
+        }
     }
-}
-
-
-
 }

@@ -99,65 +99,65 @@
         </div>
     </div>
 
-  <!-- Category Area -->
-<div class="partner-area py-5 bg-gray">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-left">
-                <h2>
-                    <i class="bi bi-slack"></i>
-                    Dataset
-                </h2>
-            </div>
-            <div class="col-12">
-                <div id="chartdiv"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-    <!-- Groups Area-->
-<div class="partner-area py-5 bg-gray">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-left mb-5">
-                <h2><i class="bi bi-buildings-fill me-2"></i>Instansi --</h2> <!-- Tambahkan judul di sini -->
-            </div>
-            <div class="col-12">
-                <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        @foreach ($groups->chunk(6) as $index => $opdChunk)
-                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                <div class="row">
-                                    @foreach ($opdChunk as $partner)
-                                        <div class="col-2 text-center">
-                                            <div class="partner-logo">
-                                                <img src="{{ asset('assets/images/logo.png') }}" alt=""
-                                                    class="img-fluid" style="width:80px;height:85px;">
-                                                <p class="mt-2">{{ $partner->name }}</p>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Tombol Navigasi -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel"
-                        data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel"
-                        data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    </button>
+    <!-- Category Area -->
+    <div class="partner-area py-5 bg-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-left">
+                    <h2>
+                        <i class="bi bi-slack"></i>
+                        Dataset
+                    </h2>
+                </div>
+                <div class="col-12">
+                    <div id="chartdiv"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+
+    <!-- Groups Area-->
+    <div class="partner-area py-5 bg-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-left mb-5">
+                    <h2><i class="bi bi-buildings-fill me-2"></i>Instansi --</h2> <!-- Tambahkan judul di sini -->
+                </div>
+                <div class="col-12">
+                    <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @foreach ($groups->chunk(6) as $index => $opdChunk)
+                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                    <div class="row">
+                                        @foreach ($opdChunk as $partner)
+                                            <div class="col-2 text-center">
+                                                <div class="partner-logo">
+                                                    <img src="{{ asset('assets/images/logo.png') }}" alt=""
+                                                        class="img-fluid" style="width:80px;height:85px;">
+                                                    <p class="mt-2">{{ $partner->name }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Tombol Navigasi -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @section('modal')
         <x-modal id="detailMapModal" :data="['title' => 'Detail Peta', 'footer' => '']" :size="'xl'" :cancelButtonText="'Tutup'">
@@ -199,45 +199,44 @@
             <div class="row justify-content-center g-4 g-md-5 g-lg-4 g-xl-5">
                 <!-- Blog Card -->
                 @forelse ($news as $value)
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                <div class="card rounded-1 border shadow-sm overflow-hidden h-100">
-                                    <div class="image-wrap position-relative">
-                                        <a href="{{ route('article.show', $value->slug) }}" class="d-block">
-                                            <img src="{{ Storage::url($value->documents->first()->path) }}"
-                                                class="card-img-top img-fluid transition-img" alt="{{ $value->title }}"
-                                                style="height: 150px; object-fit: cover;">
-                                        </a>
-                                        <div
-                                            class="position-absolute top-0 start-0 bg-success text-white px-2 py-1 small rounded-bottom-end">
-                                            {{ \Carbon\Carbon::parse($value->created_at)->diffForHumans() }}
-                                        </div>
-                                    </div>
-                                    <div class="card-body d-flex flex-column p-2">
-                                        <a class="post-title fw-bold text-success text-decoration-none small mb-1 text-truncate"
-                                            href="{{ route('article.show', $value->slug) }}"
-                                            title="{{ $value->title }}">
-                                            {{ Str::limit($value->title, 40, '...') }}
-                                        </a>
-                                        <p class="text-muted small flex-grow-1">
-                                            {!! Str::limit(strip_tags($value->content), 60, '...') !!}
-                                        </p>
-                                        <a class="btn btn-outline-success btn-sm rounded-2 mt-auto align-self-start px-2 py-1"
-                                            href="{{ route('article.show', $value->slug) }}">
-                                            Baca <i class="bi bi-arrow-right"></i>
-                                        </a>
-                                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card rounded-1 border shadow-sm overflow-hidden h-100">
+                            <div class="image-wrap position-relative">
+                                <a href="{{ route('article.show', $value->slug) }}" class="d-block">
+                                    <img src="{{ Storage::url($value->documents->first()->path) }}"
+                                        class="card-img-top img-fluid transition-img" alt="{{ $value->title }}"
+                                        style="height: 150px; object-fit: cover;">
+                                </a>
+                                <div
+                                    class="position-absolute top-0 start-0 bg-success text-white px-2 py-1 small rounded-bottom-end">
+                                    {{ \Carbon\Carbon::parse($value->created_at)->diffForHumans() }}
                                 </div>
                             </div>
-                        @empty
-                            <!-- SVG image -->
-                            <div class="text-center mb-4">
-                                <img src="{{ asset('images/undraw_friends_xscy.svg') }}" alt=""
-                                    class="mx-auto d-block  w-25 h-auto">
-                                <h1 class="mb-3">Oops! Data Tidak Tersedia.</h1>
-                                <p class="lead">Data yang Anda cari saat ini tidak tersedia
-                                    atau belum ditambahkan. Silakan coba lagi nanti.</p>
+                            <div class="card-body d-flex flex-column p-2">
+                                <a class="post-title fw-bold text-success text-decoration-none small mb-1 text-truncate"
+                                    href="{{ route('article.show', $value->slug) }}" title="{{ $value->title }}">
+                                    {{ Str::limit($value->title, 40, '...') }}
+                                </a>
+                                <p class="text-muted small flex-grow-1">
+                                    {!! Str::limit(strip_tags($value->content), 60, '...') !!}
+                                </p>
+                                <a class="btn btn-outline-success btn-sm rounded-2 mt-auto align-self-start px-2 py-1"
+                                    href="{{ route('article.show', $value->slug) }}">
+                                    Baca <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
-                        @endforelse
+                        </div>
+                    </div>
+                @empty
+                    <!-- SVG image -->
+                    <div class="text-center mb-4">
+                        <img src="{{ asset('images/undraw_friends_xscy.svg') }}" alt=""
+                            class="mx-auto d-block  w-25 h-auto">
+                        <h1 class="mb-3">Oops! Data Tidak Tersedia.</h1>
+                        <p class="lead">Data yang Anda cari saat ini tidak tersedia
+                            atau belum ditambahkan. Silakan coba lagi nanti.</p>
+                    </div>
+                @endforelse
 
             </div>
         </div>
@@ -260,10 +259,10 @@
         <script>
             var categories = @json($categories);
         </script>
-<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-        @vite(['resources/js/search.js','resources/js/home.js'])
+        <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+        <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+        <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+        @vite(['resources/js/search.js', 'resources/js/home.js'])
     @endpush
 
 </x-guest-layout>

@@ -8,7 +8,6 @@ use App\Models\Map;
 use App\Models\RegionalAgency;
 use App\Models\Sector;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class Home extends Controller
@@ -18,10 +17,10 @@ class Home extends Controller
         // Mengambil data dari database
         $groups = RegionalAgency::select('id', 'name')->get();
         $maps = Map::with('regional_agency', 'sector', 'documents')
-        ->where('is_active', 1)
-        ->latest()
-        ->take(4)
-        ->get();
+            ->where('is_active', 1)
+            ->latest()
+            ->take(4)
+            ->get();
 
         $categories = Sector::with('map')->select('id', 'name')->get();
 
