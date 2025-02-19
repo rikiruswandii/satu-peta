@@ -27,7 +27,7 @@
 <body>
     <!-- Preloader-->
     <div class="preloader" id="preloader">
-        <div class="spinner-grow text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+        <div class="spinner-grow text-warning" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>
 
     <!-- Header Area-->

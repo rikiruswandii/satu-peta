@@ -49,9 +49,9 @@
                                     <i class="bi bi-search"></i>
                                 </button>
                             </div>
-                            @if (request('regional_agencies'))
-                                @foreach ((array) request('regional_agencies') as $agency)
-                                    <input type="hidden" name="regional_agencies[]" value="{{ $agency }}">
+                            @if (request('regional_agencies_checkbox'))
+                                @foreach ((array) request('regional_agencies_checkbox') as $agency)
+                                    <input type="hidden" name="regional_agencies_checkbox[]" value="{{ $agency }}">
                                 @endforeach
                             @endif
                         </form>
@@ -81,7 +81,7 @@
             </div>
         </div>
     </div>
-    
+
 <div class="mb-120 d-block"></div>
 
     @section('modal')

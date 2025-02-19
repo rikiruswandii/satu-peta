@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use proj4php\Point;
 use proj4php\Proj;
 use proj4php\Proj4php;
+use Illuminate\Support\Arr;
 
 class Search extends Controller
 {
@@ -50,10 +51,11 @@ class Search extends Controller
         }
 
         // Filter berdasarkan nama regional agency
-        if ($request->filled('regional_agencies')) {
-            $regionalAgencies = is_array($request->regional_agencies) ? $request->regional_agencies : [$request->regional_agencies];
+        if ($request->has('regional_agencies_checkbox')) {
+            $regionalAgencies = array_map('trim', Arr::wrap($request->regional_agencies_checkbox));
+
             $mapsQuery->whereHas('regional_agency', function ($query) use ($regionalAgencies) {
-                $query->whereIn('name', $regionalAgencies); // Memfilter berdasarkan nama regional agency
+                $query->whereIn('name', $regionalAgencies);
             });
         }
 
