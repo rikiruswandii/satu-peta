@@ -21,7 +21,7 @@
                         <div class="post-tag pt-3">
                             <ul class="d-flex align-items-center ps-0 list-unstyled mb-0">
                                 <li><a class="btn btn-info btn-sm me-2 rounded-pill"
-                                        href="#">{{ $article->category->name }}</a></li>
+                                        href="{{ route('article.category', ['category_slug'=>$article->category->slug]) }}">{{ $article->category->name }}</a></li>
                             </ul>
                         </div>
                     </div>
