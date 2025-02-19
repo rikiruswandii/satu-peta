@@ -83,6 +83,16 @@
                                 @enderror
                             </div>
                         </div>
+                        <!-- reCAPTCHA -->
+                        <div class="form-group d-flex justify-content-center align-items-center">
+                            {!! htmlFormSnippet() !!}
+                        </div>
+
+                        @if ($errors->has('g-recaptcha-response'))
+                            <div class="alert alert-danger mt-2">
+                                <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                            </div>
+                        @endif
                         <div class="form-group">
                             <button type="submit" class="btn btn-lg btn-primary btn-block">Registrasi</button>
                         </div>

@@ -27,9 +27,10 @@
                                 <label class="form-label" for="email">Email</label>
                             </div>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" id="email"
-                                    value="{{ old('email') }}" required autofocus autocomplete="email"
-                                    placeholder="Masukkan alamat email terdaftar..">
+                                <input type="text"
+                                    class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                    name="email" id="email" value="{{ old('email') }}" required autofocus
+                                    autocomplete="email" placeholder="Masukkan alamat email terdaftar..">
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -51,8 +52,9 @@
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password"
-                                    id="password" required autocomplete="current-password"
+                                <input type="password"
+                                    class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                    name="password" id="password" required autocomplete="current-password"
                                     placeholder="Masukkan kata sandi..">
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
@@ -61,6 +63,18 @@
                                 @enderror
                             </div>
                         </div><!-- .form-group -->
+
+                        <!-- reCAPTCHA -->
+                        <div class="form-group d-flex justify-content-center align-items-center">
+                            {!! htmlFormSnippet() !!}
+                        </div>
+
+                        @if ($errors->has('g-recaptcha-response'))
+                            <div class="alert alert-danger mt-2">
+                                <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                            </div>
+                        @endif
+
 
                         <!-- Remember Me -->
                         <div class="form-group">
