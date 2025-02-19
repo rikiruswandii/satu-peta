@@ -66,7 +66,7 @@
             class="copywrite-wrapper bg-white mt-5 rounded-3 d-lg-flex align-items-lg-center justify-content-lg-center">
             <!-- Copywrite Text -->
             <div class="copywrite-text text-center text-lg-start mb-3 mb-lg-0 me-lg-4">
-                <p class="mb-0"> &copy; {{ Date('Y') }} <strong class="text-warning">{{ $app->name }}</strong>
+                <p class="mb-0 text-success"> &copy; {{ Date('Y') }} <strong class="text-warning">{{ $app->name }}</strong>
                     All rights reserved. </p>
             </div>
 

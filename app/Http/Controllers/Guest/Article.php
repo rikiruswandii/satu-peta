@@ -44,33 +44,54 @@ class Article extends Controller
             ->take(5)
             ->get();
 
+        $categories = Category::select(['id', 'name', 'slug'])->get();
+
         $data = [
             'title' => 'Article',
             'description' => '',
             'article' => $article,
+            'categories' => $categories,
             'latest_article' => $latest_article,
         ];
 
         return view('guest.article.show', $data);
     }
-    public function category($category_slug)
+    public function category(Request $request, $category_slug)
     {
-        // Mengambil kategori dengan artikel terkait
-        $category = Category::with('artikel')->where('slug', $category_slug)->firstOrFail();
+        // Ambil kategori berdasarkan slug
+        $category = Category::where('slug', $category_slug)->firstOrFail();
 
-        // Mengambil artikel terbaru dari kategori lain
+        // Ambil artikel berdasarkan kategori dengan pagination
+        $articlesQuery = ModelsArticle::where('category_id', $category->id)
+            ->latest();
+
+        // Jika ada pencarian, filter berdasarkan judul
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $articlesQuery->where('title', 'like', '%' . $searchTerm . '%');
+        }
+
+        // Ambil artikel dengan pagination
+        $articles = $articlesQuery->paginate(10); // Sesuaikan jumlah artikel per halaman
+
+        // Ambil artikel terbaru dari kategori lain
         $latest_article = ModelsArticle::where('category_id', '!=', $category->id)
             ->latest()
             ->take(5)
             ->get();
 
+        // Ambil daftar kategori untuk sidebar
+        $categories = Category::select(['id', 'name', 'slug'])->get();
+
         $data = [
-            'title' => 'Artikel Kategori',
+            'title' => 'Artikel Kategori: ' . $category->name,
             'description' => '',
-            'category' => $category,
+            'articles' => $articles, // Sudah dipaginasi
+            'categories' => $categories,
             'latest_article' => $latest_article,
+            'category' => $category, // Untuk digunakan di Blade
         ];
 
-        return view('guest.article.category', $data);
+        return view('guest.article.category', compact('data'));
     }
 }

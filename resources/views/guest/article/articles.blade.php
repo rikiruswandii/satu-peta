@@ -119,7 +119,7 @@
                             <ul class="catagories-list ps-0 list-unstyled">
                                 @foreach ($categories as $category)
                                     <li>
-                                        <a href="{{ route('article.category', $category->slug) }}">
+                                        <a href="{{ route('article.category', ['category_slug'=>$category->slug]) }}">
                                             <i class="bi bi-caret-right"></i>{{ $category->name }}
                                             <span class="text-warning ms-2">({{ $category->artikel->count() }})</span>
                                         </a>

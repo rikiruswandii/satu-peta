@@ -21,8 +21,8 @@ Route::get('/explorer', [Explorer::class, 'index'])->name('explorer');
 Route::get('/search', [Search::class, 'index'])->name('search');
 Route::get('/get-maps-by-viewport', [Search::class, 'getMapsByViewport'])->name('get-maps-by-viewport');
 Route::get('article/list', [GuestArticle::class, 'index'])->name('article.list');
-Route::get('article/{article_slug}', [GuestArticle::class, 'show'])->name('article.show');
-Route::get('article/{category_slug}', [GuestArticle::class, 'category'])->name('article.category');
+Route::get('article/detail/{article_slug}', [GuestArticle::class, 'show'])->name('article.show');
+Route::get('article/category/{category_slug}', [GuestArticle::class, 'category'])->name('article.category');
 
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
