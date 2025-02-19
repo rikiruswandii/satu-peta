@@ -47,7 +47,7 @@ class Article extends Controller
         $categories = Category::select(['id', 'name', 'slug'])->get();
 
         $data = [
-            'title' => 'Article',
+            'title' => 'Article Detail :' . $article->title,
             'description' => '',
             'article' => $article,
             'categories' => $categories,

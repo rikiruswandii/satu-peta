@@ -31,7 +31,7 @@
     </div>
 
     <!-- Header Area-->
-    @if (!request()->routeIs('explorer') && !request()->routeIs('search') && !request()->routeIs('article.list') && !request()->routeIs('article.show'))
+    @if (!request()->routeIs('explorer'))
         @include('guest.partials.header')
     @else
         @include('guest.partials.nav')
