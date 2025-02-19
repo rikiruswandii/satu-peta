@@ -22,7 +22,7 @@ class Log extends Controller
         $description = $title.' page!';
         $data = Activity::select('activity_log.*', 'users.name as causer_name')
             ->leftJoin('users', 'activity_log.causer_id', '=', 'users.id')
-            ->where('causer_id', '!=', 2)
+            ->where('causer_id', '!=', 1)
             ->latest()->get();
 
         return view('panel.logs', compact('data', 'count', 'header', 'title', 'description'))->with('encrypt');
