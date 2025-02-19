@@ -16,13 +16,14 @@ class Home extends Controller
     public function index(): View
     {
         // Mengambil data dari database
-        $categories = Sector::select('id', 'name')->get();
         $groups = RegionalAgency::select('id', 'name')->get();
         $maps = Map::with('regional_agency', 'sector', 'documents')
-            ->where('is_active', 1)
-            ->latest()
-            ->take(4)
-            ->get();
+        ->where('is_active', 1)
+        ->latest()
+        ->take(4)
+        ->get();
+
+        $categories = Sector::with('map')->select('id', 'name')->get();
 
         $news = Article::with('category', 'documents')->latest()->take(3)->get();
 

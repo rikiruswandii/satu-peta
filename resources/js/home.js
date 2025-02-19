@@ -25,65 +25,70 @@ var $jq = jQuery.noConflict();
                     fullScreen: true
                 }, {});
             });
+am5.ready(function () {
+    // Create root element
+    var root = am5.Root.new("chartdiv");
 
-            am5.ready(function() {
+    // Set themes
+    root.setThemes([am5themes_Animated.new(root)]);
 
-// Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
-var root = am5.Root.new("chartdiv");
+    // Create chart
+    var chart = root.container.children.push(am5percent.PieChart.new(root, {
+        startAngle: 180,
+        endAngle: 360,
+        layout: root.verticalLayout,
+        innerRadius: am5.percent(50)
+    }));
 
-// Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
-root.setThemes([
-  am5themes_Animated.new(root)
-]);
+    // Create series
+    var series = chart.series.push(am5percent.PieSeries.new(root, {
+        startAngle: 180,
+        endAngle: 360,
+        valueField: "value",
+        categoryField: "category",
+        alignLabels: true
+    }));
 
-// Create chart
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
-// start and end angle must be set both for chart and series
-var chart = root.container.children.push(am5percent.PieChart.new(root, {
-  startAngle: 180,
-  endAngle: 360,
-  layout: root.verticalLayout,
-  innerRadius: am5.percent(50)
-}));
+    series.states.create("hidden", {
+        startAngle: 180,
+        endAngle: 180
+    });
 
-// Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
-// start and end angle must be set both for chart and series
-var series = chart.series.push(am5percent.PieSeries.new(root, {
-  startAngle: 180,
-  endAngle: 360,
-  valueField: "value",
-  categoryField: "category",
-  alignLabels: false
-}));
+    series.slices.template.setAll({
+        cornerRadius: 5
+    });
 
-series.states.create("hidden", {
-  startAngle: 180,
-  endAngle: 180
+    series.ticks.template.setAll({
+        forceHidden: false
+    });
+
+    // Create legend
+    var legend = chart.children.push(am5.Legend.new(root, {
+        centerX: am5.percent(50),
+        x: am5.percent(50),
+        marginTop: 15,
+        marginBottom: 15
+    }));
+
+    legend.labels.template.setAll({
+        fontSize: 14
+    });
+
+    // Set data dari backend
+    var chartData = categories.map(function (category) {
+        return {
+            value: category.map.length,  // Sesuaikan dengan jumlah terkait
+            category: category.name
+        };
+    }).filter(item => item.value > 0); // Hanya gunakan kategori dengan nilai lebih dari 0
+
+    if (chartData.length === 0) {
+        chartData.push({ value: 1, category: "Tidak Ada Data" });
+    }
+
+    series.data.setAll(chartData);
+    legend.data.setAll(series.dataItems); // Pastikan legend mendapatkan data dari series
+
+    series.appear(1000, 100);
 });
 
-series.slices.template.setAll({
-  cornerRadius: 5
-});
-
-series.ticks.template.setAll({
-  forceHidden: true
-});
-
-// Set data
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
-series.data.setAll([
-  { value: 10, category: "One" },
-  { value: 9, category: "Two" },
-  { value: 6, category: "Three" },
-  { value: 5, category: "Four" },
-  { value: 4, category: "Five" },
-  { value: 3, category: "Six" },
-  { value: 1, category: "Seven" }
-]);
-
-series.appear(1000, 100);
-
-}); // end am5.ready()
