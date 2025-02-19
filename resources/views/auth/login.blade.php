@@ -91,9 +91,9 @@
                             <button type="submit" class="btn btn-lg btn-primary btn-block">Masuk</button>
                         </div>
                     </form><!-- form -->
-                    <div class="form-note-s2 pt-4"> Belum punya akun? <a href="{{ route('register') }}">Klik untuk
+                    {{-- <div class="form-note-s2 pt-4"> Belum punya akun? <a href="">Klik untuk
                             registrasi!</a>
-                    </div>
+                    </div> --}}
 
                 </div><!-- .nk-block -->
                 <div class="nk-block nk-auth-footer">

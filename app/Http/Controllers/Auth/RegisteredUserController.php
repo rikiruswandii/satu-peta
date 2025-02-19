@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
         $validated = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'min:8', 'regex:/^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W]).*$/', 'confirmed', Rules\Password::defaults()],
             'g-recaptcha-response' => ['required', 'recaptcha'],
         ]);
 
