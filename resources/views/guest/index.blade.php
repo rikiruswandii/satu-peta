@@ -91,10 +91,19 @@
         <div class="d-block mb-80"></div>
         <div class="container">
             <div class="row g-3">
-                @foreach ($maps as $map)
+                @forelse ($maps as $map)
                     <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 my-4'" :card_id="$map->id" :card_title="$map->name"
                         :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->sector->name" />
-                @endforeach
+                @empty
+                    <!-- SVG image -->
+                    <div class="text-center mb-4">
+                        <img src="{{ asset('images/undraw_friends_xscy.svg') }}" alt=""
+                            class="mx-auto d-block  w-25 h-auto">
+                        <h1 class="mb-3">Oops! Data Tidak Tersedia.</h1>
+                        <p class="lead">Data yang Anda cari saat ini tidak tersedia
+                            atau belum ditambahkan. Silakan coba lagi nanti.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
