@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\User;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\User;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,12 +19,29 @@ class Detail extends Controller
 {
     public function index($id): View
     {
-        $decrypt = Crypt::decrypt($id);
-        $user = User::findOrFail($decrypt);
-        $title = 'Profil User';
-        $description = $title.' page!';
+        try {
+            // Coba dekripsi ID
+            $decrypt = Crypt::decrypt($id);
+        } catch (DecryptException $e) {
+            // Jika gagal dekripsi, tampilkan error 400 (Bad Request)
+            abort(400, 'Invalid ID format.');
+        }
 
-        return view('panel.user.detail', compact('user', 'title', 'description'))->with('encrypt', $id);
+        // Cari user, jika tidak ditemukan, tampilkan 404
+        $user = User::find($decrypt);
+        if (! $user) {
+            abort(404, 'User not found.');
+        }
+
+        // Data untuk view
+        $data = [
+            'title' => 'Profil User',
+            'description' => 'Profil User page!',
+            'user' => $user,
+            'encrypt' => $id, // Kirim kembali ID terenkripsi
+        ];
+
+        return view('panel.user.detail', $data);
     }
 
     /**
