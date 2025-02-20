@@ -1,9 +1,10 @@
 <x-guest-layout>
     @section('title', $title)
     @section('description', $description)
-    <x-breadcrumb :title="$title">
+    <x-breadcrumb :title="$title" :images="['images/carrow1 (1).JPG', 'images/carrow1 (1).JPG', 'images/carrow1 (1).JPG']">
         <x-slot name="body">
-
+            <li class="breadcrumb-item"><a href="{{ route('article.list') }}" class="text-white">Berita</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $article->title }}</li>
         </x-slot>
     </x-breadcrumb>
     <div class="saasbox-blog-area">
@@ -11,7 +12,7 @@
             <div class="row justify-content-center justify-content-md-between">
                 <div class="col-12 col-md-7"><img class="rounded-3 mb-4 mb-lg-5"
                         src="{{ Storage::url($article->documents->first()->path) }}" alt="">
-                    <div class="post-date mb-2">{{ formatIndonesianDate($article->created_at) }}</div>
+                    <div class="post-date mb-2">{{ \Carbon\Carbon::parse($article->created_at)->diffForHumans() }}</div>
                     <h1 class="mb-3">{{ $article->title }}</h1>
                     {!! $article->content !!}
                     <!-- Post Tag & Share Button-->
@@ -20,7 +21,7 @@
                         <div class="post-tag pt-3">
                             <ul class="d-flex align-items-center ps-0 list-unstyled mb-0">
                                 <li><a class="btn btn-info btn-sm me-2 rounded-pill"
-                                        href="#">{{ $article->category->name }}</a></li>
+                                        href="{{ route('article.category', ['category_slug'=>$article->category->slug]) }}">{{ $article->category->name }}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -49,7 +50,7 @@
                                         <a class="post-title" href="{{ route('article.show', $value->slug) }}">
                                             {{ Str::limit($value->title, 60, '...') }}
                                         </a>
-                                        <p class="post-date">{{ formatIndonesianDate($value->created_at) }}</p>
+                                        <p class="post-date">{{ \Carbon\Carbon::parse($value->created_at)->diffForHumans() }}</p>
                                     </div>
                                 </div>
                             @endforeach

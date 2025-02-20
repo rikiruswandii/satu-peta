@@ -27,11 +27,11 @@
 <body>
     <!-- Preloader-->
     <div class="preloader" id="preloader">
-        <div class="spinner-grow text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+        <div class="spinner-grow text-warning" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>
 
-    @if (!request()->routeIs('explorer') && !request()->routeIs('search') && !request()->routeIs('article.list') && !request()->routeIs('article.show'))
-        <!-- Footer Area-->
+    <!-- Header Area-->
+    @if (!request()->routeIs('explorer'))
         @include('guest.partials.header')
     @else
         @include('guest.partials.nav')

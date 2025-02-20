@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Panel\User;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\View\View;
@@ -22,7 +23,7 @@ class Log extends Controller
         $description = $title.' page!';
         $data = Activity::select('activity_log.*', 'users.name as causer_name')
             ->leftJoin('users', 'activity_log.causer_id', '=', 'users.id')
-            ->where('causer_id', '!=', 2)
+            ->where('causer_id', '!=', 1)
             ->latest()->get();
 
         return view('panel.logs', compact('data', 'count', 'header', 'title', 'description'))->with('encrypt');
@@ -76,11 +77,19 @@ class Log extends Controller
 
     public function userLog($id)
     {
-        // Dekripsi ID
-        $decrypt = Crypt::decrypt($id);
+        try {
+            // Coba dekripsi ID
+            $decrypt = Crypt::decrypt($id);
+        } catch (DecryptException $e) {
+            // Jika gagal dekripsi, tampilkan error 400 (Bad Request)
+            abort(400, 'Invalid ID format.');
+        }
 
         // Mencari user berdasarkan ID yang didekripsi
         $user = User::findOrFail($decrypt);
+        if (! $user) {
+            abort(404, 'User not found.');
+        }
 
         // Menghitung jumlah aktivitas user
         $count = Activity::where('causer_id', $user->id)->count();

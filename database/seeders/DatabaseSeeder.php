@@ -17,9 +17,10 @@ class DatabaseSeeder extends Seeder
         // Panggil seeder UserSeeder
         $this->call([
             UserSeeder::class,
+            DatasetSeeder::class,
         ]);
 
         // Panggil event OpdSyncRequested setelah seeder selesai
-        event(new OpdSyncRequested());
+        event(new OpdSyncRequested);
     }
 }

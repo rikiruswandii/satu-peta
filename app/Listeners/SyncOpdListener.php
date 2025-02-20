@@ -27,8 +27,9 @@ class SyncOpdListener
         $apiUrl = env('OPD_API');
         $key = env('API_KEY');
 
-        if (!$apiUrl) {
+        if (! $apiUrl) {
             Log::error('OPD_API environment variable is not set.');
+
             return;
         }
 
@@ -61,17 +62,17 @@ class SyncOpdListener
                                 [   // Data yang akan diupdate atau dibuat
                                     'user_id' => 2,
                                     'name' => $item['name'],
-                                    'slug' => Str::slug($item['name'])
+                                    'slug' => Str::slug($item['name']),
                                 ]
                             );
 
                             if ($data) {
-                                Log::info('Sinkronisasi berhasil untuk ID: ' . $item['id']);
+                                Log::info('Sinkronisasi berhasil untuk ID: '.$item['id']);
                             } else {
-                                Log::warning('Data tidak berhasil disinkronkan untuk ID: ' . $item['id']);
+                                Log::warning('Data tidak berhasil disinkronkan untuk ID: '.$item['id']);
                             }
                         } catch (\Exception $e) {
-                            Log::error('Error updating or creating district ID ' . $item['id'] . ': ' . $e->getMessage());
+                            Log::error('Error updating or creating district ID '.$item['id'].': '.$e->getMessage());
                         }
                         Log::info('Item processed:', ['id' => $item['id']]);
                     }
@@ -82,11 +83,11 @@ class SyncOpdListener
                 Log::error('Failed to fetch data from API', [
                     'url' => $apiUrl,
                     'status' => $response->status(),
-                    'response_body' => $response->body()
+                    'response_body' => $response->body(),
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to make API request: ' . $e->getMessage());
+            Log::error('Failed to make API request: '.$e->getMessage());
         }
     }
 }

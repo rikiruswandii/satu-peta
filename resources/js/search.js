@@ -13,6 +13,7 @@ import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import CircleStyle from 'ol/style/Circle';
 import Overlay from 'ol/Overlay';
+
 document.addEventListener('DOMContentLoaded', function () {
     // Filter
     const checkboxes = document.querySelectorAll('.regional-agency-checkbox');
@@ -199,10 +200,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateMapCards(html, pagination) {
-        const mapCardsContainer = document.querySelector('.row.g-4.g-lg-5');
+        const mapCardsContainer = document.querySelector('.row .cardMapList');
         mapCardsContainer.innerHTML = html;
 
-        const paginationContainer = document.querySelector('.mt-4');
+        const paginationContainer = document.querySelector('.mt-4 .cardPaginate');
         if (paginationContainer) {
             paginationContainer.innerHTML = pagination;
         }

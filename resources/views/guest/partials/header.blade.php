@@ -21,8 +21,3 @@
         </div>
     </nav>
 </header>
-
-@push('css')
-<style>
-</style>
-@endpush

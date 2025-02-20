@@ -21,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /**
+         * Fix mixed content in production
+         */
         $app_url = config('app.url');
         if (app()->isProduction() && ! empty($app_url)) {
             URL::forceRootUrl($app_url);

@@ -7,6 +7,7 @@ use App\Models\Map;
 use App\Models\RegionalAgency;
 use App\Models\Sector;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -50,10 +51,11 @@ class Search extends Controller
         }
 
         // Filter berdasarkan nama regional agency
-        if ($request->filled('regional_agencies')) {
-            $regionalAgencies = is_array($request->regional_agencies) ? $request->regional_agencies : [$request->regional_agencies];
+        if ($request->has('regional_agencies_checkbox')) {
+            $regionalAgencies = array_map('trim', Arr::wrap($request->regional_agencies_checkbox));
+
             $mapsQuery->whereHas('regional_agency', function ($query) use ($regionalAgencies) {
-                $query->whereIn('name', $regionalAgencies); // Memfilter berdasarkan nama regional agency
+                $query->whereIn('name', $regionalAgencies);
             });
         }
 

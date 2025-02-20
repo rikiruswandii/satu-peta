@@ -1,0 +1,122 @@
+{
+  "_GeoJSON-DjKYdZcq.js": {
+    "file": "assets/GeoJSON-DjKYdZcq.js",
+    "name": "GeoJSON"
+  },
+  "_Map-B3PszTVP.js": {
+    "file": "assets/Map-B3PszTVP.js",
+    "name": "Map",
+    "imports": [
+      "_GeoJSON-DjKYdZcq.js"
+    ],
+    "css": [
+      "assets/Map-BjIYm04z.css"
+    ]
+  },
+  "_Map-BjIYm04z.css": {
+    "file": "assets/Map-BjIYm04z.css",
+    "src": "_Map-BjIYm04z.css"
+  },
+  "node_modules/canvg/lib/index.es.js": {
+    "file": "assets/index.es-CU226u0d.js",
+    "name": "index.es",
+    "src": "node_modules/canvg/lib/index.es.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_Map-B3PszTVP.js",
+      "_GeoJSON-DjKYdZcq.js"
+    ]
+  },
+  "node_modules/dompurify/dist/purify.es.js": {
+    "file": "assets/purify.es-C_uT9hQ1.js",
+    "name": "purify.es",
+    "src": "node_modules/dompurify/dist/purify.es.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/html2canvas/dist/html2canvas.esm.js": {
+    "file": "assets/html2canvas.esm-CBrSDip1.js",
+    "name": "html2canvas.esm",
+    "src": "node_modules/html2canvas/dist/html2canvas.esm.js",
+    "isDynamicEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BMPxQRAk.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/article.css": {
+    "file": "assets/article-CSVJH4ZE.css",
+    "src": "resources/css/article.css",
+    "isEntry": true
+  },
+  "resources/css/explorer.css": {
+    "file": "assets/explorer-COIUMoRC.css",
+    "src": "resources/css/explorer.css",
+    "isEntry": true
+  },
+  "resources/css/guestAside.css": {
+    "file": "assets/guestAside-CP52xwtC.css",
+    "src": "resources/css/guestAside.css",
+    "isEntry": true
+  },
+  "resources/css/home.css": {
+    "file": "assets/home-CGzCzDHV.css",
+    "src": "resources/css/home.css",
+    "isEntry": true
+  },
+  "resources/css/search.css": {
+    "file": "assets/search-EAT79ARS.css",
+    "src": "resources/css/search.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BP0OlzD5.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_Map-B3PszTVP.js",
+      "_GeoJSON-DjKYdZcq.js"
+    ],
+    "dynamicImports": [
+      "node_modules/html2canvas/dist/html2canvas.esm.js",
+      "node_modules/dompurify/dist/purify.es.js",
+      "node_modules/canvg/lib/index.es.js"
+    ],
+    "css": [
+      "assets/app-CgAPJiXg.css"
+    ]
+  },
+  "resources/js/explorer.js": {
+    "file": "assets/explorer-Bjwr43Ky.js",
+    "name": "explorer",
+    "src": "resources/js/explorer.js",
+    "isEntry": true,
+    "imports": [
+      "_GeoJSON-DjKYdZcq.js"
+    ]
+  },
+  "resources/js/home.js": {
+    "file": "assets/home-DN81sWgm.js",
+    "name": "home",
+    "src": "resources/js/home.js",
+    "isEntry": true
+  },
+  "resources/js/register.js": {
+    "file": "assets/register-wIspswgo.js",
+    "name": "register",
+    "src": "resources/js/register.js",
+    "isEntry": true
+  },
+  "resources/js/search.js": {
+    "file": "assets/search-DEBDXxxX.js",
+    "name": "search",
+    "src": "resources/js/search.js",
+    "isEntry": true,
+    "imports": [
+      "_Map-B3PszTVP.js",
+      "_GeoJSON-DjKYdZcq.js"
+    ]
+  }
+}

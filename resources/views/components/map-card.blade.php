@@ -1,7 +1,7 @@
 @props(['card_class', 'card_title', 'card_filename', 'card_opd', 'card_id', 'geojson_path', 'regional_agency', 'sector'])
 
 <div class="{{ $card_class }}">
-    <div class="card hover-card shadow-lg border-0 overflow-hidden" style="width: 100%; max-width: 350px; min-height: 350px;">
+    <div class="card rounded-1 hover-card shadow-sm border overflow-hidden" style="width: 100%; max-width: 350px; min-height: 350px;">
         <div class="position-relative" style="height: 200px;">
             <div id="map-{{ $card_id }}" class="map-preview detailMapModalTrigger w-100 h-100"
                 style="cursor: pointer; border-radius: 0.5rem 0.5rem 0 0;"

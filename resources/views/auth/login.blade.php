@@ -27,9 +27,10 @@
                                 <label class="form-label" for="email">Email</label>
                             </div>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" id="email"
-                                    value="{{ old('email') }}" required autofocus autocomplete="email"
-                                    placeholder="Masukkan alamat email terdaftar..">
+                                <input type="text"
+                                    class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                    name="email" id="email" value="{{ old('email') }}" required autofocus
+                                    autocomplete="email" placeholder="Masukkan alamat email terdaftar..">
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -40,10 +41,6 @@
                         <div class="form-group">
                             <div class="form-label-group">
                                 <label class="form-label" for="password">Kata Sandi</label>
-                                @if (Route::has('password.request'))
-                                    <a class="link link-primary link-sm" tabindex="-1"
-                                        href="{{ route('password.request') }}">Lupa sandi?</a>
-                                @endif
                             </div>
                             <div class="form-control-wrap">
                                 <a tabindex="-1" href="#" class="form-icon form-icon-right passcode-switch lg"
@@ -51,8 +48,9 @@
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password"
-                                    id="password" required autocomplete="current-password"
+                                <input type="password"
+                                    class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                    name="password" id="password" required autocomplete="current-password"
                                     placeholder="Masukkan kata sandi..">
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
@@ -61,6 +59,18 @@
                                 @enderror
                             </div>
                         </div><!-- .form-group -->
+
+                        <!-- reCAPTCHA -->
+                        <div class="form-group d-flex justify-content-center align-items-center">
+                            {!! htmlFormSnippet() !!}
+                        </div>
+
+                        @if ($errors->has('g-recaptcha-response'))
+                            <div class="alert alert-danger mt-2">
+                                <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                            </div>
+                        @endif
+
 
                         <!-- Remember Me -->
                         <div class="form-group">
@@ -77,9 +87,9 @@
                             <button type="submit" class="btn btn-lg btn-primary btn-block">Masuk</button>
                         </div>
                     </form><!-- form -->
-                    <div class="form-note-s2 pt-4"> Belum punya akun? <a href="{{ route('register') }}">Klik untuk
+                    {{-- <div class="form-note-s2 pt-4"> Belum punya akun? <a href="">Klik untuk
                             registrasi!</a>
-                    </div>
+                    </div> --}}
 
                 </div><!-- .nk-block -->
                 <div class="nk-block nk-auth-footer">

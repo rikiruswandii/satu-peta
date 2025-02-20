@@ -1,0 +1,24 @@
+# docker-compose.yml
+
+services:
+    satu_peta:
+        container_name: purwakarta-diskominfo-satu-peta
+        image: pratamatechsolution/purwakarta-diskominfo-satu-peta:latest
+        restart: always
+        env_file: stack.env
+        volumes:
+        - satu_peta:/app/storage
+        - /etc/localtime:/etc/localtime:ro
+        - /etc/timezone:/etc/timezone:ro
+        ports:
+        - "13003:8000"
+        networks:
+        - purwakarta
+
+networks:
+    purwakarta:
+        external: true
+
+volumes:
+    satu_peta:
+        name: purwakarta-diskominfo-satu-peta

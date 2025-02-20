@@ -8,7 +8,6 @@ use App\Models\Map;
 use App\Models\RegionalAgency;
 use App\Models\Sector;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class Home extends Controller
@@ -16,7 +15,6 @@ class Home extends Controller
     public function index(): View
     {
         // Mengambil data dari database
-        $categories = Sector::select('id', 'name')->get();
         $groups = RegionalAgency::select('id', 'name')->get();
         $maps = Map::with('regional_agency', 'sector', 'documents')
             ->where('is_active', 1)
@@ -24,17 +22,15 @@ class Home extends Controller
             ->take(4)
             ->get();
 
-        $news = Article::with('category', 'documents')->latest()->take(3)->get();
+        $categories = Sector::with('map')->select('id', 'name')->get();
 
-        // Mengambil data dari API TPP
-        $opdResponse = Http::get('https://tpp.purwakartakab.go.id/api/opd?key=developerganteng');
-        $opdData = $opdResponse->successful() ? collect($opdResponse->json()['data']) : collect([]);
+        $news = Article::with('category', 'documents')->latest()->take(3)->get();
 
         // Data untuk dikirim ke view
         $title = env('APP_NAME', 'Satu Peta Purwakarta');
         $description = 'Website Satu Peta Purwakarta adalah platform informasi geospasial yang menyajikan data peta terintegrasi untuk mendukung pembangunan dan layanan publik di Kabupaten Purwakarta';
 
-        return view('guest.index', compact('title', 'description', 'categories', 'groups', 'maps', 'opdData', 'news'));
+        return view('guest.index', compact('title', 'description', 'categories', 'groups', 'maps', 'news'));
     }
 
     public function search(Request $request)
