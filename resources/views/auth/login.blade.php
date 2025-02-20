@@ -41,10 +41,6 @@
                         <div class="form-group">
                             <div class="form-label-group">
                                 <label class="form-label" for="password">Kata Sandi</label>
-                                @if (Route::has('password.request'))
-                                    <a class="link link-primary link-sm" tabindex="-1"
-                                        href="{{ route('password.request') }}">Lupa sandi?</a>
-                                @endif
                             </div>
                             <div class="form-control-wrap">
                                 <a tabindex="-1" href="#" class="form-icon form-icon-right passcode-switch lg"
