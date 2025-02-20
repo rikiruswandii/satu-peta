@@ -37,7 +37,14 @@ class Article extends Controller
 
     public function show($article_slug)
     {
-        $article = ModelsArticle::with('category', 'documents')->where('slug', $article_slug)->first();
+        $article = ModelsArticle::with('category', 'documents')
+            ->where('slug', $article_slug)
+            ->first();
+
+        // Jika artikel tidak ditemukan, lempar 404
+        if (! $article) {
+            abort(404);
+        }
 
         $latest_article = ModelsArticle::latest()
             ->where('slug', '!=', $article_slug)
@@ -47,8 +54,8 @@ class Article extends Controller
         $categories = Category::select(['id', 'name', 'slug'])->get();
 
         $data = [
-            'title' => 'Article Detail :'.$article->title,
-            'description' => '',
+            'title' => 'Article Detail: '.$article->title,
+            'description' => $article->description ?? '',
             'article' => $article,
             'categories' => $categories,
             'latest_article' => $latest_article,
@@ -59,17 +66,22 @@ class Article extends Controller
 
     public function category(Request $request, $category_slug)
     {
-        // Ambil kategori berdasarkan slug
-        $category = Category::where('slug', $category_slug)->firstOrFail();
+        // Ambil kategori berdasarkan slug, jika tidak ditemukan, tampilkan 404
+        $category = Category::where('slug', $category_slug)->first();
+        if (! $category) {
+            abort(404);
+        }
 
-        // Ambil artikel berdasarkan kategori dengan pagination
+        // Query untuk mengambil artikel dalam kategori
         $articlesQuery = ModelsArticle::where('category_id', $category->id)
             ->latest();
 
         // Jika ada pencarian, filter berdasarkan judul
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-            $articlesQuery->where('title', 'like', '%'.$searchTerm.'%');
+        if ($request->has('search')) {
+            $searchTerm = trim(strip_tags($request->search)); // Sanitasi input
+            if (! empty($searchTerm)) {
+                $articlesQuery->where('title', 'like', '%'.$searchTerm.'%');
+            }
         }
 
         // Ambil artikel dengan pagination
