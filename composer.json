@@ -21,6 +21,7 @@
         "sopamo/laravel-filepond": "^1.4",
         "spatie/laravel-activitylog": "^4.9",
         "spatie/laravel-settings": "^3.4",
+        "spatie/laravel-tags": "^4.9",
         "symfony/process": "^7.2",
         "yajra/laravel-datatables": "11.0"
     },

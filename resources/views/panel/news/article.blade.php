@@ -61,7 +61,7 @@
 
     @push('scripts')
         <script>
-             var $r = jQuery.noConflict();
+            var $r = jQuery.noConflict();
             $r(document).ready(function() {
                 $r('#articles-table').DataTable({
                     processing: true,
@@ -79,8 +79,8 @@
                             name: 'title'
                         },
                         {
-                            data: 'category.name',
-                            name: 'category.name'
+                            data: 'tags', 
+                            name: 'tags'
                         },
                         {
                             data: 'thumbnail',

@@ -2,18 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\Sector;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Spatie\Tags\Tag;
 
 class DatasetSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Jalankan seeder untuk mengisi dataset ke dalam tags dengan type 'map' dan 'article'.
      */
     public function run(): void
     {
-        $agencies = [
+        // Tags untuk tipe 'map'
+        $mapDatasets = [
             'Lingkungan Terbangun',
             'Hipsografi',
             'Toponimi',
@@ -32,12 +32,25 @@ class DatasetSeeder extends Seeder
             'Sungai',
         ];
 
-        foreach ($agencies as $agency) {
-            Sector::create([
-                'user_id' => 2,
-                'name' => $agency,
-                'slug' => Str::slug($agency),
-            ]);
+        foreach ($mapDatasets as $dataset) {
+            Tag::findOrCreate($dataset, 'map'); // ✅ Menyimpan dengan type 'map'
+        }
+
+        // Tags untuk tipe 'article'
+        $articleCategories = [
+            'Berita Pemetaan',
+            'Teknologi GIS',
+            'Kebijakan Geospasial',
+            'Tutorial Peta Digital',
+            'Analisis Data Spasial',
+            'Remote Sensing',
+            'Sistem Informasi Geografis',
+            'Data Geospasial Terbuka',
+            'Tautan',
+        ];
+
+        foreach ($articleCategories as $category) {
+            Tag::findOrCreate($category, 'article'); // ✅ Menyimpan dengan type 'article'
         }
     }
 }

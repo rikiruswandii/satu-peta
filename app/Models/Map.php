@@ -9,10 +9,21 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Tags\HasTags;
 
 class Map extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, HasTags, LogsActivity, SoftDeletes;
+
+    public function setTagsAttribute($tags)
+    {
+        $this->syncTagsWithType($tags, 'article');
+    }
+
+    public function getTagsAttribute()
+    {
+        return $this->tagsWithType('article');
+    }
 
     protected static $logName = 'maps_activity';
 

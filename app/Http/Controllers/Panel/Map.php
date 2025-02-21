@@ -22,7 +22,7 @@ class Map extends Controller
     public function index(): View
     {
         $regional_agencies = RegionalAgency::all();
-        $sectors = Sector::all();
+        $sectors = Tag::all();
         $count = ModelMap::count();
         $title = 'Peta';
         $prefix = 'maps';
