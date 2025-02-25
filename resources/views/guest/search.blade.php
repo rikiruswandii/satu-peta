@@ -18,7 +18,7 @@
                             <x-map-container geoJsonPath="" mapId="viewportLayering" />
                             <form id="filterForm" action="{{ route('search') }}" method="GET">
                                 @if (request('search'))
-                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                    <input type="hidden" name="search" value="{{ old('search', request('search')) }}">
                                 @endif
 
                                 @php
@@ -44,7 +44,7 @@
                             <div class="input-group m-3">
                                 <input type="text" class="form-control" placeholder="Kata Kunci"
                                     aria-label="Kata Kunci" aria-describedby="basic-addon2" name="search"
-                                    value="{{ request('search') }}">
+                                    value="{{ old('search', request('search')) }}">
                                 <button type="submit" class="btn btn-success">
                                     <i class="bi bi-search"></i>
                                 </button>
@@ -61,7 +61,7 @@
                         @forelse ($maps as $map)
                             <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 mb-4'" :card_id="$map->id" :card_title="$map->name"
                                 :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name"
-                                :sector="$map->sector->name" />
+                                :sector="$map->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
                         @empty
                             <!-- SVG image -->
                             <div class="text-center mb-4">

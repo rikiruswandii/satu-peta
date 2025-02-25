@@ -5,75 +5,45 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 use App\Models\Map;
 use App\Models\RegionalAgency;
-use App\Models\Sector;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use proj4php\Point;
 use proj4php\Proj;
 use proj4php\Proj4php;
+use Spatie\Tags\Tag;
 
 class Search extends Controller
 {
     public function index(Request $request)
     {
-        $regionalAgencySum = RegionalAgency::leftJoin('maps', 'maps.regional_agency_id', '=', 'regional_agencies.id')
-            ->leftJoin('sectors', 'sectors.id', '=', 'maps.sector_id')
-            ->select(
-                'regional_agencies.id',
-                'regional_agencies.name',
-                DB::raw('COUNT(maps.id) as total'),
-                'sectors.name as nama_sektor',
-                'sectors.created_at'
-            )
-            ->whereNull('maps.deleted_at')
-            ->groupBy('regional_agencies.id', 'regional_agencies.name', 'sectors.name', 'sectors.created_at')
-            ->latest('sectors.created_at')
+        Log::info('Data request:', $request->all());
+        // Subquery untuk menghitung jumlah peta per RegionalAgency
+        $mapCounts = DB::table('maps')
+            ->select('regional_agency_id', DB::raw('COUNT(*) as total'))
+            ->whereNull('deleted_at')
+            ->groupBy('regional_agency_id');
+
+        // Query utama untuk mendapatkan data RegionalAgency beserta jumlah peta
+        $regionalAgencySum = RegionalAgency::leftJoinSub($mapCounts, 'map_counts', function ($join) {
+            $join->on('regional_agencies.id', '=', 'map_counts.regional_agency_id');
+        })
+            ->select('regional_agencies.id', 'regional_agencies.name', DB::raw('COALESCE(map_counts.total, 0) as total'))
             ->get();
 
-        $mapsQuery = Map::with('regional_agency', 'sector', 'documents')->where('is_active', 1);
-
-        if ($request->has('regional_agencies')) {
-            $mapsQuery->whereIn('regional_agency_id', $request->regional_agencies);
-        }
-
-        if ($request->has('sector') && $request->sector != '') {
-            $mapsQuery->whereIn('sector_id', $request->sector);
-        }
-
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-            $mapsQuery->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'like', '%'.$searchTerm.'%');
-            });
-        }
-
-        // Filter berdasarkan nama regional agency
-        if ($request->has('regional_agencies_checkbox')) {
-            $regionalAgencies = array_map('trim', Arr::wrap($request->regional_agencies_checkbox));
-
-            $mapsQuery->whereHas('regional_agency', function ($query) use ($regionalAgencies) {
-                $query->whereIn('name', $regionalAgencies);
-            });
-        }
-
-        // Filter berdasarkan kata kunci pencarian
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-            $mapsQuery->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'like', '%'.$searchTerm.'%');  // Mencocokkan berdasarkan nama map
-            });
-        }
-
-        // Menyelesaikan query dengan paginasi
-        $maps = $mapsQuery->paginate(9);
+        $maps = Map::with(['regional_agency', 'tags', 'documents'])
+            ->where('is_active', 1)
+            ->filterByRegionalAgencies($request->input('regional_agencies'))
+            ->filterBySector($request->input('sector'))
+            ->filterBySearch($request->input('search'))
+            ->filterByRegionalAgenciesCheckbox($request->input('regional_agencies_checkbox'))
+            ->paginate(9);
 
         $data = [
             'title' => 'Pencarian',
             'description' => 'Masukkan kata kunci pencarian anda di sini.',
-            'categories' => Sector::all(),
+            'categories' => Tag::where('type', 'map')->get(),
             'groups' => RegionalAgency::with('map')->get(),
             'maps' => $maps,
             'regionalAgencySum' => $regionalAgencySum,

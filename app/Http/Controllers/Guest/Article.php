@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article as ModelsArticle;
-use App\Models\Category;
+use App\Models\Tag as ModelTag;
 use Illuminate\Http\Request;
+use Spatie\Tags\Tag;
 
 class Article extends Controller
 {
     public function index(Request $request)
     {
-        $articles = ModelsArticle::with('category', 'documents');
+        $articles = ModelsArticle::with('tags', 'documents');
 
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
@@ -22,7 +23,7 @@ class Article extends Controller
         $latest_article = ModelsArticle::with('documents')->latest()
             ->take(5)
             ->get();
-        $categories = Category::select(['id', 'name', 'slug'])->get();
+        $categories = ModelTag::withCount('articles')->where('type', 'article')->get();
 
         $data = [
             'title' => 'Artikel',
@@ -37,7 +38,7 @@ class Article extends Controller
 
     public function show($article_slug)
     {
-        $article = ModelsArticle::with('category', 'documents')
+        $article = ModelsArticle::with('tags', 'documents')
             ->where('slug', $article_slug)
             ->first();
 
@@ -51,7 +52,7 @@ class Article extends Controller
             ->take(5)
             ->get();
 
-        $categories = Category::select(['id', 'name', 'slug'])->get();
+        $categories = ModelTag::withCount('articles')->where('type', 'article')->get();
 
         $data = [
             'title' => 'Article Detail: '.$article->title,
@@ -64,16 +65,18 @@ class Article extends Controller
         return view('guest.article.show', $data);
     }
 
-    public function category(Request $request, $category_slug)
+    public function category(Request $request, $tag)
     {
-        // Ambil kategori berdasarkan slug, jika tidak ditemukan, tampilkan 404
-        $category = Category::where('slug', $category_slug)->first();
+        // Ambil tag berdasarkan slug, jika tidak ditemukan, tampilkan 404
+        $category = Tag::where('slug->id', $tag)->first();
+
         if (! $category) {
             abort(404);
         }
 
-        // Query untuk mengambil artikel dalam kategori
-        $articlesQuery = ModelsArticle::where('category_id', $category->id)
+        // Query untuk mengambil artikel yang memiliki tag tertentu
+        $articlesQuery = ModelsArticle::withAnyTags([$category->name], 'article')
+            ->with('tags')
             ->latest();
 
         // Jika ada pencarian, filter berdasarkan judul
@@ -87,14 +90,17 @@ class Article extends Controller
         // Ambil artikel dengan pagination
         $articles = $articlesQuery->paginate(10); // Sesuaikan jumlah artikel per halaman
 
-        // Ambil artikel terbaru dari kategori lain
-        $latest_article = ModelsArticle::where('category_id', '!=', $category->id)
+        // Ambil artikel terbaru yang tidak memiliki tag ini
+        $latest_article = ModelsArticle::with('tags')
+            ->whereDoesntHave('tags', function ($query) use ($category) {
+                $query->where('id', $category->id);
+            })
             ->latest()
             ->take(5)
             ->get();
 
-        // Ambil daftar kategori untuk sidebar
-        $categories = Category::select(['id', 'name', 'slug'])->get();
+        // Ambil daftar tag untuk sidebar
+        $categories = ModelTag::withCount('articles')->where('type', 'article')->get();
 
         $data = [
             'title' => 'Artikel Kategori: '.$category->name,

@@ -519,12 +519,22 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
         if (feature) {
             const properties = feature.getProperties();
             let tableHTML = '<table class="table table-sm table-bordered" style="width: 200px; font-size: 0.8rem;">' +
-                '<thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
+                '<thead><tr><th>Atribut</th><th>Nilai</th></tr></thead><tbody>';
 
+            let hasProperties = false;
             for (const key in properties) {
                 if (properties.hasOwnProperty(key) && key !== 'geometry') {
                     tableHTML += `<tr><td>${key}</td><td>${properties[key]}</td></tr>`;
+                    hasProperties = true;
                 }
+            }
+
+            if (!hasProperties) {
+                const geometry = feature.getGeometry();
+                const geometryType = geometry.getType();
+                const coordinates = geometry.getCoordinates();
+                tableHTML += `<tr><td>Geometri</td><td>${geometryType}</td></tr>`;
+                tableHTML += `<tr><td>Koordinat</td><td>${coordinates}</td></tr>`;
             }
 
             tableHTML += '</tbody></table>';
@@ -537,6 +547,8 @@ function initMap(mapId, geoJsonPath, controlOptions = {}, interactionOptions = {
             popupElement.style.display = 'none'; // Sembunyikan popup
         }
     };
+
+
 
     map.on('pointermove', function (event) {
         let hit = map.hasFeatureAtPixel(event.pixel);
@@ -737,9 +749,5 @@ $jq(document).ready(function () {
         // Inisialisasi semua tooltip
         $jq('[data-bs-toggle="tooltip"]').tooltip();
     }, 500);
-    
-    $jq('.btn-tooltip').on('click', function () {
-        $(this).tooltip('hide'); // Sembunyikan tooltip setelah klik
-    });
 });
 

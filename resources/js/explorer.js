@@ -114,6 +114,10 @@ $m(document).ready(function () {
 
         // Inisialisasi tooltip setelah elemen masuk ke DOM
         $m("#layerList [data-bs-toggle='tooltip']").tooltip();
+
+        $m('.bound-to-layer, .remove-layer').on('click', function () {
+            $m(this).tooltip('hide'); // Sembunyikan tooltip setelah klik
+        });
     }
 
     // Saat tombol diklik, tambahkan layer baru dan masukkan ke dalam list
@@ -159,7 +163,7 @@ $m(document).ready(function () {
             color: 'white',
             backgroundColor: '#0fac81'
         });
-        $m('.modal-title').attr('style', 'color: #FFC107 !important; font-size: 16px !important;');
+        $m('.modal-header h5').attr('style', 'color: #FFC107 !important; font-size: 16px !important;');
         $m('.modal-content').css({
             'background': 'rgba(255, 255, 255, 0.5)',
             'backdrop-filter': 'blur(3px)'

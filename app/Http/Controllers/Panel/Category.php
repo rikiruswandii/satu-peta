@@ -3,37 +3,40 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
-use App\Models\Sector;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Spatie\Tags\Tag;
 use Yajra\DataTables\Facades\DataTables;
 
-class DatasetsCategory extends Controller
+class Category extends Controller
 {
     public function index(): View
     {
-        $count = Sector::count();
+        $count = Tag::count();
         $title = 'Kategori';
-        $prefix = 'datasets';
+        $prefix = 'category';
         $description = 'Jelajahi kumpulan kategori dataset informatif dan terpercaya seputar '.env('APP_NAME', 'Satu Peta Purwakarta').'. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.datasets', compact('prefix', 'count', 'title', 'description'));
+        return view('panel.category', compact('prefix', 'count', 'title', 'description'));
     }
 
     public function datatable(Request $request)
     {
         if ($request->ajax()) {
             try {
-                $data = Sector::latest()->get();
+                $data = Tag::latest()->get();
 
                 return DataTables::of($data)
                     ->addIndexColumn()
                     ->editColumn('updated_at', function ($row) {
                         return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('tags', function ($row) {
+                        return $row->name ?? '-';
                     })
                     ->addColumn('action', function ($row) {
                         return '<ul class="preview-list">
@@ -41,6 +44,7 @@ class DatasetsCategory extends Controller
                                                     <a href="javascript:void(0);" class="btn btn-xs btn-dim btn-outline-warning rounded-pill" data-bs-toggle="modal"
                                                 data-bs-target="#editGroupModal"
                                                 data-name="'.$row->name.'"
+                                                data-type="'.$row->type.'"
                                                 data-id="'.Crypt::encrypt($row->id).'">
                                                 <em class="icon ni ni-edit"></em><span>Edit</span>
                                             </a>
@@ -55,7 +59,7 @@ class DatasetsCategory extends Controller
                                                     </li>
                                                 </ul>';
                     })
-                    ->rawColumns(['action'])
+                    ->rawColumns(['action', 'tags'])
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
@@ -72,8 +76,8 @@ class DatasetsCategory extends Controller
 
         // Validasi input
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string',
+            'category_type' => 'nullable|string',
         ]);
 
         // Log hasil validasi
@@ -85,14 +89,10 @@ class DatasetsCategory extends Controller
 
         try {
             // Buat kategori baru
-            $sector = Sector::create([
-                'user_id' => $request->user_id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-            ]);
+            $category = Tag::findOrCreate($request->name, $request->category_type ?? null);
 
             // Log keberhasilan pembuatan kategori
-            \Log::info('Kategori berhasil ditambahkan:', $sector->toArray());
+            \Log::info('Kategori berhasil ditambahkan:', $category->toArray());
 
             return redirect()->back()->with('success', 'Berhasil menambahkan kategori: '.$request->name);
         } catch (\Exception $e) {
@@ -109,8 +109,8 @@ class DatasetsCategory extends Controller
     public function update(Request $request): RedirectResponse
     {
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string',
+            'category_type' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -119,14 +119,22 @@ class DatasetsCategory extends Controller
 
         try {
             $id = Crypt::decrypt($request->id);
-            $data = Sector::find($id);
-            $data->slug = Str::slug($request->name);
+            $data = Tag::find($id);
 
-            $data->fill($request->only(['user_id', 'name']))->save();
+            if (! $data) {
+                return redirect()->back()->with('error', 'Tag tidak ditemukan.');
+            }
 
-            return redirect()->back()->with('success', 'Berhasil menyunting kategori: ');
+            // Update kolom name dalam format JSON multi-language
+            $data->setTranslation('name', 'id', $request->name);
+            $data->setTranslation('slug', 'id', Str::slug($request->name)); // Slug juga dalam format JSON
+
+            $data->type = $request->category_type;
+            $data->save();
+
+            return redirect()->back()->with('success', 'Berhasil menyunting tag: '.$request->name);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menyunting kategori: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menyunting tag: '.$e->getMessage());
         }
     }
 
@@ -134,7 +142,7 @@ class DatasetsCategory extends Controller
     {
         try {
             $id = Crypt::decrypt($request->id);
-            $sector = Sector::findOrFail($id);
+            $sector = Tag::findOrFail($id);
             $sector->delete();
 
             return redirect()->back()->with('success', 'Kategori berhasil dihapus.');

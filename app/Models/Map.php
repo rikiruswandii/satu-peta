@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,10 +10,11 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Tags\HasTags;
 
 class Map extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, HasTags, LogsActivity, SoftDeletes;
 
     protected static $logName = 'maps_activity';
 
@@ -62,4 +64,45 @@ class Map extends Model
         'is_active' => 'boolean',
         'can_download' => 'boolean',
     ];
+
+    // Scope untuk filter berdasarkan regional_agencies
+    public function scopeFilterByRegionalAgencies(Builder $query, $regionalAgencies)
+    {
+        if (! empty($regionalAgencies)) {
+            if (is_string($regionalAgencies)) {
+                $regionalAgencies = explode(',', $regionalAgencies);
+            }
+            $query->whereHas('regional_agency', function ($q) use ($regionalAgencies) {
+                $q->whereIn('slug', $regionalAgencies);
+            });
+        }
+    }
+
+    // Scope untuk filter berdasarkan sektor
+    public function scopeFilterBySector(Builder $query, $sector)
+    {
+        if (! empty($sector)) {
+            $sectors = is_array($sector) ? $sector : [$sector];
+            $query->withAnyTags($sectors, 'map');
+        }
+    }
+
+    // Scope untuk filter berdasarkan kata kunci pencarian
+    public function scopeFilterBySearch(Builder $query, $search)
+    {
+        if (! empty($search)) {
+            $query->where('name', 'like', '%'.$search.'%');
+        }
+    }
+
+    // Scope untuk filter berdasarkan nama regional agency
+    public function scopeFilterByRegionalAgenciesCheckbox(Builder $query, $regionalAgenciesCheckbox)
+    {
+        if (! empty($regionalAgenciesCheckbox)) {
+            $regionalAgencies = array_map('trim', (array) $regionalAgenciesCheckbox);
+            $query->whereHas('regional_agency', function ($query) use ($regionalAgencies) {
+                $query->whereIn('name', $regionalAgencies);
+            });
+        }
+    }
 }

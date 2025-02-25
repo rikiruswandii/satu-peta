@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article as ModelsArticle;
-use App\Models\Category;
 use App\Models\Document;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -13,13 +12,14 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Spatie\Tags\Tag;
 use Yajra\DataTables\Facades\DataTables;
 
 class Article extends Controller
 {
     public function index(): View
     {
-        $categories = Category::all();
+        $categories = Tag::where('type', 'article')->get();
         $count = ModelsArticle::count();
         $title = 'Artikel';
         $prefix = 'articles';
@@ -32,7 +32,8 @@ class Article extends Controller
     {
         if ($request->ajax()) {
             try {
-                $data = ModelsArticle::with('category')->latest()->get();
+                $data = ModelsArticle::latest()->with('tags')->get();
+                \Log::info('', $data->toArray());
 
                 return DataTables::of($data)
                     ->addIndexColumn()
@@ -41,6 +42,9 @@ class Article extends Controller
                     })
                     ->editColumn('created_at', function ($row) {
                         return Carbon::parse($row->created_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('tags', function ($article) {
+                        return $article->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ');
                     })
                     ->addColumn('thumbnail', function ($row) {
                         if ($row->documents->isNotEmpty()) {
@@ -80,7 +84,7 @@ class Article extends Controller
                                 </div>
                             </div>';
                     })
-                    ->rawColumns(['action', 'thumbnail'])
+                    ->rawColumns(['action', 'thumbnail', 'tags'])
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
@@ -92,7 +96,7 @@ class Article extends Controller
 
     public function create(): View
     {
-        $categories = Category::all();
+        $categories = Tag::where('type', 'article')->get();
         $title = 'Artikel';
         $description = 'Gunakan halaman ini untuk membuat artikel baru. Isi judul, konten, dan kategori yang sesuai, lalu publikasikan untuk dibaca oleh pengunjung.';
 
@@ -106,7 +110,7 @@ class Article extends Controller
 
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
-            'category_id' => 'required|integer',
+            'tag' => 'required|string',
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'file' => 'required|string',
@@ -150,12 +154,12 @@ class Article extends Controller
                 // Simpan artikel
                 $data = ModelsArticle::create([
                     'user_id' => $request->user_id,
-                    'category_id' => $request->category_id,
                     'title' => $request->title,
                     'content' => $request->content,
                     'slug' => Str::slug($request->title),
                 ]);
                 \Log::info("Artikel berhasil dibuat dengan ID: {$data->id}");
+                $data->attachTag($request->tag, 'article');
 
                 // Simpan data file ke tabel documents
                 Document::create([
@@ -199,7 +203,7 @@ class Article extends Controller
         $data = ModelsArticle::findOrFail($id);
 
         // Ambil semua kategori
-        $categories = Category::all();
+        $categories = Tag::where('type', 'article')->get();
 
         // Jika kategori kosong, berikan log peringatan
         if ($categories->isEmpty()) {
@@ -219,7 +223,7 @@ class Article extends Controller
 
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
-            'category_id' => 'required|integer|exists:categories,id',
+            'tag' => 'required|string',
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'file' => 'required|string',
@@ -294,8 +298,10 @@ class Article extends Controller
 
                 $data->slug = Str::slug($request->title);
 
-                $data->fill($request->only(keys: ['user_id', 'category_id', 'title', 'content']))->save();
+                $data->fill($request->only(keys: ['user_id', 'title', 'content']))->save();
                 \Log::info("File berhasil disimpan dalam database dengan path: $newFilePath");
+
+                $data->syncTags($request->tag, 'article');
 
                 return redirect()->back()->with('success', 'Artikel berhasil dibuat.');
             } else {
@@ -367,8 +373,7 @@ class Article extends Controller
 
         // Validasi input
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
-            'name' => 'required|string|max:255|unique:'.Category::class,
+            'name' => 'required|string',
         ]);
 
         // Log hasil validasi
@@ -380,11 +385,7 @@ class Article extends Controller
 
         try {
             // Buat kategori baru
-            $category = Category::create([
-                'user_id' => $request->user_id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-            ]);
+            $category = Tag::findOrCreate($request->name, 'article');
 
             // Log keberhasilan pembuatan kategori
             \Log::info('Kategori berhasil dibuat:', $category->toArray());
@@ -404,8 +405,7 @@ class Article extends Controller
     public function category_update(Request $request, $id): RedirectResponse
     {
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -414,10 +414,9 @@ class Article extends Controller
 
         try {
             $id = Crypt::decrypt($id);
-            $data = Category::find($id);
-            $data->slug = Str::slug($request->name);
+            $data = Tag::find($id);
 
-            $data->fill($request->only(['user_id', 'name']))->save();
+            $data->fill($request->only(['name']))->save();
 
             return redirect()->back()->with('success', 'Berhasil menyunting kategori: ');
         } catch (\Exception $e) {
@@ -428,7 +427,7 @@ class Article extends Controller
     public function category_destroy(Request $request): RedirectResponse
     {
         try {
-            $categories = Category::findOrFail($request->id);
+            $categories = Tag::findOrFail($request->id);
             $categories->delete();
 
             return redirect()->back()->with('success', 'Kategori berhasil dihapus.');

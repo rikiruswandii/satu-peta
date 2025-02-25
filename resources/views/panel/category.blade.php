@@ -48,7 +48,8 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Kategori</th></th>
+                                        <th>Kategori</th>
+                                        <th>Tipe</th>
                                         <th>Diperbarui</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -67,7 +68,7 @@
     @section('modal')
         <x-modal :id="'editGroupModal'" :data="$modalEdit">
             <x-slot name="body">
-                <form id="editGroupForm" method="POST" action="{{ route('datasets.update') }}"
+                <form id="editGroupForm" method="POST" action="{{ route('category.update') }}"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="row g-gs">
@@ -88,6 +89,26 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="category_type">Kategori <span
+                                        class="text-danger">*</span></label>
+                                <div class="form-control-wrap">
+                                    <select class="form-select js-select2 @error('category_type') is-invalid @enderror"
+                                        data-search="on" data-dropdown-parent="#editGroupModal" name="category_type"
+                                        id="category_type">
+                                        <option value="Pilih Tipe">Pilih Tipe</option>
+                                        <option value="map">Peta</option>
+                                        <option value="article">Artikel</option>
+                                    </select>
+                                </div>
+                                @error('category_type')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </form>
             </x-slot>
@@ -95,7 +116,7 @@
 
         <x-modal :id="'addSectorModal'" :data="$modalTambahSector">
             <x-slot name="body">
-                <form id="addSectorForm" method="POST" action="{{ route('datasets.store') }}">
+                <form id="addSectorForm" method="POST" action="{{ route('category.store') }}">
                     @csrf
                     <div class="row g-gs">
                         <div class="col-md-12">
@@ -114,6 +135,26 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="category_type_edit">Kategori <span
+                                        class="text-danger">*</span></label>
+                                <div class="form-control-wrap">
+                                    <select class="form-select js-select2 @error('category_type') is-invalid @enderror"
+                                        data-search="on" data-dropdown-parent="#addSectorModal" name="category_type"
+                                        id="category_type_edit">
+                                        <option value="Pilih Tipe">Pilih Tipe</option>
+                                        <option value="map">Peta</option>
+                                        <option value="article">Artikel</option>
+                                    </select>
+                                </div>
+                                @error('category_type')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </form>
             </x-slot>
@@ -129,7 +170,7 @@
                 $r('#datasets-table').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: "{{ route('datasets.datatable') }}",
+                    ajax: "{{ route('category.datatable') }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -138,8 +179,12 @@
                             className: 'text-center'
                         },
                         {
-                            data: 'name',
-                            name: 'name'
+                            data: 'tags',
+                            name: 'tags'
+                        },
+                        {
+                            data: 'type',
+                            name: 'type'
                         },
                         {
                             data: 'updated_at',
@@ -174,11 +219,13 @@
             $r(document).on('click', '[data-bs-target="#editGroupModal"]', function() {
                 var id = $r(this).data('id');
                 var name = $r(this).data('name');
+                var category_type = $r(this).data('type');
 
                 var modal = $r('#editGroupModal');
 
                 modal.find('input[name="id"]').val(id);
                 modal.find('input[name="name"]').val(name);
+                modal.find('select[name="category_type"]').val(category_type).trigger('change');
             });
         </script>
     @endpush

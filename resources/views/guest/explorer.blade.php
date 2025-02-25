@@ -32,7 +32,8 @@
             <x-slot name="body">
                 <div class="p-2 d-flex justify-content-center align-items-center">
                     <input class="border-0 p-1 rounded-start" type="text" name="search-dataset" id="search-dataset"
-                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cari Layer"><i
+                        placeholder="cari.."><button class="border-0 p-1 rounded-end" type="button" id="search-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cari Layer"><i
                             class="bi bi-search text-success ms-1"></i></button>
                 </div>
                 <div class="mt-1 row p-2 overflow-x-auto body-dataset" style="max-height: 370px; scrollbar-width: none;">
@@ -43,8 +44,15 @@
                     <div class="col-12 text-success text-sm">
                         <div class="accordion" id="accordionExample">
                             @if ($data->isNotEmpty())
-                                <div class="accordion" id="accordionExample">
-                                    @foreach ($data as $index => $regionalAgency)
+                                @foreach ($data as $index => $regionalAgency)
+                                    @php
+                                        // Filter peta yang memiliki dokumen
+                                        $mapsWithDocuments = $regionalAgency->map->filter(function ($map) {
+                                            return $map->documents->isNotEmpty();
+                                        });
+                                    @endphp
+
+                                    @if ($mapsWithDocuments->isNotEmpty())
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading{{ $index }}">
                                                 <button class="accordion-button collapsed text-success" type="button"
@@ -59,7 +67,7 @@
                                                 data-bs-parent="#accordionExample">
                                                 <div class="accordion-body">
                                                     <ul class="list-group overflow-y-auto">
-                                                        @foreach ($regionalAgency->map as $map)
+                                                        @foreach ($mapsWithDocuments as $map)
                                                             @foreach ($map->documents as $document)
                                                                 <li class="list-group-item">
                                                                     <a href="javascript:void(0);" id="activateLayerButton"
@@ -76,14 +84,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    @endif
+                                @endforeach
                             @else
                                 <div class="alert alert-warning text-center">
                                     <i class="bi bi-exclamation-triangle-fill"></i> Data tidak tersedia.
                                 </div>
                             @endif
-
                         </div>
                     </div>
                 </div>

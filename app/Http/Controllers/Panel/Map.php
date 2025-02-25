@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Map as ModelMap;
 use App\Models\RegionalAgency;
-use App\Models\Sector;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +13,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Spatie\Tags\Tag;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -22,7 +22,7 @@ class Map extends Controller
     public function index(): View
     {
         $regional_agencies = RegionalAgency::all();
-        $sectors = Sector::all();
+        $sectors = Tag::where('type', 'map')->get();
         $count = ModelMap::count();
         $title = 'Peta';
         $prefix = 'maps';
@@ -35,12 +35,15 @@ class Map extends Controller
     {
         if ($request->ajax()) {
             try {
-                $data = ModelMap::with('regional_agency', 'sector', 'documents')->latest()->get();
+                $data = ModelMap::with('regional_agency', 'tags', 'documents')->latest()->get();
 
                 return DataTables::of($data)
                     ->addIndexColumn()
                     ->editColumn('updated_at', function ($row) {
                         return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('tags', function ($article) {
+                        return $article->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ');
                     })
                     ->addColumn('download', function ($row) {
                         if ($row->documents->isNotEmpty()) {
@@ -70,7 +73,7 @@ class Map extends Controller
                             $detailLinks .= '<li><a href="javascript:void(0);" data-bs-toggle="modal"
                                             data-bs-target="#detailMapModal"
                                             data-regional-agency="'.optional($row->regional_agency)->name.'"
-                                            data-sector="'.optional($row->sector)->name.'"
+                                            data-sector="'.optional($row->tags)->pluck('name')->first().'"
                                             data-geojson="'.Storage::url($document->path).'"
                                             data-name="'.$row->name.'"
                                             data-id="'.$row->id.'">
@@ -89,7 +92,7 @@ class Map extends Controller
                                     <li><a href="javascript:void(0);" data-bs-toggle="modal"
                                             data-bs-target="#editMapModal"
                                             data-regional-agency="'.optional($row->regional_agency)->id.'"
-                                            data-sector="'.optional($row->sector)->id.'"
+                                            data-sector="'.optional($row->tags)->pluck('name')->first().'"
                                             data-name="'.$row->name.'"
                                             data-id="'.Crypt::encrypt($row->id).'">
                                             <em class="icon ni ni-edit"></em><span>Edit</span>
@@ -110,7 +113,7 @@ class Map extends Controller
                             </div>
                         </div>';
                     })
-                    ->rawColumns(['action', 'download', 'checkbox'])
+                    ->rawColumns(['action', 'download', 'checkbox', 'tags'])
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
@@ -129,7 +132,7 @@ class Map extends Controller
             'user_id' => 'required|exists:users,id',
             'can_download' => 'boolean',
             'regional_agency_id' => 'required|exists:regional_agencies,id',
-            'sector_id' => 'required|exists:sectors,id',
+            'tag' => 'required|string',
             'name' => 'required|string|max:80',
             'file' => 'required|string',
         ]);
@@ -196,14 +199,13 @@ class Map extends Controller
                     'user_id' => $request->user_id,
                     'can_download' => $request->boolean('can_download') ? 1 : 0,
                     'regional_agency_id' => $request->regional_agency_id,
-                    'sector_id' => $request->sector_id,
                     'name' => $request->name,
                     'slug' => Str::slug($request->name),
                     'latitude' => json_encode([$coordinates['latitude']]),
                     'longitude' => json_encode([$coordinates['longitude']]),
                 ]);
                 \Log::info("Peta berhasil dibuat dengan ID: {$data->id}");
-
+                $data->attachTag($request->tag, 'map');
                 // Menyimpan informasi file GeoJSON dalam tabel Document
                 Document::create([
                     'name' => $fileInfo['basename'],
@@ -289,8 +291,9 @@ class Map extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'regional_agency_id' => 'required|exists:regional_agencies,id',
-            'sector_id' => 'required|exists:sectors,id',
+            'tag' => 'required|string',
             'name' => 'required|string|max:80',
+            'file' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -343,7 +346,7 @@ class Map extends Controller
                         'mime_type' => mime_content_type($fullpath),
                         'size' => filesize($fullpath),
                     ]);
-                    \Illuminate\Support\Facades\Log::info('ditemukan');
+                    \Illuminate\Support\Facades\Log::info('Dokumen lama ditemukan dan diperbarui.');
                 } else {
                     // Jika tidak ada dokumen, buat baru
                     Document::create([
@@ -356,12 +359,8 @@ class Map extends Controller
                         'mime_type' => mime_content_type($fullpath),
                         'size' => filesize($fullpath),
                     ]);
-                    \Illuminate\Support\Facades\Log::info('tidak ditemukan');
+                    \Illuminate\Support\Facades\Log::info('Dokumen baru dibuat.');
                 }
-
-                $data->slug = Str::slug($request->name);
-
-                $data->fill($request->only(['user_id', 'regional_agency_id', 'sector_id', 'name']));
 
                 // Extract GeoJSON coordinates
                 $geojsonContent = file_get_contents($fullpath);
@@ -375,7 +374,7 @@ class Map extends Controller
 
                 // Mengambil koordinat dari GeoJSON
                 $coordinates = $this->extractCoordinates($geojsonData);
-                \Illuminate\Support\Facades\Log::info('Extracted Coordinates:', $coordinates);
+                \Illuminate\Support\Facades\Log::info('Koordinat yang diekstrak:', $coordinates);
 
                 if (empty($coordinates['latitude']) || empty($coordinates['longitude'])) {
                     \Illuminate\Support\Facades\Log::error('Koordinat tidak valid dalam file GeoJSON.');
@@ -386,26 +385,23 @@ class Map extends Controller
                 // Update latitude dan longitude sebagai array dua dimensi
                 $data->latitude = json_encode([$coordinates['latitude']]);
                 $data->longitude = json_encode([$coordinates['longitude']]);
-
-                // Simpan perubahan
-                $data->save();
-
-                \Illuminate\Support\Facades\Log::info('Peta berhasil diperbarui.');
-
-                return redirect()->back()->with('success', 'Peta berhasil diperbarui.');
-            } else {
-                \Illuminate\Support\Facades\Log::warning('File tidak ditemukan dalam request.');
             }
-        } catch (\Exception $e) {
 
+            $data->slug = Str::slug($request->name);
+            $data->fill($request->only(['user_id', 'regional_agency_id', 'name']));
+            $data->syncTags($request->tag, 'map');
+
+            // Simpan perubahan
+            $data->save();
+
+            \Illuminate\Support\Facades\Log::info('Peta berhasil diperbarui.');
+
+            return redirect()->back()->with('success', 'Peta berhasil diperbarui.');
+        } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Gagal memperbarui peta', ['error' => $e->getMessage()]);
 
             return redirect()->back()->with('error', 'Gagal memperbarui peta: '.$e->getMessage());
         }
-
-        \Illuminate\Support\Facades\Log::error('Permintaan tidak valid: File harus diunggah.');
-
-        return redirect()->back()->with('error', 'File harus diunggah.');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -426,8 +422,13 @@ class Map extends Controller
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
             }
 
-            // Cari maps beserta dokumen terkait
-            $maps = ModelMap::with('documents')->findOrFail($id);
+            // Cari maps beserta dokumen dan tags terkait
+            $maps = ModelMap::with(['documents', 'tags'])->findOrFail($id);
+
+            // Hapus hubungan tag terlebih dahulu
+            if ($maps->tags()->exists()) {
+                $maps->tags()->detach();
+            }
 
             // Hapus dokumen jika ada
             if ($maps->documents->isNotEmpty()) {
