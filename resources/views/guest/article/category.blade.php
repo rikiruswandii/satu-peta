@@ -21,7 +21,7 @@
                         <!-- Widget -->
                         <div class="single-widget-area mb-4 mb-lg-5">
                             <!-- Search Form-->
-                            <form class="widget-form" action="{{ route('article.category', ['category_slug'=>$data['category']->slug]) }}" method="get">
+                            <form class="widget-form" action="{{ route('article.category', ['tag'=>$data['category']->slug]) }}" method="get">
                                 <!-- Label dan Input Pencarian -->
                                 <div class="input-group mb-3">
                                     <input type="search" name="search" class="form-control"
@@ -40,9 +40,9 @@
                             <ul class="catagories-list ps-0 list-unstyled">
                                 @foreach ($data['categories'] as $category)
                                     <li>
-                                        <a href="{{ route('article.category', ['category_slug'=>$category->slug]) }}">
+                                        <a href="{{ route('article.category', ['tag'=>$category->slug]) }}">
                                             <i class="bi bi-caret-right"></i>{{ $category->name }}
-                                            <span class="text-warning ms-2">({{ $category->artikel->count() }})</span>
+                                            <span class="text-warning ms-2">({{ $category->articles_count }})</span>
                                         </a>
                                     </li>
                                 @endforeach

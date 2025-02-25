@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article as ModelsArticle;
-use App\Models\Category;
 use App\Models\Document;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +19,7 @@ class Article extends Controller
 {
     public function index(): View
     {
-        $categories = Category::all();
+        $categories = Tag::where('type', 'article')->get();
         $count = ModelsArticle::count();
         $title = 'Artikel';
         $prefix = 'articles';
@@ -160,7 +159,7 @@ class Article extends Controller
                     'slug' => Str::slug($request->title),
                 ]);
                 \Log::info("Artikel berhasil dibuat dengan ID: {$data->id}");
-                $data->syncTags([$request->tag]);
+                $data->attachTag($request->tag, 'article');
 
                 // Simpan data file ke tabel documents
                 Document::create([
@@ -302,7 +301,7 @@ class Article extends Controller
                 $data->fill($request->only(keys: ['user_id', 'title', 'content']))->save();
                 \Log::info("File berhasil disimpan dalam database dengan path: $newFilePath");
 
-                $data->syncTags($request->tag);
+                $data->syncTags($request->tag, 'article');
 
                 return redirect()->back()->with('success', 'Artikel berhasil dibuat.');
             } else {

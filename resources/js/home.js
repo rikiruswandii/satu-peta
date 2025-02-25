@@ -1,94 +1,62 @@
 var $jq = jQuery.noConflict();
-            $jq(document).ready(function() {
-                $jq('#dropdownTrigger').on('click', function(event) {
-                    event.stopPropagation();
+$jq(document).ready(function() {
+$jq('#dropdownTrigger').on('click', function(event) {
+event.stopPropagation();
 
-                    let dropdownMenu = $jq('#dropdownMenu');
-                    let extraOptions = $jq('#extraOptions');
-                    let inputSearch = $jq('#input-search');
+let dropdownMenu = $jq('#dropdownMenu');
+let extraOptions = $jq('#extraOptions');
+let inputSearch = $jq('#input-search');
 
-                    $jq('#app-name').toggleClass('d-none').toggleClass('d-block');
+$jq('#app-name').toggleClass('d-none').toggleClass('d-block');
 
-                    // Toggle kelas d-block untuk dropdown dan extraOptions
-                    dropdownMenu.toggleClass('d-none').toggleClass('d-block');
-                    extraOptions.toggleClass('d-none').toggleClass('d-block');
-                    inputSearch.toggleClass('expanded');
-                });
+// Toggle kelas d-block untuk dropdown dan extraOptions
+dropdownMenu.toggleClass('d-none').toggleClass('d-block');
+extraOptions.toggleClass('d-none').toggleClass('d-block');
+inputSearch.toggleClass('expanded');
+});
 
-                $jq('.select2').select2({
-                    width: '100%',
-                    theme: 'bootstrap-5'
-                });
+$jq('.select2').select2({
+width: '100%',
+theme: 'bootstrap-5'
+});
 
-                initMap('searchMapId', '', {
-                    scale: true,
-                    fullScreen: true
-                }, {});
-            });
+initMap('searchMapId', '', {
+scale: true,
+fullScreen: true
+}, {});
+});
 am5.ready(function () {
-    // Create root element
+    // Membuat root elemen
     var root = am5.Root.new("chartdiv");
 
-    // Set themes
+    // Mengatur tema
     root.setThemes([am5themes_Animated.new(root)]);
 
-    // Create chart
-    var chart = root.container.children.push(am5percent.PieChart.new(root, {
-        startAngle: 180,
-        endAngle: 360,
-        layout: root.verticalLayout,
-        innerRadius: am5.percent(50)
+    // Membuat container
+    var container = root.container.children.push(am5.Container.new(root, {
+        width: am5.percent(100),
+        height: am5.percent(100),
+        layout: root.verticalLayout
     }));
 
-    // Create series
-    var series = chart.series.push(am5percent.PieSeries.new(root, {
-        startAngle: 180,
-        endAngle: 360,
+    // Membuat seri Force-Directed
+    var series = container.children.push(am5hierarchy.ForceDirected.new(root, {
+        singleBranchOnly: false,
+        downDepth: 1,
+        initialDepth: 1, // Mengatur kedalaman awal tampilan
         valueField: "value",
-        categoryField: "category",
-        alignLabels: true
+        categoryField: "name",
+        childDataField: "children",
+        centerStrength: 0.5,
+        minRadius: 20,  // Ukuran terkecil untuk anak
+        maxRadius: 80,  // Ukuran terbesar untuk induk
+        nodePadding: 10
     }));
 
-    series.states.create("hidden", {
-        startAngle: 180,
-        endAngle: 180
-    });
+    // Mengatur data ke dalam seri
+    series.data.setAll([chartData]);
 
-    series.slices.template.setAll({
-        cornerRadius: 5
-    });
-
-    series.ticks.template.setAll({
-        forceHidden: false
-    });
-
-    // Create legend
-    var legend = chart.children.push(am5.Legend.new(root, {
-        centerX: am5.percent(50),
-        x: am5.percent(50),
-        marginTop: 15,
-        marginBottom: 15
-    }));
-
-    legend.labels.template.setAll({
-        fontSize: 14
-    });
-
-    // Set data dari backend
-    var chartData = categories.map(function (category) {
-        return {
-            value: category.map.length,  // Sesuaikan dengan jumlah terkait
-            category: category.name
-        };
-    }).filter(item => item.value > 0); // Hanya gunakan kategori dengan nilai lebih dari 0
-
-    if (chartData.length === 0) {
-        chartData.push({ value: 1, category: "Tidak Ada Data" });
-    }
-
-    series.data.setAll(chartData);
-    legend.data.setAll(series.dataItems); // Pastikan legend mendapatkan data dari series
-
+    // Animasi muncul
     series.appear(1000, 100);
 });
 

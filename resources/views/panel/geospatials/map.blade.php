@@ -149,11 +149,11 @@
                                         class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
                                     <select class="form-select js-select2 @error('sector_id') is-invalid @enderror"
-                                        data-search="on" data-dropdown-parent="#addMapModal" name="sector_id"
+                                        data-search="on" data-dropdown-parent="#addMapModal" name="tag"
                                         id="sector_id">
-                                        <option value="Pilih Hak Akses" disabled>Pilih Kategori</option>
+                                        <option value="Pilih Kategori" disabled>Pilih Kategori</option>
                                         @foreach ($sectors as $d)
-                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            <option value="{{ $d->name }}">{{ $d->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -214,7 +214,7 @@
                                 <span>Masukkan file JSON/geoJSON disini.</span>
                                 <div class="form-control-wrap">
                                     <input type="file" class="filepond @error('file') is-invalid @enderror"
-                                        name="file" id="edit-file" accept="application/json" required>
+                                        name="file" id="edit-file" accept="application/json">
                                     @error('file')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -251,11 +251,11 @@
                                         class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
                                     <select class="form-select js-select2 @error('sector_id') is-invalid @enderror"
-                                        data-search="on" data-dropdown-parent="#editMapModal" name="sector_id"
+                                        data-search="on" data-dropdown-parent="#editMapModal" name="tag"
                                         id="edit_sector_id">
                                         <option value="Pilih Hak Akses" disabled>Pilih Kategori</option>
                                         @foreach ($sectors as $d)
-                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            <option value="{{ $d->name }}">{{ $d->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -373,8 +373,8 @@
                             name: 'regional_agency.name'
                         },
                         {
-                            data: 'sector.name',
-                            name: 'sector.name'
+                            data: 'tags',
+                            name: 'tags'
                         },
                         {
                             data: 'download',
@@ -443,10 +443,9 @@
 
                 modal.find('input[name="id"]').val(id);
                 modal.find('input[name="name"]').val(name);
-                modal.find('select[name="sector_id"]').val(sector).trigger('change');
+                modal.find('select[name="tag"]').val(sector[0]).trigger('change');
                 modal.find('select[name="regional_agency_id"]').val(regional_agency).trigger('change');
             });
-
 
             $r(document).on('click', '[data-bs-target="#detailMapModal"]', function() {
                 var currentMap = null;

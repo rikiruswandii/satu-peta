@@ -9,7 +9,7 @@ class Explorer extends Controller
 {
     public function index()
     {
-        $data = RegionalAgency::with('map.sector', 'map.documents')
+        $data = RegionalAgency::with('map.tags', 'map.documents')
             ->latest()
             ->get();
         $title = env('APP_NAME', 'Satu Peta Purwakarta');

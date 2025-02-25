@@ -117,20 +117,21 @@
                         <div class="single-widget-area mb-4 mb-lg-5">
                             <h5 class="widget-title mb-30">Kategori</h5>
                             <ul class="catagories-list ps-0 list-unstyled">
-                                @foreach ($categories as $category)
+                                @foreach ($categories as $tag)
                                     <li>
-                                        <a href="{{ route('article.category', ['category_slug'=>$category->slug]) }}">
-                                            <i class="bi bi-caret-right"></i>{{ $category->name }}
-                                            <span class="text-warning ms-2">({{ $category->artikel->count() }})</span>
+                                        <a href="{{ route('article.category', ['tag' => $tag->slug]) }}">
+                                            <i class="bi bi-caret-right"></i>{{ $tag->name }}
+                                            <span class="text-warning ms-2">({{ $tag->articles_count }})</span>
                                         </a>
                                     </li>
                                 @endforeach
                             </ul>
                         </div>
+
                         <!-- Widget untuk artikel terbaru -->
                         <div class="single-widget-area mb-4 mb-lg-5">
                             <h4 class="widget-title mb-30">Terbaru</h4>
-                            @foreach ($latest_article as $article)
+                            @forelse($latest_article as $article)
                                 <div class="single-recent-post d-flex align-items-center">
                                     <div class="post-thumb">
                                         <!-- Menggunakan dokumen terkait sebagai gambar thumbnail -->
@@ -163,7 +164,13 @@
                                         <p class="post-date">{{ $article->created_at->format('M d, Y') }}</p>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+                                <!-- SVG image -->
+                                <div class="text-left mb-4">
+                                    <img src="{{ asset('images/undraw_news_nz1p.svg') }}" alt=""
+                                        class="d-block  w-25 h-auto">
+                                </div>
+                            @endforelse
                         </div>
 
                     </div>

@@ -6,8 +6,8 @@ use App\Http\Controllers\Guest\Explorer;
 use App\Http\Controllers\Guest\Home;
 use App\Http\Controllers\Guest\Search;
 use App\Http\Controllers\Panel\Article;
+use App\Http\Controllers\Panel\Category;
 use App\Http\Controllers\Panel\Dashboard;
-use App\Http\Controllers\Panel\DatasetsCategory;
 use App\Http\Controllers\Panel\Grup;
 use App\Http\Controllers\Panel\Map;
 use App\Http\Controllers\Panel\User\Detail;
@@ -22,7 +22,7 @@ Route::get('/search', [Search::class, 'index'])->name('search');
 Route::get('/get-maps-by-viewport', [Search::class, 'getMapsByViewport'])->name('get-maps-by-viewport');
 Route::get('article/list', [GuestArticle::class, 'index'])->name('article.list');
 Route::get('article/detail/{article_slug}', [GuestArticle::class, 'show'])->name('article.show');
-Route::get('article/category/{category_slug}', [GuestArticle::class, 'category'])->name('article.category');
+Route::get('article/category/{tag}', [GuestArticle::class, 'category'])->name('article.category');
 
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
@@ -95,12 +95,12 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
         });
 
         // dataset categories
-        Route::prefix('datasets')->group(function () {
-            Route::get('/', [DatasetsCategory::class, 'index'])->name('datasets');
-            Route::get('/datatable', [DatasetsCategory::class, 'datatable'])->name('datasets.datatable');
-            Route::post('/store', [DatasetsCategory::class, 'store'])->name('datasets.store');
-            Route::post('/update', [DatasetsCategory::class, 'update'])->name('datasets.update');
-            Route::delete('/destroy', [DatasetsCategory::class, 'destroy'])->name('datasets.destroy');
+        Route::prefix('category')->group(function () {
+            Route::get('/', [Category::class, 'index'])->name('category');
+            Route::get('/datatable', [Category::class, 'datatable'])->name('category.datatable');
+            Route::post('/store', [Category::class, 'store'])->name('category.store');
+            Route::post('/update', [Category::class, 'update'])->name('category.update');
+            Route::delete('/destroy', [Category::class, 'destroy'])->name('category.destroy');
         });
     }
 );

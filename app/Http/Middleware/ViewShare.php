@@ -95,10 +95,10 @@ class ViewShare
                     'is_active' => request()->routeIs('groups'),
                 ],
                 [
-                    'route' => 'datasets',
+                    'route' => 'category',
                     'icon' => 'ni ni-grid-fill',
                     'text' => 'Kategori',
-                    'is_active' => request()->routeIs('datasets'),
+                    'is_active' => request()->routeIs('category'),
                 ],
             ],
             'Kelola' => [

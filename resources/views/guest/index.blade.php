@@ -39,16 +39,16 @@
 
                                     <!-- Pilihan Dataset & Instansi (Hidden by Default) -->
                                     <div id="extraOptions" class="d-flex w-100 d-none">
-                                        <select name="sector" class="form-select select2 form-control">
-                                            <option value="" selected disabled>Semua Kategori</option>
+                                        <select name="sector" class="form-select select2 form-control" id="selectS">
+                                            <option value="" selected>Semua Kategori</option>
                                             @foreach ($categories as $sector)
-                                                <option value="{{ $sector->name }}">{{ $sector->name }}</option>
+                                                <option value="{{ $sector['name'] }}">{{ $sector['name'] }}</option>
                                             @endforeach
                                         </select>
-                                        <select name="regional_agencies" class="form-select select2 form-control">
-                                            <option value="" disabled selected>Semua Instansi</option>
+                                        <select name="regional_agencies" class="form-select select2 form-control" id="selectI">
+                                            <option value="" selected>Semua Instansi</option>
                                             @foreach ($groups as $group)
-                                                <option value="{{ $group->name }}">{{ $group->name }}</option>
+                                                <option value="{{ $group->slug }}">{{ $group->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -93,7 +93,7 @@
             <div class="row g-3">
                 @forelse ($maps as $map)
                     <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 my-4'" :card_id="$map->id" :card_title="$map->name"
-                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->sector->name" />
+                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
                 @empty
                     <!-- SVG image -->
                     <div class="text-center mb-4">
@@ -266,10 +266,10 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
         <!-- Resources -->
         <script>
-            var categories = @json($categories);
+            var chartData = @json($chartData);
         </script>
         <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-        <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+        <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
         <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
         @vite(['resources/js/search.js', 'resources/js/home.js'])
     @endpush
