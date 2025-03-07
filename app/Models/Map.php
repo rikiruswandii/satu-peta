@@ -20,8 +20,6 @@ class Map extends Model
 
     protected static $logAttributes = ['user_id', 'name'];
 
-    protected $with = ['sector'];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

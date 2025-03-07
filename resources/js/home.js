@@ -43,20 +43,52 @@ am5.ready(function () {
     var series = container.children.push(am5hierarchy.ForceDirected.new(root, {
         singleBranchOnly: false,
         downDepth: 1,
-        initialDepth: 1, // Mengatur kedalaman awal tampilan
+        initialDepth: 5,
+        nodePadding: 20,
         valueField: "value",
         categoryField: "name",
         childDataField: "children",
-        centerStrength: 0.5,
-        minRadius: 20,  // Ukuran terkecil untuk anak
-        maxRadius: 80,  // Ukuran terbesar untuk induk
-        nodePadding: 10
+        minRadius: 30, // Atur ukuran minimal node agar level 1 tidak terlalu kecil
+    maxRadius: 80, // Pastikan level 1 lebih besar
     }));
+
+    series.linkBullets.push(function (root, source, target) {
+        const bullet = am5.Bullet.new(root, {
+            locationX: 0.5,
+            autoRotate: true,
+            autoRotateAngle: 180,
+            sprite: am5.Graphics.new(root, {
+                fill: source.get("fill"),
+                centerY: am5.percent(50),
+                centerX: am5.percent(50),
+                draw: function (display) {
+                    display.moveTo(0, -6);
+                    display.lineTo(16, 0);
+                    display.lineTo(0, 6);
+                    display.lineTo(3, 0);
+                    display.lineTo(0, -6);
+                }
+            })
+        });
+
+        bullet.animate({
+            key: "locationX",
+            to: -0.1,
+            from: 1.1,
+            duration: Math.random() * 500 + 1000,
+            loops: Infinity,
+            easing: am5.ease.quad
+        });
+
+        return bullet;
+    });
+
+    series.labels.template.set("minScale", 0);
 
     // Mengatur data ke dalam seri
     series.data.setAll([chartData]);
 
-    // Animasi muncul
+    // Make stuff animate on load
     series.appear(1000, 100);
 });
 

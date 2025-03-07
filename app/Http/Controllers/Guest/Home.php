@@ -28,18 +28,15 @@ class Home extends Controller
 
         $chartData = [
             'name' => 'Dataset',
-            'value' => $total_maps,
             'children' => [
                 [
                     'name' => 'Instansi',
-                    'value' => $groups->sum(function ($group) {
-                        return Map::where('regional_agency_id', $group->id)->count();
-                    }),
+                    'level' => 1,
                     'expanded' => false,
                     'children' => $groups->map(function ($group) {
                         $maps_count = Map::where('regional_agency_id', $group->id)->count();
 
-                        return $maps_count > 0 ? [ // Hanya tambahkan jika memiliki nilai
+                        return $maps_count > 0 ? [
                             'name' => $group->name,
                             'value' => $maps_count,
                         ] : null;
@@ -47,13 +44,11 @@ class Home extends Controller
                 ],
                 [
                     'name' => 'Kategori',
-                    'value' => $categories->sum(function ($tag) {
-                        return Map::withAnyTags([$tag->name], 'map')->count();
-                    }),
+                    'level' => 1,
                     'children' => $categories->map(function ($tag) {
                         $tag_count = Map::withAnyTags([$tag->name], 'map')->count();
 
-                        return $tag_count > 0 ? [ // Hanya tambahkan jika memiliki nilai
+                        return $tag_count > 0 ? [
                             'name' => $tag->getTranslation('name', 'id'),
                             'value' => $tag_count,
                         ] : null;
@@ -61,6 +56,11 @@ class Home extends Controller
                 ],
             ],
         ];
+
+        // Menambahkan nilai 'value' pada level 1 berdasarkan jumlah dari children-nya
+        foreach ($chartData['children'] as &$child) {
+            $child['value'] = array_sum(array_column($child['children'], 'value'));
+        }
 
         $news = Article::with('tags', 'documents')->latest()->take(3)->get();
 
