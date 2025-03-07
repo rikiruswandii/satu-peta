@@ -585,7 +585,7 @@ ol li {
   z-index: 9999;
   width: 1.5rem;
   height: 1.5rem;
-  background-color: #000;
+  background-color: #FFC107;
   font-size: 1rem;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -597,7 +597,7 @@ ol li {
       -ms-flex-pack: center;
           justify-content: center;
   border-radius: 0.25rem;
-  color: #ffffff;
+  color: #007052;
   cursor: pointer;
   -webkit-transform: translateY(100px);
           transform: translateY(100px);
