@@ -434,9 +434,6 @@
                 });
             });
 
-
-
-
             $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var id = $r(this).data('id');
                 $r('#deleteMapModal').find('input[name="id"]').val(id);

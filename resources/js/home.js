@@ -60,3 +60,12 @@ am5.ready(function () {
     series.appear(1000, 100);
 });
 
+$jq(document).ready(function () {
+    $jq('.partner-logo-action').click(function () {
+        console.log('Tombol diklik!'); // Debugging
+
+        // Cari form terdekat dan submit
+        $jq(this).closest('.search-form').submit();
+    });
+});
+

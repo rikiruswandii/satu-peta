@@ -45,7 +45,8 @@
                                                 <option value="{{ $sector['name'] }}">{{ $sector['name'] }}</option>
                                             @endforeach
                                         </select>
-                                        <select name="regional_agencies" class="form-select select2 form-control" id="selectI">
+                                        <select name="regional_agencies" class="form-select select2 form-control"
+                                            id="selectI">
                                             <option value="" selected>Semua Instansi</option>
                                             @foreach ($groups as $group)
                                                 <option value="{{ $group->slug }}">{{ $group->name }}</option>
@@ -93,7 +94,7 @@
             <div class="row g-3">
                 @forelse ($maps as $map)
                     <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 my-4'" :card_id="$map->id" :card_title="$map->name"
-                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
+                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->tags->map(fn($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
                 @empty
                     <!-- SVG image -->
                     <div class="text-center mb-4">
@@ -140,18 +141,22 @@
                                 <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                                     <div class="row">
                                         @foreach ($opdChunk as $partner)
-                                            <div class="col-2 text-center">
-                                                <div class="partner-logo">
+                                            <form class="col-2 text-center search-form" action="{{ route('search') }}"
+                                                method="GET">
+                                                <div class="partner-logo partner-logo-action">
                                                     <img src="{{ asset('assets/images/logo.png') }}" alt=""
                                                         class="img-fluid" style="width:80px;height:85px;">
                                                     <p class="mt-2">{{ $partner->name }}</p>
                                                 </div>
-                                            </div>
+                                                <input type="hidden" name="regional_agencies"
+                                                    value="{{ $partner->slug }}">
+                                            </form>
                                         @endforeach
                                     </div>
                                 </div>
                             @endforeach
                         </div>
+
 
                         <!-- Tombol Navigasi -->
                         <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel"

@@ -39,11 +39,6 @@ class Map extends Model
         return $this->belongsTo(RegionalAgency::class);
     }
 
-    public function sector(): BelongsTo
-    {
-        return $this->belongsTo(Sector::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
