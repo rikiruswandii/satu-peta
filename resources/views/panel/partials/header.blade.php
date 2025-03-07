@@ -88,7 +88,7 @@
                                                 class="icon ni ni-user-alt"></em><span>Lihat
                                                 Profile</span></a></li>
                                     <li><a href="{{ route('user.log', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
-                                                class="icon ni ni-activity-alt"></em><span>Aktifitas</span></a></li>
+                                                class="icon ni ni-activity-alt"></em><span>Aktivitas</span></a></li>
                                     {{-- <li><a class="dark-switch" href="#"><em
                                                 class="icon ni ni-moon"></em><span>Dark Mode</span></a>
                                     </li> --}}
@@ -97,8 +97,7 @@
                             <div class="dropdown-inner">
                                 <ul class="link-list">
                                     <li><a onclick="document.getElementById('logoutAction').submit();"
-                                            class="px-1 cursor-pointer"><em class="icon ni ni-signout"></em><span>Sign
-                                                out</span></a></li>
+                                            class="px-1 cursor-pointer"><em class="icon ni ni-signout"></em><span>Keluar</span></a></li>
                                     <li>
                                         <form id="logoutAction" method="post" action="{{ route('logout') }}">@csrf
                                         </form>
