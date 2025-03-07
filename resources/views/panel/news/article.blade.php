@@ -79,7 +79,7 @@
                             name: 'title'
                         },
                         {
-                            data: 'tags', 
+                            data: 'tags',
                             name: 'tags'
                         },
                         {
@@ -102,7 +102,21 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
                 });
             });
 
