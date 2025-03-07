@@ -28,36 +28,36 @@ class Home extends Controller
 
         $chartData = [
             'name' => 'Dataset',
-            'value' => $total_maps, // Induk (paling besar)
+            'value' => $total_maps,
             'children' => [
                 [
                     'name' => 'Instansi',
                     'value' => $groups->sum(function ($group) {
                         return Map::where('regional_agency_id', $group->id)->count();
-                    }), // Jumlah total map yang terkait dengan semua instansi
+                    }),
                     'expanded' => false,
                     'children' => $groups->map(function ($group) {
                         $maps_count = Map::where('regional_agency_id', $group->id)->count();
 
-                        return [
+                        return $maps_count > 0 ? [ // Hanya tambahkan jika memiliki nilai
                             'name' => $group->name,
-                            'value' => $maps_count, // Jumlah map yang terkait dengan instansi ini
-                        ];
-                    })->toArray(),
+                            'value' => $maps_count,
+                        ] : null;
+                    })->filter()->values()->toArray(), // Filter data yang NULL
                 ],
                 [
                     'name' => 'Kategori',
                     'value' => $categories->sum(function ($tag) {
                         return Map::withAnyTags([$tag->name], 'map')->count();
-                    }), // Jumlah total map yang terkait dengan semua kategori
+                    }),
                     'children' => $categories->map(function ($tag) {
                         $tag_count = Map::withAnyTags([$tag->name], 'map')->count();
 
-                        return [
+                        return $tag_count > 0 ? [ // Hanya tambahkan jika memiliki nilai
                             'name' => $tag->getTranslation('name', 'id'),
-                            'value' => $tag_count, // Jumlah map yang terkait dengan kategori ini
-                        ];
-                    })->toArray(),
+                            'value' => $tag_count,
+                        ] : null;
+                    })->filter()->values()->toArray(), // Filter data yang NULL
                 ],
             ],
         ];
