@@ -85,11 +85,10 @@
                                                 Website</span></a></li>
                                     <li><a
                                             href="{{ route('user.detail', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
-                                                class="icon ni ni-user-alt"></em><span>View
+                                                class="icon ni ni-user-alt"></em><span>Lihat
                                                 Profile</span></a></li>
                                     <li><a href="{{ route('user.log', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
-                                                class="icon ni ni-activity-alt"></em><span>Login
-                                                Activity</span></a></li>
+                                                class="icon ni ni-activity-alt"></em><span>Aktifitas</span></a></li>
                                     {{-- <li><a class="dark-switch" href="#"><em
                                                 class="icon ni ni-moon"></em><span>Dark Mode</span></a>
                                     </li> --}}
