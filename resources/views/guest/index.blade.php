@@ -135,40 +135,36 @@
                     <h2><i class="bi bi-buildings-fill me-2"></i>Instansi</h2> <!-- Tambahkan judul di sini -->
                 </div>
                 <div class="col-12">
-                    <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            @foreach ($groups->chunk(6) as $index => $opdChunk)
-                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                    <div class="row">
-                                        @foreach ($opdChunk as $partner)
-                                            <form class="col-2 text-center search-form" action="{{ route('search') }}"
-                                                method="GET">
-                                                <div class="partner-logo partner-logo-action">
-                                                    <img src="{{ asset('assets/images/logo.png') }}" alt=""
-                                                        class="img-fluid" style="width:80px;height:85px;">
-                                                    <p class="mt-2">{{ $partner->name }}</p>
-                                                </div>
-                                                <input type="hidden" name="regional_agencies"
-                                                    value="{{ $partner->slug }}">
-                                            </form>
-                                        @endforeach
-                                    </div>
+    <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            @foreach ($groups->chunk(6) as $index => $opdChunk)
+                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                    <div class="row justify-content-center"> <!-- Tambahkan justify-content-center -->
+                        @foreach ($opdChunk as $partner)
+                            <form class="col-2 text-center search-form" action="{{ route('search') }}" method="GET">
+                                <div class="partner-logo partner-logo-action">
+                                    <img src="{{ asset('assets/images/logo.png') }}" alt=""
+                                        class="img-fluid" style="width:80px;height:85px;">
+                                    <p class="mt-2">{{ $partner->name }}</p>
                                 </div>
-                            @endforeach
-                        </div>
-
-
-                        <!-- Tombol Navigasi -->
-                        <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        </button>
+                                <input type="hidden" name="regional_agencies" value="{{ $partner->slug }}">
+                            </form>
+                        @endforeach
                     </div>
                 </div>
+            @endforeach
+        </div>
+
+        <!-- Tombol Navigasi -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+
             </div>
         </div>
     </div>
