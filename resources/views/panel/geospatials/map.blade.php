@@ -42,7 +42,7 @@
                             <h3 class="nk-block-title page-title text-primary">Peta</h3>
                             <div class="nk-block-des text-soft">
                                 <p>Anda memiliki total
-                                    <strong  class="text-primary"> {{ $count }} peta</strong>
+                                    <strong class="text-primary"> {{ $count }} peta</strong>
                                     .
                                 </p>
                             </div>
@@ -111,7 +111,9 @@
                                 <span>Masukkan file JSON/geoJSON disini.</span>
                                 <div class="form-control-wrap">
                                     <input type="file" class="filepond @error('file') is-invalid @enderror"
-                                        name="file" id="file" accept="application/json,application/geo+json,application/vnd.geo+json,.geojson" required>
+                                        name="file" id="file"
+                                        accept="application/json,application/geo+json,application/vnd.geo+json,.geojson"
+                                        required>
                                     @error('file')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -149,8 +151,7 @@
                                         class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
                                     <select class="form-select js-select2 @error('sector_id') is-invalid @enderror"
-                                        data-search="on" data-dropdown-parent="#addMapModal" name="tag"
-                                        id="sector_id">
+                                        data-search="on" data-dropdown-parent="#addMapModal" name="tag" id="sector_id">
                                         <option value="Pilih Kategori" disabled>Pilih Kategori</option>
                                         @foreach ($sectors as $d)
                                             <option value="{{ $d->name }}">{{ $d->name }}</option>
@@ -353,10 +354,17 @@
         <script>
             var $r = jQuery.noConflict();
             $r(document).ready(function() {
-                $r('#maps-table').DataTable({
+                var searchValue = new URLSearchParams(window.location.search).get('search') || '';
+
+                var table = $r('#maps-table').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: "{{ route('maps.datatable') }}",
+                    ajax: {
+                        url: "{{ route('maps.datatable') }}",
+                        data: function(d) {
+                            d.search = $r('#search-maps').val() || searchValue;
+                        }
+                    },
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -399,6 +407,16 @@
                             searchable: false
                         }
                     ]
+                });
+
+                // Jika ada pencarian dari URL, langsung reload DataTables
+                if (searchValue) {
+                    table.ajax.reload();
+                }
+
+                // Jika user mengetik di input search di halaman Maps
+                $r('#search-maps').on('keyup', function() {
+                    table.ajax.reload();
                 });
             });
 

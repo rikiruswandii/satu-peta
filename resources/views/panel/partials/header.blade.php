@@ -13,11 +13,11 @@
                         srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo-dark">
                 </a>
             </div><!-- .nk-header-brand -->
-            <div class="nk-header-search ms-3 ms-xl-0">
+            <form class="nk-header-search ms-3 ms-xl-0" action="{{ route('maps') }}" method="GET">
                 <em class="icon ni ni-search"></em>
-                <input type="text" class="form-control border-transparent form-focus-none"
-                    placeholder="Search anything">
-            </div><!-- .nk-header-news -->
+                <input type="text" class="form-control border-transparent form-focus-none" id="search-maps"
+                    placeholder="Cari data.." name="search" value="{{ request('search') }}">
+            </form>
             <div class="nk-header-tools">
                 <ul class="nk-quick-nav">
                     <li class="dropdown notification-dropdown">
@@ -90,8 +90,7 @@
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a
-                                            onclick="document.getElementById('logoutAction').submit();"
+                                    <li><a onclick="document.getElementById('logoutAction').submit();"
                                             class="px-1 cursor-pointer"><em class="icon ni ni-signout"></em><span>Sign
                                                 out</span></a></li>
                                     <li>
