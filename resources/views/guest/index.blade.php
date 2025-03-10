@@ -72,7 +72,7 @@
     </div>
 
     <!-- Portfolio Area-->
-    <div class="saasbox-portfolio-area pt-120 pb-120">
+    <div class="saasbox-portfolio-area pt-120 pb-120 bg-gray">
         <div class="container">
             <div class="row align-items-end justify-content-between">
                 <div class="col-12 col-sm-8 col-lg-7 col-xxl-6">
@@ -111,7 +111,7 @@
     </div>
 
     <!-- Category Area -->
-    <div class="partner-area py-5 bg-gray">
+    <div class="partner-area py-5">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-left">
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Groups Area-->
-    <div class="partner-area py-5 bg-gray">
+    <div class="partner-area py-5 bg-light bg-gradient">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-left mb-5">
@@ -193,8 +193,7 @@
             </x-slot>
         </x-modal>
     @endsection
-    <div class="mb-120 d-block"></div>
-    <div class="saasbox-news-area news2">
+    <div class="saasbox-news-area news2 py-5 bg-gray">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-12 col-sm-9 col-lg-7 col-xxl-6">
@@ -254,7 +253,6 @@
             </div>
         </div>
     </div>
-    <div class="mb-120 d-block"></div>
 
     @push('css')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
