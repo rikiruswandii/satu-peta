@@ -20,10 +20,7 @@ width: '100%',
 theme: 'bootstrap-5'
 });
 
-initMap('searchMapId', '', {
-scale: true,
-fullScreen: true
-}, {});
+initMap('searchMapId', '', {});
 });
 am5.ready(function () {
     // Membuat root elemen

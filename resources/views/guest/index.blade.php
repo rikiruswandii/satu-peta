@@ -18,21 +18,21 @@
             <div class="row">
                 <div class="row mb-4 justify-content-center align-items-center">
                     <h1 id="app-name" class="text-center text-light">{{ $app->name }}</h1>
-                    <strong class="text-center text-light">{{ $app->about }}</strong>
+                    <strong class="text-center text-light" id="floating-about">{{ $app->about }}</strong>
                     <hr />
-                    <strong class="text-center text-light">{{ __('Temukan dataset dengan mudah!') }}</strong>
+                    <strong class="text-center text-light" id="floating-label">{{ __('Temukan dataset dengan mudah!') }}</strong>
                 </div>
                 <div class="rounded p-0 m-0 shadow-lg bg-text-gray border-0" id="searchCard"
                     style="background: rgba(255, 255, 255, 0.5) !important;">
                     <div class="card-body">
                         <form action="{{ route('search') }}" method="GET">
-                            <div class="d-flex align-items-center">
+                            <div id="flying-content" class="d-flex justify-content-between align-items-center gap-1">
                                 <!-- Gear Icon (Trigger Dropdown) -->
-                                <button type="button" class="btn btn-light border me-2" id="dropdownTrigger">
+                                <button type="button" class="btn btn-light border" id="dropdownTrigger">
                                     <i class="bi bi-gear text-dark"></i>
                                 </button>
 
-                                <div class="d-flex w-100">
+                                <div id="input-end-option" class="d-flex w-100">
                                     <!-- Input Pencarian -->
                                     <input id="input-search" name="search" type="text" class="form-control"
                                         placeholder="Masukkan kata kunci...">
@@ -56,7 +56,7 @@
                                 </div>
 
                                 <!-- Tombol Cari -->
-                                <button class="btn btn-warning ms-2">Cari</button>
+                                <button class="btn btn-warning" id="flying-submit">Cari</button>
                             </div>
                         </form>
 
@@ -126,7 +126,6 @@
         </div>
     </div>
 
-
     <!-- Groups Area-->
     <div class="partner-area py-5 bg-gray">
         <div class="container">
@@ -135,35 +134,39 @@
                     <h2><i class="bi bi-buildings-fill me-2"></i>Instansi</h2> <!-- Tambahkan judul di sini -->
                 </div>
                 <div class="col-12">
-    <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            @foreach ($groups->chunk(6) as $index => $opdChunk)
-                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                    <div class="row justify-content-center"> <!-- Tambahkan justify-content-center -->
-                        @foreach ($opdChunk as $partner)
-                            <form class="col-2 text-center search-form" action="{{ route('search') }}" method="GET">
-                                <div class="partner-logo partner-logo-action">
-                                    <img src="{{ asset('assets/images/logo.png') }}" alt=""
-                                        class="img-fluid" style="width:80px;height:85px;">
-                                    <p class="mt-2">{{ $partner->name }}</p>
+                    <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @foreach ($groups->chunk(6) as $index => $opdChunk)
+                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                    <div class="row justify-content-center"> <!-- Tambahkan justify-content-center -->
+                                        @foreach ($opdChunk as $partner)
+                                            <form class="col-2 text-center search-form" action="{{ route('search') }}"
+                                                method="GET">
+                                                <div class="partner-logo partner-logo-action">
+                                                    <img src="{{ asset('assets/images/logo.png') }}" alt=""
+                                                        class="img-fluid" style="width:80px;height:85px;">
+                                                    <p class="mt-2">{{ $partner->name }}</p>
+                                                </div>
+                                                <input type="hidden" name="regional_agencies"
+                                                    value="{{ $partner->slug }}">
+                                            </form>
+                                        @endforeach
+                                    </div>
                                 </div>
-                                <input type="hidden" name="regional_agencies" value="{{ $partner->slug }}">
-                            </form>
-                        @endforeach
+                            @endforeach
+                        </div>
+
+                        <!-- Tombol Navigasi -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
-            @endforeach
-        </div>
-
-        <!-- Tombol Navigasi -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#partnerCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#partnerCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        </button>
-    </div>
-</div>
 
             </div>
         </div>
@@ -253,9 +256,6 @@
     </div>
     <div class="mb-120 d-block"></div>
 
-    <!-- Group Area-->
-
-
     @push('css')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
         <link rel="stylesheet"
@@ -274,5 +274,4 @@
         <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
         @vite(['resources/js/search.js', 'resources/js/home.js'])
     @endpush
-
 </x-guest-layout>
