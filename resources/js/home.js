@@ -9,7 +9,6 @@ let inputSearch = $jq('#input-search');
 
 $jq('#app-name').toggleClass('d-none').toggleClass('d-block');
 
-// Toggle kelas d-block untuk dropdown dan extraOptions
 dropdownMenu.toggleClass('d-none').toggleClass('d-block');
 extraOptions.toggleClass('d-none').toggleClass('d-block');
 inputSearch.toggleClass('expanded');
@@ -22,31 +21,33 @@ theme: 'bootstrap-5'
 
 initMap('searchMapId', '', {});
 });
+
 am5.ready(function () {
-    // Membuat root elemen
     var root = am5.Root.new("chartdiv");
 
-    // Mengatur tema
     root.setThemes([am5themes_Animated.new(root)]);
 
-    // Membuat container
-    var container = root.container.children.push(am5.Container.new(root, {
-        width: am5.percent(100),
-        height: am5.percent(100),
-        layout: root.verticalLayout
+    var zoomableContainer = root.container.children.push(
+        am5.ZoomableContainer.new(root, {
+            width: am5.p100,
+            height: am5.p100,
+            wheelable: true,
+            pinchZoom: true
+        })
+    );
+
+    var zoomTools = zoomableContainer.children.push(am5.ZoomTools.new(root, {
+        target: zoomableContainer
     }));
 
-    // Membuat seri Force-Directed
-    var series = container.children.push(am5hierarchy.ForceDirected.new(root, {
+    var series = zoomableContainer.contents.children.push(am5hierarchy.ForceDirected.new(root, {
         singleBranchOnly: false,
         downDepth: 1,
-        initialDepth: 5,
+        initialDepth: 10,
         nodePadding: 20,
         valueField: "value",
         categoryField: "name",
-        childDataField: "children",
-        minRadius: 30, // Atur ukuran minimal node agar level 1 tidak terlalu kecil
-    maxRadius: 80, // Pastikan level 1 lebih besar
+        childDataField: "children"
     }));
 
     series.linkBullets.push(function (root, source, target) {
@@ -82,18 +83,15 @@ am5.ready(function () {
 
     series.labels.template.set("minScale", 0);
 
-    // Mengatur data ke dalam seri
     series.data.setAll([chartData]);
-
-    // Make stuff animate on load
+    series.set("selectedDataItem", series.dataItems[0]);
     series.appear(1000, 100);
 });
 
 $jq(document).ready(function () {
     $jq('.partner-logo-action').click(function () {
-        console.log('Tombol diklik!'); // Debugging
+        console.log('Tombol diklik!'); 
 
-        // Cari form terdekat dan submit
         $jq(this).closest('.search-form').submit();
     });
 });

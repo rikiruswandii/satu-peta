@@ -20,7 +20,8 @@
                     <h1 id="app-name" class="text-center text-light">{{ $app->name }}</h1>
                     <strong class="text-center text-light" id="floating-about">{{ $app->about }}</strong>
                     <hr />
-                    <strong class="text-center text-light" id="floating-label">{{ __('Temukan dataset dengan mudah!') }}</strong>
+                    <strong class="text-center text-light"
+                        id="floating-label">{{ __('Temukan dataset dengan mudah!') }}</strong>
                 </div>
                 <div class="rounded p-0 m-0 shadow-lg bg-text-gray border-0" id="searchCard"
                     style="background: rgba(255, 255, 255, 0.5) !important;">
@@ -131,20 +132,20 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 text-left mb-5">
-                    <h2><i class="bi bi-buildings-fill me-2"></i>Instansi</h2> <!-- Tambahkan judul di sini -->
+                    <h2><i class="bi bi-buildings-fill me-2"></i>Instansi</h2>
                 </div>
                 <div class="col-12">
                     <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
                             @foreach ($groups->chunk(6) as $index => $opdChunk)
                                 <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                    <div class="row justify-content-center"> <!-- Tambahkan justify-content-center -->
+                                    <div class="row justify-content-center flex-nowrap overflow-auto">
                                         @foreach ($opdChunk as $partner)
-                                            <form class="col-2 text-center search-form" action="{{ route('search') }}"
-                                                method="GET">
+                                            <form class="col-6 col-md-4 col-lg-2 text-center search-form"
+                                                action="{{ route('search') }}" method="GET">
                                                 <div class="partner-logo partner-logo-action">
                                                     <img src="{{ asset('assets/images/logo.png') }}" alt=""
-                                                        class="img-fluid" style="width:80px;height:85px;">
+                                                        class="img-fluid" style="max-width: 100px; height: auto;">
                                                     <p class="mt-2">{{ $partner->name }}</p>
                                                 </div>
                                                 <input type="hidden" name="regional_agencies"
@@ -167,7 +168,6 @@
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
