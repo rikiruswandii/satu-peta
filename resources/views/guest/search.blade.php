@@ -61,7 +61,9 @@
                         @forelse ($maps as $map)
                             <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 mb-4'" :card_id="$map->id" :card_title="$map->name"
                                 :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name"
-                                :sector="$map->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
+                                :sector="$map->tags
+                                    ->map(fn($tag) => $tag->getTranslation('name', 'id'))
+                                    ->implode(', ')" />
                         @empty
                             <!-- SVG image -->
                             <div class="text-center mb-4">
@@ -74,8 +76,39 @@
                         @endforelse
                     </div>
                     @if ($maps->isNotEmpty())
-                        <div class="mt-4 cardPaginate">
-                            {{ $maps->links() }}
+                        <div class="saasbox-pagination-area my-5 mb-lg-0">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-center mb-0">
+                                    @if ($maps->onFirstPage())
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Prev</span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link link-success" href="{{ $maps->previousPageUrl() }}"
+                                                rel="prev">Prev</a>
+                                        </li>
+                                    @endif
+
+                                    <!-- Menampilkan halaman secara dinamis -->
+                                    @foreach ($maps->getUrlRange(1, $maps->lastPage()) as $page => $url)
+                                        <li class="page-item {{ $page == $maps->currentPage() ? 'active' : '' }}">
+                                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                        </li>
+                                    @endforeach
+
+                                    @if ($maps->hasMorePages())
+                                        <li class="page-item">
+                                            <a class="page-link link-success" href="{{ $maps->nextPageUrl() }}"
+                                                rel="next">Next</a>
+                                        </li>
+                                    @else
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Next</span>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </nav>
                         </div>
                     @endif
                 </div>
