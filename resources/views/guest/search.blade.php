@@ -41,7 +41,7 @@
                 <div class="col-12 col-sm-8 col-md-9">
                     <div class="row mb-4">
                         <form action="{{ route('search') }}" method="get" id="searchForm">
-                            <div class="input-group m-3">
+                            <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Kata Kunci"
                                     aria-label="Kata Kunci" aria-describedby="basic-addon2" name="search"
                                     value="{{ old('search', request('search')) }}">
