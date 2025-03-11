@@ -20,8 +20,6 @@ class Map extends Model
 
     protected static $logAttributes = ['user_id', 'name'];
 
-    protected $with = ['sector'];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -37,11 +35,6 @@ class Map extends Model
     public function regional_agency(): BelongsTo
     {
         return $this->belongsTo(RegionalAgency::class);
-    }
-
-    public function sector(): BelongsTo
-    {
-        return $this->belongsTo(Sector::class);
     }
 
     public function user()

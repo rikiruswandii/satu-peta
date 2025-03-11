@@ -9,7 +9,6 @@ let inputSearch = $jq('#input-search');
 
 $jq('#app-name').toggleClass('d-none').toggleClass('d-block');
 
-// Toggle kelas d-block untuk dropdown dan extraOptions
 dropdownMenu.toggleClass('d-none').toggleClass('d-block');
 extraOptions.toggleClass('d-none').toggleClass('d-block');
 inputSearch.toggleClass('expanded');
@@ -20,43 +19,80 @@ width: '100%',
 theme: 'bootstrap-5'
 });
 
-initMap('searchMapId', '', {
-scale: true,
-fullScreen: true
-}, {});
+initMap('searchMapId', '', {});
 });
+
 am5.ready(function () {
-    // Membuat root elemen
     var root = am5.Root.new("chartdiv");
 
-    // Mengatur tema
     root.setThemes([am5themes_Animated.new(root)]);
 
-    // Membuat container
-    var container = root.container.children.push(am5.Container.new(root, {
-        width: am5.percent(100),
-        height: am5.percent(100),
-        layout: root.verticalLayout
+    var zoomableContainer = root.container.children.push(
+        am5.ZoomableContainer.new(root, {
+            width: am5.p100,
+            height: am5.p100,
+            wheelable: true,
+            pinchZoom: true
+        })
+    );
+
+    var zoomTools = zoomableContainer.children.push(am5.ZoomTools.new(root, {
+        target: zoomableContainer
     }));
 
-    // Membuat seri Force-Directed
-    var series = container.children.push(am5hierarchy.ForceDirected.new(root, {
+    var series = zoomableContainer.contents.children.push(am5hierarchy.ForceDirected.new(root, {
         singleBranchOnly: false,
         downDepth: 1,
-        initialDepth: 1, // Mengatur kedalaman awal tampilan
+        initialDepth: 10,
+        nodePadding: 20,
         valueField: "value",
         categoryField: "name",
-        childDataField: "children",
-        centerStrength: 0.5,
-        minRadius: 20,  // Ukuran terkecil untuk anak
-        maxRadius: 80,  // Ukuran terbesar untuk induk
-        nodePadding: 10
+        childDataField: "children"
     }));
 
-    // Mengatur data ke dalam seri
-    series.data.setAll([chartData]);
+    series.linkBullets.push(function (root, source, target) {
+        const bullet = am5.Bullet.new(root, {
+            locationX: 0.5,
+            autoRotate: true,
+            autoRotateAngle: 180,
+            sprite: am5.Graphics.new(root, {
+                fill: source.get("fill"),
+                centerY: am5.percent(50),
+                centerX: am5.percent(50),
+                draw: function (display) {
+                    display.moveTo(0, -6);
+                    display.lineTo(16, 0);
+                    display.lineTo(0, 6);
+                    display.lineTo(3, 0);
+                    display.lineTo(0, -6);
+                }
+            })
+        });
 
-    // Animasi muncul
+        bullet.animate({
+            key: "locationX",
+            to: -0.1,
+            from: 1.1,
+            duration: Math.random() * 500 + 1000,
+            loops: Infinity,
+            easing: am5.ease.quad
+        });
+
+        return bullet;
+    });
+
+    series.labels.template.set("minScale", 0);
+
+    series.data.setAll([chartData]);
+    series.set("selectedDataItem", series.dataItems[0]);
     series.appear(1000, 100);
+});
+
+$jq(document).ready(function () {
+    $jq('.partner-logo-action').click(function () {
+        console.log('Tombol diklik!'); 
+
+        $jq(this).closest('.search-form').submit();
+    });
 });
 

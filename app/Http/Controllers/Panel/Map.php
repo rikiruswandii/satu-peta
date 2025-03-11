@@ -19,25 +19,31 @@ use Yajra\DataTables\Facades\DataTables;
 
 class Map extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $regional_agencies = RegionalAgency::all();
         $sectors = Tag::where('type', 'map')->get();
         $count = ModelMap::count();
         $title = 'Peta';
         $prefix = 'maps';
+        $searchQuery = $request->query('search');
         $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar '.env('APP_NAME', 'Satu Peta Purwakarta').'. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.geospatials.map', compact('prefix', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
+        return view('panel.geospatials.map', compact('prefix', 'searchQuery', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
     }
 
     public function datatable(Request $request)
     {
         if ($request->ajax()) {
             try {
-                $data = ModelMap::with('regional_agency', 'tags', 'documents')->latest()->get();
+                $query = ModelMap::with('regional_agency', 'tags', 'documents')->latest();
 
-                return DataTables::of($data)
+                if ($request->has('search') && ! empty($request->search)) {
+                    $searchTerm = $request->search;
+                    $query->where('name', 'like', '%'.$searchTerm.'%');
+                }
+
+                return DataTables::of($query)
                     ->addIndexColumn()
                     ->editColumn('updated_at', function ($row) {
                         return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
@@ -63,55 +69,55 @@ class Map extends Controller
                         $checked = $row->is_active ? 'checked' : '';
 
                         return '<div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="customCheck'.$row->id.'" '.$checked.' disabled>
-                            <label class="custom-control-label" for="customCheck'.$row->id.'"></label>
-                        </div>';
+                        <input type="checkbox" class="custom-control-input" id="customCheck'.$row->id.'" '.$checked.' disabled>
+                        <label class="custom-control-label" for="customCheck'.$row->id.'"></label>
+                    </div>';
                     })
                     ->addColumn('action', function ($row) {
                         $detailLinks = '';
                         foreach ($row->documents as $document) {
                             $detailLinks .= '<li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="#detailMapModal"
-                                            data-regional-agency="'.optional($row->regional_agency)->name.'"
-                                            data-sector="'.optional($row->tags)->pluck('name')->first().'"
-                                            data-geojson="'.Storage::url($document->path).'"
-                                            data-name="'.$row->name.'"
-                                            data-id="'.$row->id.'">
-                                            <em class="icon ni ni-eye"></em><span>Lihat</span>
-                                        </a></li>';
+                                        data-bs-target="#detailMapModal"
+                                        data-regional-agency="'.optional($row->regional_agency)->name.'"
+                                        data-sector="'.optional($row->tags)->pluck('name')->first().'"
+                                        data-geojson="'.Storage::url($document->path).'"
+                                        data-name="'.$row->name.'"
+                                        data-id="'.$row->id.'">
+                                        <em class="icon ni ni-eye"></em><span>Lihat</span>
+                                    </a></li>';
                         }
 
                         return '<div class="dropdown">
-                            <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
-                                <em class="icon ni ni-more-h rounded-full"></em>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <ul class="link-list-opt no-bdr">
-                                    '.$detailLinks.'
-                                    <li class="divider"></li>
-                                    <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="#editMapModal"
-                                            data-regional-agency="'.optional($row->regional_agency)->id.'"
-                                            data-sector="'.optional($row->tags)->pluck('name')->first().'"
-                                            data-name="'.$row->name.'"
-                                            data-id="'.Crypt::encrypt($row->id).'">
-                                            <em class="icon ni ni-edit"></em><span>Edit</span>
-                                        </a></li>
-                                    <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="'.($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal').'"
-                                            data-name="'.$row->name.'"
-                                            data-id="'.Crypt::encrypt($row->id).'">
-                                            <em class="icon ni '.($row->is_active ? 'ni-cross-round' : 'ni-check-round').'"></em><span>'.($row->is_active ? 'Deaktivasi' : 'Aktivasi').'</span>
-                                        </a></li>
-                                    <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="#deleteMapModal"
-                                            data-id="'.Crypt::encrypt($row->id).'"
-                                            data-name="'.$row->name.'">
-                                            <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
-                                        </a></li>
-                                </ul>
-                            </div>
-                        </div>';
+                        <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                            <em class="icon ni ni-more-h rounded-full"></em>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <ul class="link-list-opt no-bdr">
+                                '.$detailLinks.'
+                                <li class="divider"></li>
+                                <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="#editMapModal"
+                                        data-regional-agency="'.optional($row->regional_agency)->id.'"
+                                        data-sector="'.optional($row->tags)->pluck('name')->first().'"
+                                        data-name="'.$row->name.'"
+                                        data-id="'.Crypt::encrypt($row->id).'">
+                                        <em class="icon ni ni-edit"></em><span>Edit</span>
+                                    </a></li>
+                                <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="'.($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal').'"
+                                        data-name="'.$row->name.'"
+                                        data-id="'.Crypt::encrypt($row->id).'">
+                                        <em class="icon ni '.($row->is_active ? 'ni-cross-round' : 'ni-check-round').'"></em><span>'.($row->is_active ? 'Deaktivasi' : 'Aktivasi').'</span>
+                                    </a></li>
+                                <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="#deleteMapModal"
+                                        data-id="'.Crypt::encrypt($row->id).'"
+                                        data-name="'.$row->name.'">
+                                        <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
+                                    </a></li>
+                            </ul>
+                        </div>
+                    </div>';
                     })
                     ->rawColumns(['action', 'download', 'checkbox', 'tags'])
                     ->make(true);
@@ -243,38 +249,71 @@ class Map extends Controller
 
         if (isset($geojsonData['features']) && is_array($geojsonData['features'])) {
             foreach ($geojsonData['features'] as $feature) {
-                if (isset($feature['geometry']['coordinates'])) {
+                if (isset($feature['geometry']['coordinates']) && isset($feature['geometry']['type'])) {
                     $coords = $feature['geometry']['coordinates'];
+                    $type = $feature['geometry']['type'];
 
-                    // Jika tipe geometri adalah Point
-                    if ($feature['geometry']['type'] == 'Point' && is_array($coords) && count($coords) >= 2) {
-                        // Ambil koordinat dari Point (hanya latitude dan longitude, abaikan altitude)
-                        $coordinates['longitude'][] = floatval($coords[0]); // Longitude
-                        $coordinates['latitude'][] = floatval($coords[1]);  // Latitude
-                    }
-
-                    // Jika tipe geometri adalah LineString
-                    elseif ($feature['geometry']['type'] == 'LineString' && is_array($coords)) {
-                        // Ambil seluruh koordinat dari LineString
-                        foreach ($coords as $coord) {
-                            // Pastikan koordinat valid (dengan mengabaikan nilai ketiga jika ada)
-                            if (is_array($coord) && count($coord) >= 2) {
-                                $coordinates['longitude'][] = floatval($coord[0]); // Longitude
-                                $coordinates['latitude'][] = floatval($coord[1]);  // Latitude
+                    switch ($type) {
+                        case 'Point':
+                            if (is_array($coords) && count($coords) >= 2) {
+                                $coordinates['longitude'][] = floatval($coords[0]);
+                                $coordinates['latitude'][] = floatval($coords[1]);
                             }
-                        }
-                    }
+                            break;
 
-                    // Jika tipe geometri adalah Polygon
-                    elseif ($feature['geometry']['type'] == 'Polygon' && is_array($coords) && count($coords) > 0) {
-                        // Ambil seluruh koordinat pertama dari polygon
-                        foreach ($coords[0] as $coord) {
-                            // Pastikan koordinat valid (dengan mengabaikan nilai ketiga jika ada)
-                            if (is_array($coord) && count($coord) >= 2) {
-                                $coordinates['longitude'][] = floatval($coord[0]); // Longitude
-                                $coordinates['latitude'][] = floatval($coord[1]);  // Latitude
+                        case 'LineString':
+                        case 'MultiPoint': // MultiPoint mirip dengan LineString (kumpulan titik)
+                            if (is_array($coords)) {
+                                foreach ($coords as $coord) {
+                                    if (is_array($coord) && count($coord) >= 2) {
+                                        $coordinates['longitude'][] = floatval($coord[0]);
+                                        $coordinates['latitude'][] = floatval($coord[1]);
+                                    }
+                                }
                             }
-                        }
+                            break;
+
+                        case 'Polygon':
+                        case 'MultiLineString': // MultiLineString adalah kumpulan LineString
+                            if (is_array($coords)) {
+                                foreach ($coords as $line) {
+                                    if (is_array($line)) {
+                                        foreach ($line as $coord) {
+                                            if (is_array($coord) && count($coord) >= 2) {
+                                                $coordinates['longitude'][] = floatval($coord[0]);
+                                                $coordinates['latitude'][] = floatval($coord[1]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 'MultiPolygon':
+                            if (is_array($coords)) {
+                                foreach ($coords as $polygon) {
+                                    if (is_array($polygon)) {
+                                        foreach ($polygon[0] as $coord) { // Hanya ambil ring pertama
+                                            if (is_array($coord) && count($coord) >= 2) {
+                                                $coordinates['longitude'][] = floatval($coord[0]);
+                                                $coordinates['latitude'][] = floatval($coord[1]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 'GeometryCollection':
+                            if (isset($feature['geometry']['geometries']) && is_array($feature['geometry']['geometries'])) {
+                                foreach ($feature['geometry']['geometries'] as $geometry) {
+                                    // Rekursi untuk menangani setiap geometri di dalam koleksi
+                                    $subCoordinates = $this->extractCoordinates(['features' => [['geometry' => $geometry]]]);
+                                    $coordinates['longitude'] = array_merge($coordinates['longitude'], $subCoordinates['longitude']);
+                                    $coordinates['latitude'] = array_merge($coordinates['latitude'], $subCoordinates['latitude']);
+                                }
+                            }
+                            break;
                     }
                 }
             }

@@ -18,21 +18,22 @@
             <div class="row">
                 <div class="row mb-4 justify-content-center align-items-center">
                     <h1 id="app-name" class="text-center text-light">{{ $app->name }}</h1>
-                    <strong class="text-center text-light">{{ $app->about }}</strong>
+                    <strong class="text-center text-light" id="floating-about">{{ $app->about }}</strong>
                     <hr />
-                    <strong class="text-center text-light">{{ __('Temukan dataset dengan mudah!') }}</strong>
+                    <strong class="text-center text-light"
+                        id="floating-label">{{ __('Temukan dataset dengan mudah!') }}</strong>
                 </div>
                 <div class="rounded p-0 m-0 shadow-lg bg-text-gray border-0" id="searchCard"
                     style="background: rgba(255, 255, 255, 0.5) !important;">
                     <div class="card-body">
                         <form action="{{ route('search') }}" method="GET">
-                            <div class="d-flex align-items-center">
+                            <div id="flying-content" class="d-flex justify-content-between align-items-center gap-1">
                                 <!-- Gear Icon (Trigger Dropdown) -->
-                                <button type="button" class="btn btn-light border me-2" id="dropdownTrigger">
+                                <button type="button" class="btn btn-light border" id="dropdownTrigger">
                                     <i class="bi bi-gear text-dark"></i>
                                 </button>
 
-                                <div class="d-flex w-100">
+                                <div id="input-end-option" class="d-flex w-100">
                                     <!-- Input Pencarian -->
                                     <input id="input-search" name="search" type="text" class="form-control"
                                         placeholder="Masukkan kata kunci...">
@@ -45,7 +46,8 @@
                                                 <option value="{{ $sector['name'] }}">{{ $sector['name'] }}</option>
                                             @endforeach
                                         </select>
-                                        <select name="regional_agencies" class="form-select select2 form-control" id="selectI">
+                                        <select name="regional_agencies" class="form-select select2 form-control"
+                                            id="selectI">
                                             <option value="" selected>Semua Instansi</option>
                                             @foreach ($groups as $group)
                                                 <option value="{{ $group->slug }}">{{ $group->name }}</option>
@@ -55,7 +57,7 @@
                                 </div>
 
                                 <!-- Tombol Cari -->
-                                <button class="btn btn-warning ms-2">Cari</button>
+                                <button class="btn btn-warning" id="flying-submit">Cari</button>
                             </div>
                         </form>
 
@@ -70,7 +72,7 @@
     </div>
 
     <!-- Portfolio Area-->
-    <div class="saasbox-portfolio-area pt-120 pb-120">
+    <div class="saasbox-portfolio-area pt-120 pb-120 bg-gray">
         <div class="container">
             <div class="row align-items-end justify-content-between">
                 <div class="col-12 col-sm-8 col-lg-7 col-xxl-6">
@@ -93,7 +95,7 @@
             <div class="row g-3">
                 @forelse ($maps as $map)
                     <x-map-card :id="$map->id" :card_class="'col-12 col-md-6 col-lg-3 my-4'" :card_id="$map->id" :card_title="$map->name"
-                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
+                        :card_opd="$map->regional_agency->name" :card_filename="$map->documents->first()->name ?? 'No file'" :geojson_path="$map->documents->first() ? Storage::url($map->documents->first()->path) : ''" :regional_agency="$map->regional_agency->name" :sector="$map->tags->map(fn($tag) => $tag->getTranslation('name', 'id'))->implode(', ')" />
                 @empty
                     <!-- SVG image -->
                     <div class="text-center mb-4">
@@ -109,7 +111,7 @@
     </div>
 
     <!-- Category Area -->
-    <div class="partner-area py-5 bg-gray">
+    <div class="partner-area py-5">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-left">
@@ -125,28 +127,30 @@
         </div>
     </div>
 
-
     <!-- Groups Area-->
-    <div class="partner-area py-5 bg-gray">
+    <div class="partner-area py-5 bg-light bg-gradient">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-left mb-5">
-                    <h2><i class="bi bi-buildings-fill me-2"></i>Instansi</h2> <!-- Tambahkan judul di sini -->
+                    <h2><i class="bi bi-buildings-fill me-2"></i>Instansi</h2>
                 </div>
                 <div class="col-12">
                     <div id="partnerCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
                             @foreach ($groups->chunk(6) as $index => $opdChunk)
                                 <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                    <div class="row">
+                                    <div class="row justify-content-center flex-nowrap overflow-auto">
                                         @foreach ($opdChunk as $partner)
-                                            <div class="col-2 text-center">
-                                                <div class="partner-logo">
+                                            <form class="col-6 col-md-4 col-lg-2 text-center search-form"
+                                                action="{{ route('search') }}" method="GET">
+                                                <div class="partner-logo partner-logo-action">
                                                     <img src="{{ asset('assets/images/logo.png') }}" alt=""
-                                                        class="img-fluid" style="width:80px;height:85px;">
+                                                        class="img-fluid" style="max-width: 100px; height: auto;">
                                                     <p class="mt-2">{{ $partner->name }}</p>
                                                 </div>
-                                            </div>
+                                                <input type="hidden" name="regional_agencies"
+                                                    value="{{ $partner->slug }}">
+                                            </form>
                                         @endforeach
                                     </div>
                                 </div>
@@ -189,8 +193,7 @@
             </x-slot>
         </x-modal>
     @endsection
-    <div class="mb-120 d-block"></div>
-    <div class="saasbox-news-area news2">
+    <div class="saasbox-news-area news2 py-5 bg-gray">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-12 col-sm-9 col-lg-7 col-xxl-6">
@@ -250,10 +253,6 @@
             </div>
         </div>
     </div>
-    <div class="mb-120 d-block"></div>
-
-    <!-- Group Area-->
-
 
     @push('css')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
@@ -273,5 +272,4 @@
         <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
         @vite(['resources/js/search.js', 'resources/js/home.js'])
     @endpush
-
 </x-guest-layout>

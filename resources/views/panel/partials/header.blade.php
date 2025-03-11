@@ -13,27 +13,34 @@
                         srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo-dark">
                 </a>
             </div><!-- .nk-header-brand -->
-            <div class="nk-header-search ms-3 ms-xl-0">
+            <form class="nk-header-search ms-3 ms-xl-0" action="{{ route('maps') }}" method="GET">
                 <em class="icon ni ni-search"></em>
-                <input type="text" class="form-control border-transparent form-focus-none"
-                    placeholder="Search anything">
-            </div><!-- .nk-header-news -->
+                <input type="text" class="form-control border-transparent form-focus-none" id="search-maps"
+                    placeholder="Cari data.." name="search" value="{{ request('search') }}">
+            </form>
             <div class="nk-header-tools">
                 <ul class="nk-quick-nav">
                     <li class="dropdown notification-dropdown">
                         <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                            <div class="icon-status icon-status-info"><em class="icon ni ni-bell"></em></div>
+                            <div class="icon-status icon-status-secondary"><em class="icon ni ni-bell"></em></div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
                             <div class="dropdown-head">
-                                <span class="sub-title nk-dropdown-title">Notifications</span>
-                                <a href="#">Mark All as Read</a>
+                                <span class="sub-title nk-dropdown-title">Notifikasi</span>
                             </div>
                             <div class="dropdown-body">
+                                <div class="nk-notification">
+                                    <div class="nk-notification-item dropdown-inner">
+                                        <div class="nk-notification-icon">
+                                            <em class="icon icon-circle bg-warning-dim ni ni-alert-circle"></em>
+                                        </div>
+                                        <div class="nk-notification-content">
+                                            <div class="nk-notification-text">Belum ada notifikasi saat ini.</div>
+                                            {{-- <div class="nk-notification-time">2 hrs ago</div> --}}
+                                        </div>
+                                    </div>
+                                </div><!-- .nk-notification -->
                             </div><!-- .nk-dropdown-body -->
-                            <div class="dropdown-foot center">
-                                <a href="#">View All</a>
-                            </div>
                         </div>
                     </li>
                     <li class="dropdown user-dropdown">
@@ -67,7 +74,7 @@
                                         @endif
                                     </div>
                                     <div class="user-info">
-                                        <span class="lead-text">{{ Auth::user()->name }}</span>
+                                        <span class="lead-text text-primary">{{ Auth::user()->name }}</span>
                                         <span class="sub-text">{{ Auth::user()->email }}</span>
                                     </div>
                                 </div>
@@ -78,22 +85,19 @@
                                                 Website</span></a></li>
                                     <li><a
                                             href="{{ route('user.detail', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
-                                                class="icon ni ni-user-alt"></em><span>View
+                                                class="icon ni ni-user-alt"></em><span>Lihat
                                                 Profile</span></a></li>
                                     <li><a href="{{ route('user.log', ['id' => Crypt::encrypt(Auth::user()->id)]) }}"><em
-                                                class="icon ni ni-activity-alt"></em><span>Login
-                                                Activity</span></a></li>
-                                    <li><a class="dark-switch" href="#"><em
+                                                class="icon ni ni-activity-alt"></em><span>Aktivitas</span></a></li>
+                                    {{-- <li><a class="dark-switch" href="#"><em
                                                 class="icon ni ni-moon"></em><span>Dark Mode</span></a>
-                                    </li>
+                                    </li> --}}
                                 </ul>
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a
-                                            onclick="document.getElementById('logoutAction').submit();"
-                                            class="px-1 cursor-pointer"><em class="icon ni ni-signout"></em><span>Sign
-                                                out</span></a></li>
+                                    <li><a onclick="document.getElementById('logoutAction').submit();"
+                                            class="px-1 cursor-pointer text-danger"><em class="icon ni ni-signout"></em><span>Keluar</span></a></li>
                                     <li>
                                         <form id="logoutAction" method="post" action="{{ route('logout') }}">@csrf
                                         </form>

@@ -92,7 +92,7 @@
                 font-weight: 500;
                 transform: translateY(20px);
                 transition: transform 0.3s ease;
-            } 
+            }
 
             .hover-card:hover .view-details {
                 transform: translateY(0);
@@ -176,4 +176,12 @@
     --bs-btn-disabled-color: #fff !important;
     --bs-btn-disabled-bg: #0fac81 !important;
     --bs-btn-disabled-border-color: #0fac81 !important;
+}
+@media (max-width: 768px) {
+    div.shop-with-sidebar {
+        margin-top: 220px;
+    }
+    div.col-12.col-sm-4.col-md-3.border.py-4.rounded-1 {
+        display: none;
+    }
 }

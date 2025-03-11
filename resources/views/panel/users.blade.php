@@ -22,21 +22,23 @@
     </div><!-- .nk-block-head -->
     <div class="card card-bordered card-preview">
         <div class="card-inner">
-            <table class="table table-striped" style="width:100%" id="user-table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Hak Akses</th>
-                        <th>Dibuat</th>
-                        <th>Diperbarui</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped" style="width:100%" id="user-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Hak Akses</th>
+                            <th>Dibuat</th>
+                            <th>Diperbarui</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div><!-- .card -->
     @php
@@ -145,7 +147,7 @@
 
     @push('scripts')
         <script>
-             var $r = jQuery.noConflict();
+            var $r = jQuery.noConflict();
             $r(document).ready(function() {
                 $r('#user-table').DataTable({
                     processing: true,
@@ -184,7 +186,21 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
                 });
             });
 

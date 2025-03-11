@@ -28,39 +28,39 @@ class Home extends Controller
 
         $chartData = [
             'name' => 'Dataset',
-            'value' => $total_maps, // Induk (paling besar)
             'children' => [
                 [
                     'name' => 'Instansi',
-                    'value' => $groups->sum(function ($group) {
-                        return Map::where('regional_agency_id', $group->id)->count();
-                    }), // Jumlah total map yang terkait dengan semua instansi
+                    'level' => 1,
                     'expanded' => false,
                     'children' => $groups->map(function ($group) {
                         $maps_count = Map::where('regional_agency_id', $group->id)->count();
 
-                        return [
+                        return $maps_count > 0 ? [
                             'name' => $group->name,
-                            'value' => $maps_count, // Jumlah map yang terkait dengan instansi ini
-                        ];
-                    })->toArray(),
+                            'value' => $maps_count,
+                        ] : null;
+                    })->filter()->values()->toArray(), // Filter data yang NULL
                 ],
                 [
                     'name' => 'Kategori',
-                    'value' => $categories->sum(function ($tag) {
-                        return Map::withAnyTags([$tag->name], 'map')->count();
-                    }), // Jumlah total map yang terkait dengan semua kategori
+                    'level' => 1,
                     'children' => $categories->map(function ($tag) {
                         $tag_count = Map::withAnyTags([$tag->name], 'map')->count();
 
-                        return [
+                        return $tag_count > 0 ? [
                             'name' => $tag->getTranslation('name', 'id'),
-                            'value' => $tag_count, // Jumlah map yang terkait dengan kategori ini
-                        ];
-                    })->toArray(),
+                            'value' => $tag_count,
+                        ] : null;
+                    })->filter()->values()->toArray(), // Filter data yang NULL
                 ],
             ],
         ];
+
+        // Menambahkan nilai 'value' pada level 1 berdasarkan jumlah dari children-nya
+        foreach ($chartData['children'] as &$child) {
+            $child['value'] = array_sum(array_column($child['children'], 'value'));
+        }
 
         $news = Article::with('tags', 'documents')->latest()->take(3)->get();
 

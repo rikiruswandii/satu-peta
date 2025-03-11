@@ -2,7 +2,8 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <!-- Navbar Brand --><a class="navbar-brand" href="{{ route('/') }}">
-                <img class="img-fluid" src="{{ asset('assets/images/logo.png') }}" alt="" style="width: 38px;height:40px;"> <strong class="text-warning">{{ $app->name }}</strong></a>
+                <img class="img-fluid" src="{{ asset('assets/images/logo.png') }}" alt="" style="width: 38px;height:40px;">
+                <strong class="text-warning">{{ $app->name }}</strong></a>
             <!-- Navbar Toggler -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#saasboxNav"
                 aria-controls="saasboxNav" aria-expanded="false" aria-label="Toggle navigation"><i

@@ -42,7 +42,7 @@
                             <h3 class="nk-block-title page-title text-primary">Peta</h3>
                             <div class="nk-block-des text-soft">
                                 <p>Anda memiliki total
-                                    <strong  class="text-primary"> {{ $count }} peta</strong>
+                                    <strong class="text-primary"> {{ $count }} peta</strong>
                                     .
                                 </p>
                             </div>
@@ -59,22 +59,24 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="table table-striped" style="width:100%" id="maps-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Grup</th>
-                                        <th>Kategori</th>
-                                        <th>File</th>
-                                        <th>Aktif</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="maps-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Grup</th>
+                                            <th>Kategori</th>
+                                            <th>File</th>
+                                            <th>Aktif</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
@@ -111,7 +113,9 @@
                                 <span>Masukkan file JSON/geoJSON disini.</span>
                                 <div class="form-control-wrap">
                                     <input type="file" class="filepond @error('file') is-invalid @enderror"
-                                        name="file" id="file" accept="application/json,application/geo+json,application/vnd.geo+json,.geojson" required>
+                                        name="file" id="file"
+                                        accept="application/json,application/geo+json,application/vnd.geo+json,.geojson"
+                                        required>
                                     @error('file')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -149,8 +153,7 @@
                                         class="text-danger">*</span></label>
                                 <div class="form-control-wrap">
                                     <select class="form-select js-select2 @error('sector_id') is-invalid @enderror"
-                                        data-search="on" data-dropdown-parent="#addMapModal" name="tag"
-                                        id="sector_id">
+                                        data-search="on" data-dropdown-parent="#addMapModal" name="tag" id="sector_id">
                                         <option value="Pilih Kategori" disabled>Pilih Kategori</option>
                                         @foreach ($sectors as $d)
                                             <option value="{{ $d->name }}">{{ $d->name }}</option>
@@ -353,10 +356,17 @@
         <script>
             var $r = jQuery.noConflict();
             $r(document).ready(function() {
-                $r('#maps-table').DataTable({
+                var searchValue = new URLSearchParams(window.location.search).get('search') || '';
+
+                var table = $r('#maps-table').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: "{{ route('maps.datatable') }}",
+                    ajax: {
+                        url: "{{ route('maps.datatable') }}",
+                        data: function(d) {
+                            d.search = $r('#search-maps').val() || searchValue;
+                        }
+                    },
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -398,11 +408,33 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
+                });
+
+                // Jika ada pencarian dari URL, langsung reload DataTables
+                if (searchValue) {
+                    table.ajax.reload();
+                }
+
+                // Jika user mengetik di input search di halaman Maps
+                $r('#search-maps').on('keyup', function() {
+                    table.ajax.reload();
                 });
             });
-
-
 
             $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
                 var id = $r(this).data('id');
