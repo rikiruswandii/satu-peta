@@ -59,22 +59,24 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="table table-striped" style="width:100%" id="maps-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Grup</th>
-                                        <th>Kategori</th>
-                                        <th>File</th>
-                                        <th>Aktif</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="maps-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Grup</th>
+                                            <th>Kategori</th>
+                                            <th>File</th>
+                                            <th>Aktif</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->

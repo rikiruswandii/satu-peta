@@ -44,20 +44,22 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="table table-striped" style="width:100%" id="datasets-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Kategori</th>
-                                        <th>Tipe</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="datasets-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Kategori</th>
+                                            <th>Tipe</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
@@ -165,8 +167,8 @@
 
     @push('scripts')
         <script>
-             var $r = jQuery.noConflict();
-             $r(document).ready(function() {
+            var $r = jQuery.noConflict();
+            $r(document).ready(function() {
                 $r('#datasets-table').DataTable({
                     processing: true,
                     serverSide: true,

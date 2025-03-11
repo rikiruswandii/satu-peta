@@ -32,22 +32,24 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="table table-striped" style="width:100%" id="articles-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Judul</th>
-                                        <th>Kategori</th>
-                                        <th>Gambar Mini</th>
-                                        <th>Diterbitkan</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="articles-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Judul</th>
+                                            <th>Kategori</th>
+                                            <th>Gambar Mini</th>
+                                            <th>Diterbitkan</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->

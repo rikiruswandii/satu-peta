@@ -30,7 +30,7 @@
                                                 @endif
                                             </div>
                                             <div class="user-info">
-                                                <span class="lead-text">{{ $user->name }}</span>
+                                                <span class="lead-text text-primary">{{ $user->name }}</span>
                                                 <span class="sub-text">{{ $user->email }}</span>
                                             </div>
                                             <div class="user-action">

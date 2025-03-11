@@ -170,22 +170,24 @@
                                     </div><!-- .toggle-wrap -->
                                 </div>
                             </div>
-                            <table class="table table-striped" style="width:100%" id="related-links-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>URL</th>
-                                        <th>Logo</th>
-                                        <th>Dibuat</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="related-links-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>URL</th>
+                                            <th>Logo</th>
+                                            <th>Dibuat</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
@@ -275,7 +277,7 @@
 
     @push('scripts')
         <script>
-             var $r = jQuery.noConflict();
+            var $r = jQuery.noConflict();
             $r(document).ready(function() {
                 $r('#related-links-table').DataTable({
                     processing: true,

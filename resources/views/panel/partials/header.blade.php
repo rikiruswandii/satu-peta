@@ -74,7 +74,7 @@
                                         @endif
                                     </div>
                                     <div class="user-info">
-                                        <span class="lead-text">{{ Auth::user()->name }}</span>
+                                        <span class="lead-text text-primary">{{ Auth::user()->name }}</span>
                                         <span class="sub-text">{{ Auth::user()->email }}</span>
                                     </div>
                                 </div>
@@ -97,7 +97,7 @@
                             <div class="dropdown-inner">
                                 <ul class="link-list">
                                     <li><a onclick="document.getElementById('logoutAction').submit();"
-                                            class="px-1 cursor-pointer"><em class="icon ni ni-signout"></em><span>Keluar</span></a></li>
+                                            class="px-1 cursor-pointer text-danger"><em class="icon ni ni-signout"></em><span>Keluar</span></a></li>
                                     <li>
                                         <form id="logoutAction" method="post" action="{{ route('logout') }}">@csrf
                                         </form>
