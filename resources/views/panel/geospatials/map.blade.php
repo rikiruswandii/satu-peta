@@ -114,7 +114,7 @@
                                 <div class="form-control-wrap">
                                     <input type="file" class="filepond @error('file') is-invalid @enderror"
                                         name="file" id="file"
-                                        accept="application/json,application/geo+json,application/vnd.geo+json,.geojson"
+                                        accept="application/json,application/geo+json,application/vnd.geo+json,.geojson,.kmz"
                                         required>
                                     @error('file')
                                         <span class="invalid-feedback" role="alert">

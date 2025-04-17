@@ -7,6 +7,10 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
+//convert
+import JSZip from 'jszip';
+import { kml } from '@tmcw/togeojson';
+
 //openlayer
 import 'ol/ol.css';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
@@ -636,42 +640,68 @@ inputElements.forEach(inputElement => {
     const existingFileUrl = inputElement.getAttribute('data-existing-file');
     const pond = FilePond.create(inputElement, {
         labelIdle: `Drag & Drop your file or <span class="filepond--label-action">Browse</span>`,
-        allowMultiple: false, // Hanya satu file yang diunggah
+        allowMultiple: false,
         acceptedFileTypes: [
             'image/*',
-            'application/json'
+            'application/json',
+            '.kmz'
         ],
         maxFileSize: '10MB',
-        fileValidateTypeDetectType: (source, type) => {
+        fileValidateTypeDetectType: async (source, type) => {
+            if (source.name.toLowerCase().endsWith('.kmz')) {
+                console.log("File KMZ terdeteksi, mengonversi ke GeoJSON...");
+
+                try {
+                    const zip = await JSZip.loadAsync(source);
+                    const kmlFile = Object.keys(zip.files).find(filename => filename.endsWith('.kml'));
+
+                    if (!kmlFile) {
+                        throw new Error("File KML tidak ditemukan dalam KMZ.");
+                    }
+
+                    const kmlText = await zip.files[kmlFile].async('text');
+                    const parser = new DOMParser();
+                    const kmlDom = parser.parseFromString(kmlText, 'text/xml');
+                    const geojson = kml(kmlDom);
+
+                    // Buat blob baru dari geojson hasil konversi
+                    const geojsonBlob = new Blob(
+                        [JSON.stringify(geojson)],
+                        { type: 'application/geo+json' }
+                    );
+
+                    // Buat file baru dan ganti file di FilePond
+                    const geojsonFile = new File([geojsonBlob], source.name.replace(/\.kmz$/, '.geojson'), {
+                        type: 'application/geo+json',
+                    });
+
+                    // FilePond akan mengganti file dengan file baru
+                    pond.removeFile(source);
+                    pond.addFile(geojsonFile);
+
+                    return 'application/geo+json';
+
+                } catch (error) {
+                    console.error("Gagal konversi KMZ:", error);
+                    throw error;
+                }
+            }
+
+            // Untuk file selain .kmz
+            const reader = new FileReader();
             return new Promise((resolve, reject) => {
-                // Mendapatkan file dari sumber input
-                const reader = new FileReader();
-
                 reader.onloadend = () => {
-                    const fileContent = reader.result;
-
-                    // Menampilkan tipe awal yang diterima oleh FilePond
-                    console.log("Tipe MIME yang diterima oleh FilePond: ", type);
-
-                    // Periksa apakah file adalah geojson berdasarkan kontennya
-                    if (typeof fileContent === 'string' && fileContent.includes('"type": "FeatureCollection"')) {
-                        console.log("File ini terdeteksi sebagai GeoJSON.");
-                        resolve('application/geo+json'); // Deteksi sebagai geojson
+                    const content = reader.result;
+                    if (typeof content === 'string' && content.includes('"type": "FeatureCollection"')) {
+                        resolve('application/geo+json');
                     } else {
-                        console.log("File ini tidak terdeteksi sebagai GeoJSON.");
-                        resolve(type); // Kembalikan tipe yang ada jika tidak terdeteksi sebagai geojson
+                        resolve(type);
                     }
                 };
-
-                reader.onerror = () => {
-                    console.error("Terjadi kesalahan dalam membaca file.");
-                    reject('File error');
-                };
-
-                // Membaca file sebagai teks
+                reader.onerror = () => reject('File read error');
                 reader.readAsText(source);
             });
-        },
+        }
     });
 
     pond.setOptions({
