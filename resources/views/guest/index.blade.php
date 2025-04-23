@@ -17,7 +17,7 @@
         <div class="container">
             <div class="row">
                 <div class="row mb-4 justify-content-center align-items-center">
-                    <h1 id="app-name" class="text-center text-light">{{ $app->name }}</h1>
+                    <h1 id="app-name" class="text-center text-light">{{ $app->name }}..</h1>
                     <strong class="text-center text-light" id="floating-about">{{ $app->about }}</strong>
                     <hr />
                     <strong class="text-center text-light"
