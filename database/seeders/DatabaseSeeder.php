@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Events\OpdSyncRequested;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,8 +14,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Panggil seeder UserSeeder
         $this->call([
             UserSeeder::class,
+            DatasetSeeder::class,
         ]);
+
+        // Panggil event OpdSyncRequested setelah seeder selesai
+        event(new OpdSyncRequested);
     }
 }

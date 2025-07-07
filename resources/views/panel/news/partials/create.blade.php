@@ -44,7 +44,7 @@
                                             <label for="content" class="form-label"
                                                 for="content">Konten</label>
                                             <textarea class="summernote-basic @error('content') is-invalid @enderror" id="content" name="content" required></textarea>
-                                            
+
                                             @error('content')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -61,10 +61,10 @@
                                                 <!-- Form Select -->
                                                 <select id="category"
                                                     class="form-select js-select2 @error('category_id') is-invalid @enderror"
-                                                    data-search="on" name="category_id" required>
+                                                    data-search="on" name="tag" required>
                                                     <option value="Pilih Kategori" disabled>Pilih Kategori</option>
                                                     @foreach ($categories as $c)
-                                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                        <option value="{{ $c->name }}">{{ $c->name }}</option>
                                                     @endforeach
                                                 </select>
 

@@ -4,130 +4,148 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Document;
-use App\Models\Sector;
-use App\Models\RegionalAgency;
 use App\Models\Map as ModelMap;
+use App\Models\RegionalAgency;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
+use Spatie\Tags\Tag;
 use Symfony\Component\HttpFoundation\Response;
-use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 class Map extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $regional_agencies = RegionalAgency::all();
-        $sectors = Sector::all();
+        $sectors = Tag::where('type', 'map')->get();
         $count = ModelMap::count();
         $title = 'Peta';
         $prefix = 'maps';
-        $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar ' . env('APP_NAME', 'Satu Peta Purwakarta') . '. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
+        $searchQuery = $request->query('search');
+        $description = 'Jelajahi kumpulan peta informatif dan terpercaya seputar '.env('APP_NAME', 'Satu Peta Purwakarta').'. Temukan wawasan, tips, dan panduan terbaru untuk meningkatkan pengetahuan Anda.';
 
-        return view('panel.geospatials.map', compact('prefix', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
+        return view('panel.geospatials.map', compact('prefix', 'searchQuery', 'regional_agencies', 'sectors', 'count', 'title', 'description'));
     }
 
     public function datatable(Request $request)
     {
         if ($request->ajax()) {
             try {
-                $data = ModelMap::with('regional_agency', 'sector', 'documents')->latest()->get();
+                $query = ModelMap::with('regional_agency', 'tags', 'documents')->latest();
 
-                return DataTables::of($data)
+                if ($request->has('search') && ! empty($request->search)) {
+                    $searchTerm = $request->search;
+                    $query->where('name', 'like', '%'.$searchTerm.'%');
+                }
+
+                return DataTables::of($query)
                     ->addIndexColumn()
                     ->editColumn('updated_at', function ($row) {
                         return Carbon::parse($row->updated_at)->translatedFormat('l, d F Y H:i');
+                    })
+                    ->addColumn('tags', function ($article) {
+                        return $article->tags->map(fn ($tag) => $tag->getTranslation('name', 'id'))->implode(', ');
                     })
                     ->addColumn('download', function ($row) {
                         if ($row->documents->isNotEmpty()) {
                             $downloadLinks = '';
                             foreach ($row->documents as $document) {
-                                $downloadLinks .= '<a href="' . route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]) . '" class="badge rounded-pill bg-primary text-light">
-                                <em class="icon ni ni-download-cloud"></em> Unduh
-                            </a><br>';
+                                $downloadLinks .= '<a href="'.route('maps.download', ['map' => Crypt::encrypt($row->id), 'id' => Crypt::encrypt($document->id)]).'" class="badge rounded-pill bg-primary text-light">
+                            <em class="icon ni ni-download-cloud"></em> Unduh
+                        </a><br>';
                             }
+
                             return $downloadLinks;
                         }
+
                         return '<span class="badge bg-secondary">Tidak ada dokumen</span>';
                     })
                     ->addColumn('checkbox', function ($row) {
                         $checked = $row->is_active ? 'checked' : '';
+
                         return '<div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck' . $row->id . '" ' . $checked . ' disabled>
-                                <label class="custom-control-label" for="customCheck' . $row->id . '"></label>
-                            </div>';
+                        <input type="checkbox" class="custom-control-input" id="customCheck'.$row->id.'" '.$checked.' disabled>
+                        <label class="custom-control-label" for="customCheck'.$row->id.'"></label>
+                    </div>';
                     })
                     ->addColumn('action', function ($row) {
+                        $detailLinks = '';
+                        foreach ($row->documents as $document) {
+                            $detailLinks .= '<li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="#detailMapModal"
+                                        data-regional-agency="'.optional($row->regional_agency)->name.'"
+                                        data-sector="'.optional($row->tags)->pluck('name')->first().'"
+                                        data-geojson="'.Storage::url($document->path).'"
+                                        data-name="'.$row->name.'"
+                                        data-id="'.$row->id.'">
+                                        <em class="icon ni ni-eye"></em><span>Lihat</span>
+                                    </a></li>';
+                        }
+
                         return '<div class="dropdown">
-                                <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
-                                    <em class="icon ni ni-more-h rounded-full"></em>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <ul class="link-list-opt no-bdr">
-                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                data-bs-target="#detailMapModal"
-                                                data-regional-agency="' . optional($row->regional_agency)->name . '"
-                                                data-sector="' . optional($row->sector)->name . '"
-                                                data-geojson="' . (optional($row->documents)->first()->path ? Storage::url($row->documents->first()->path) : '') . '"
-                                                data-name="' . $row->name . '"
-                                                data-id="' . $row->id . '">
-                                                <em class="icon ni ni-eye"></em><span>Lihat</span>
-                                            </a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                data-bs-target="#editMapModal"
-                                                data-regional-agency="' . optional($row->regional_agency)->id . '"
-                                                data-sector="' . optional($row->sector)->id . '"
-                                                data-name="' . $row->name . '"
-                                                data-id="' . Crypt::encrypt($row->id) . '">
-                                                <em class="icon ni ni-edit"></em><span>Edit</span>
-                                            </a></li>
-                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                data-bs-target="' . ($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal') . '"
-                                                data-name="' . $row->name . '"
-                                                data-id="' . Crypt::encrypt($row->id) . '">
-                                                <em class="icon ni ' . ($row->is_active ? 'ni-cross-round' : 'ni-check-round') . '"></em><span>' . ($row->is_active ? 'Deaktivasi' : 'Aktivasi') . '</span>
-                                            </a></li>
-                                        <li><a href="javascript:void(0);" data-bs-toggle="modal"
-                                                data-bs-target="#deleteMapModal"
-                                                data-id="' . Crypt::encrypt($row->id) . '"
-                                                data-name="' . $row->name . '">
-                                                <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
-                                            </a></li>
-                                    </ul>
-                                </div>
-                            </div>';
+                        <a href="#" class="btn btn-sm btn-icon btn-trigger dropdown-toggle" data-bs-toggle="dropdown">
+                            <em class="icon ni ni-more-h rounded-full"></em>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <ul class="link-list-opt no-bdr">
+                                '.$detailLinks.'
+                                <li class="divider"></li>
+                                <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="#editMapModal"
+                                        data-regional-agency="'.optional($row->regional_agency)->id.'"
+                                        data-sector="'.optional($row->tags)->pluck('name')->first().'"
+                                        data-name="'.$row->name.'"
+                                        data-id="'.Crypt::encrypt($row->id).'">
+                                        <em class="icon ni ni-edit"></em><span>Edit</span>
+                                    </a></li>
+                                <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="'.($row->is_active ? '#deaktivasiMapModal' : '#aktivasiMapModal').'"
+                                        data-name="'.$row->name.'"
+                                        data-id="'.Crypt::encrypt($row->id).'">
+                                        <em class="icon ni '.($row->is_active ? 'ni-cross-round' : 'ni-check-round').'"></em><span>'.($row->is_active ? 'Deaktivasi' : 'Aktivasi').'</span>
+                                    </a></li>
+                                <li><a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="#deleteMapModal"
+                                        data-id="'.Crypt::encrypt($row->id).'"
+                                        data-name="'.$row->name.'">
+                                        <em class="icon ni ni-trash text-red-500"></em><span>Delete</span>
+                                    </a></li>
+                            </ul>
+                        </div>
+                    </div>';
                     })
-                    ->rawColumns(['action', 'download', 'checkbox'])
+                    ->rawColumns(['action', 'download', 'checkbox', 'tags'])
                     ->make(true);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
+
                 return response()->json(['error' => 'Something went wrong'], 500);
             }
         }
     }
 
-
     public function store(Request $request): RedirectResponse
     {
-        // Log data yang diterima dari request
         \Log::info('Data yang diterima:', $request->all());
 
+        // Validasi input request
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'can_download' => 'boolean',
             'regional_agency_id' => 'required|exists:regional_agencies,id',
-            'sector_id' => 'required|exists:sectors,id',
+            'tag' => 'required|string',
             'name' => 'required|string|max:80',
             'file' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             \Log::warning('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -135,7 +153,8 @@ class Map extends Controller
             if ($request->filled('file')) {
                 \Log::info('File terdeteksi dalam request.');
 
-                $serverId = $request->input('file'); // FilePond mengirimkan serverId
+                // Ambil server ID file dari request
+                $serverId = $request->input('file');
                 \Log::info("Server ID FilePond: $serverId");
 
                 $filepond = app(\Sopamo\LaravelFilepond\Filepond::class);
@@ -146,31 +165,54 @@ class Map extends Controller
                 \Log::info("Path sementara file: $temporaryPath");
                 \Log::info("Path lengkap file: $fullpath");
 
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file dari lokasi sementara ke folder final
-                $newFilePath = 'uploads/maps/' . basename($temporaryPath);
+                $newFilePath = 'uploads/maps/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
                 \Log::info("File berhasil dipindahkan ke: $newFilePath");
 
+                // Mendapatkan informasi file dan isi GeoJSON
                 $fileInfo = pathinfo($fullpath);
+                $geojsonContent = file_get_contents($fullpath);
+                $geojsonData = json_decode($geojsonContent, true);
 
-                // Simpan artikel
+                // Validasi format GeoJSON
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    \Log::error('Gagal parsing file GeoJSON: '.json_last_error_msg());
+
+                    return redirect()->back()->with('error', 'File GeoJSON tidak valid.');
+                }
+
+                // Ekstraksi koordinat
+                $coordinates = $this->extractCoordinates($geojsonData);
+                \Log::info('Extracted Coordinates:', $coordinates);
+
+                // Validasi koordinat
+                if (empty($coordinates['latitude']) || empty($coordinates['longitude'])) {
+                    \Log::error('Koordinat tidak valid dalam file GeoJSON.');
+
+                    return redirect()->back()->with('error', 'Koordinat tidak valid dalam file GeoJSON.');
+                }
+
+                // Simpan data peta ke database
                 $data = ModelMap::create([
                     'user_id' => $request->user_id,
                     'can_download' => $request->boolean('can_download') ? 1 : 0,
                     'regional_agency_id' => $request->regional_agency_id,
-                    'sector_id' => $request->sector_id,
                     'name' => $request->name,
                     'slug' => Str::slug($request->name),
+                    'latitude' => json_encode([$coordinates['latitude']]),
+                    'longitude' => json_encode([$coordinates['longitude']]),
                 ]);
                 \Log::info("Peta berhasil dibuat dengan ID: {$data->id}");
-
-                // Simpan data file ke tabel documents
+                $data->attachTag($request->tag, 'map');
+                // Menyimpan informasi file GeoJSON dalam tabel Document
                 Document::create([
                     'name' => $fileInfo['basename'],
                     'path' => $newFilePath,
@@ -187,31 +229,115 @@ class Map extends Controller
                 return redirect()->back()->with('success', 'Peta berhasil ditambahkan.');
             } else {
                 \Log::warning('File tidak ditemukan dalam request.');
+
+                return redirect()->back()->with('error', 'File harus diunggah.');
             }
         } catch (\Exception $e) {
-            \Log::error('Gagal membuat peta', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal membuat peta: ' . $e->getMessage());
+
+            \Log::error('Gagal membuat peta', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
+            return redirect()->back()->with('error', 'Gagal membuat peta: '.$e->getMessage());
+        }
+    }
+
+    private function extractCoordinates($geojsonData)
+    {
+        $coordinates = [
+            'latitude' => [],
+            'longitude' => [],
+        ];
+
+        if (isset($geojsonData['features']) && is_array($geojsonData['features'])) {
+            foreach ($geojsonData['features'] as $feature) {
+                if (isset($feature['geometry']['coordinates']) && isset($feature['geometry']['type'])) {
+                    $coords = $feature['geometry']['coordinates'];
+                    $type = $feature['geometry']['type'];
+
+                    switch ($type) {
+                        case 'Point':
+                            if (is_array($coords) && count($coords) >= 2) {
+                                $coordinates['longitude'][] = floatval($coords[0]);
+                                $coordinates['latitude'][] = floatval($coords[1]);
+                            }
+                            break;
+
+                        case 'LineString':
+                        case 'MultiPoint': // MultiPoint mirip dengan LineString (kumpulan titik)
+                            if (is_array($coords)) {
+                                foreach ($coords as $coord) {
+                                    if (is_array($coord) && count($coord) >= 2) {
+                                        $coordinates['longitude'][] = floatval($coord[0]);
+                                        $coordinates['latitude'][] = floatval($coord[1]);
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 'Polygon':
+                        case 'MultiLineString': // MultiLineString adalah kumpulan LineString
+                            if (is_array($coords)) {
+                                foreach ($coords as $line) {
+                                    if (is_array($line)) {
+                                        foreach ($line as $coord) {
+                                            if (is_array($coord) && count($coord) >= 2) {
+                                                $coordinates['longitude'][] = floatval($coord[0]);
+                                                $coordinates['latitude'][] = floatval($coord[1]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 'MultiPolygon':
+                            if (is_array($coords)) {
+                                foreach ($coords as $polygon) {
+                                    if (is_array($polygon)) {
+                                        foreach ($polygon[0] as $coord) { // Hanya ambil ring pertama
+                                            if (is_array($coord) && count($coord) >= 2) {
+                                                $coordinates['longitude'][] = floatval($coord[0]);
+                                                $coordinates['latitude'][] = floatval($coord[1]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 'GeometryCollection':
+                            if (isset($feature['geometry']['geometries']) && is_array($feature['geometry']['geometries'])) {
+                                foreach ($feature['geometry']['geometries'] as $geometry) {
+                                    // Rekursi untuk menangani setiap geometri di dalam koleksi
+                                    $subCoordinates = $this->extractCoordinates(['features' => [['geometry' => $geometry]]]);
+                                    $coordinates['longitude'] = array_merge($coordinates['longitude'], $subCoordinates['longitude']);
+                                    $coordinates['latitude'] = array_merge($coordinates['latitude'], $subCoordinates['latitude']);
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
-        \Log::error('Permintaan tidak valid: File harus diunggah.');
-        return redirect()->back()->with('error', 'File harus diunggah.');
+        return $coordinates;
     }
 
     public function update(Request $request): RedirectResponse
     {
-        // Log data yang diterima dari request
-        \Log::info('Data yang diterima:', $request->all());
+        // \Log data yang diterima dari request
+        \Illuminate\Support\Facades\Log::info('Data yang diterima:', $request->all());
 
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'regional_agency_id' => 'required|exists:regional_agencies,id',
-            'sector_id' => 'required|exists:sectors,id',
+            'tag' => 'required|string',
             'name' => 'required|string|max:80',
+            'file' => 'nullable|string',
         ]);
-
 
         if ($validator->fails()) {
             \Log::warning('Validasi gagal:', $validator->errors()->all());
+
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -220,30 +346,30 @@ class Map extends Controller
             $data = ModelMap::with('documents')->find($id);
 
             if ($request->filled('file')) {
-                \Log::info('File terdeteksi dalam request.');
+                \Illuminate\Support\Facades\Log::info('File terdeteksi dalam request.');
 
                 $serverId = $request->input('file'); // FilePond mengirimkan serverId
-                \Log::info("Server ID FilePond: $serverId");
+                \Illuminate\Support\Facades\Log::info("Server ID FilePond: $serverId");
 
                 $filepond = app(\Sopamo\LaravelFilepond\Filepond::class);
                 $disk = config('filepond.temporary_files_disk');
                 $temporaryPath = $filepond->getPathFromServerId($serverId);
                 $fullpath = Storage::disk($disk)->path($temporaryPath);
+                \Illuminate\Support\Facades\Log::info("Path sementara file: $temporaryPath");
+                \Illuminate\Support\Facades\Log::info("Path lengkap file: $fullpath");
 
-                \Log::info("Path sementara file: $temporaryPath");
-                \Log::info("Path lengkap file: $fullpath");
-
-                if (!file_exists($fullpath)) {
+                if (! file_exists($fullpath)) {
                     \Log::error("File tidak ditemukan di lokasi sementara: $fullpath");
+
                     return redirect()->back()->with('error', 'File tidak ditemukan.');
                 }
 
                 // Pindahkan file ke folder tujuan
-                $newFilePath = 'uploads/maps/' . basename($temporaryPath);
+                $newFilePath = 'uploads/maps/'.basename($temporaryPath);
                 $temporaryFile = Storage::disk($disk)->get($temporaryPath);
                 Storage::put($newFilePath, $temporaryFile);
 
-                \Log::info("File berhasil dipindahkan ke: $newFilePath");
+                \Illuminate\Support\Facades\Log::info("File berhasil dipindahkan ke: $newFilePath");
 
                 $fileInfo = pathinfo($fullpath);
 
@@ -259,7 +385,7 @@ class Map extends Controller
                         'mime_type' => mime_content_type($fullpath),
                         'size' => filesize($fullpath),
                     ]);
-                    \Log::info('ditemukan');
+                    \Illuminate\Support\Facades\Log::info('Dokumen lama ditemukan dan diperbarui.');
                 } else {
                     // Jika tidak ada dokumen, buat baru
                     Document::create([
@@ -272,32 +398,56 @@ class Map extends Controller
                         'mime_type' => mime_content_type($fullpath),
                         'size' => filesize($fullpath),
                     ]);
-                    \Log::info('tidak ditemukan');
+                    \Illuminate\Support\Facades\Log::info('Dokumen baru dibuat.');
                 }
 
-                $data->slug = Str::slug($request->name);
+                // Extract GeoJSON coordinates
+                $geojsonContent = file_get_contents($fullpath);
+                $geojsonData = json_decode($geojsonContent, true);
 
-                $data->fill($request->only(keys: ['user_id', 'regional_agency_id', 'sector_id', 'name']))->save();
-                \Log::info("File berhasil disimpan dalam database dengan path: $newFilePath");
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    \Illuminate\Support\Facades\Log::error('Gagal parsing file GeoJSON: '.json_last_error_msg());
 
-                return redirect()->back()->with('success', 'Peta berhasil dibuat.');
-            } else {
-                \Log::warning('File tidak ditemukan dalam request.');
+                    return redirect()->back()->with('error', 'File GeoJSON tidak valid.');
+                }
+
+                // Mengambil koordinat dari GeoJSON
+                $coordinates = $this->extractCoordinates($geojsonData);
+                \Illuminate\Support\Facades\Log::info('Koordinat yang diekstrak:', $coordinates);
+
+                if (empty($coordinates['latitude']) || empty($coordinates['longitude'])) {
+                    \Illuminate\Support\Facades\Log::error('Koordinat tidak valid dalam file GeoJSON.');
+
+                    return redirect()->back()->with('error', 'Koordinat tidak valid dalam file GeoJSON.');
+                }
+
+                // Update latitude dan longitude sebagai array dua dimensi
+                $data->latitude = json_encode([$coordinates['latitude']]);
+                $data->longitude = json_encode([$coordinates['longitude']]);
             }
-        } catch (\Exception $e) {
-            \Log::error('Gagal membuat peta', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal membuat peta: ' . $e->getMessage());
-        }
 
-        \Log::error('Permintaan tidak valid: File harus diunggah.');
-        return redirect()->back()->with('error', 'File harus diunggah.');
+            $data->slug = Str::slug($request->name);
+            $data->fill($request->only(['user_id', 'regional_agency_id', 'name']));
+            $data->syncTags($request->tag, 'map');
+
+            // Simpan perubahan
+            $data->save();
+
+            \Illuminate\Support\Facades\Log::info('Peta berhasil diperbarui.');
+
+            return redirect()->back()->with('success', 'Peta berhasil diperbarui.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal memperbarui peta', ['error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'Gagal memperbarui peta: '.$e->getMessage());
+        }
     }
 
     public function destroy(Request $request): RedirectResponse
     {
         try {
             // Pastikan request memiliki ID
-            if (!$request->has('id')) {
+            if (! $request->has('id')) {
                 return redirect()->back()->with('error', 'ID peta tidak ditemukan.');
             }
 
@@ -305,12 +455,19 @@ class Map extends Controller
             try {
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                \Log::error('Gagal dekripsi ID maps.', ['error' => $e->getMessage()]);
+
+                \Illuminate\Support\Facades\Log::error('Gagal dekripsi ID maps.', ['error' => $e->getMessage()]);
+
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
             }
 
-            // Cari maps beserta dokumen terkait
-            $maps = ModelMap::with('documents')->findOrFail($id);
+            // Cari maps beserta dokumen dan tags terkait
+            $maps = ModelMap::with(['documents', 'tags'])->findOrFail($id);
+
+            // Hapus hubungan tag terlebih dahulu
+            if ($maps->tags()->exists()) {
+                $maps->tags()->detach();
+            }
 
             // Hapus dokumen jika ada
             if ($maps->documents->isNotEmpty()) {
@@ -330,7 +487,7 @@ class Map extends Controller
 
             return redirect()->back()->with('success', 'peta berhasil dihapus.');
         } catch (\Exception $e) {
-            \Log::error('Gagal hapus peta', [
+            \Illuminate\Support\Facades\Log::error('Gagal hapus peta', [
                 'error' => $e->getMessage(),
                 'request_data' => $request->all(),
                 'stack_trace' => $e->getTraceAsString(),
@@ -344,7 +501,7 @@ class Map extends Controller
     {
         try {
             // Pastikan request memiliki ID
-            if (!$request->has('id')) {
+            if (! $request->has('id')) {
                 return redirect()->back()->with('error', 'ID peta tidak ditemukan.');
             }
 
@@ -352,7 +509,9 @@ class Map extends Controller
             try {
                 $id = Crypt::decrypt($request->id);
             } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                \Log::error('Gagal dekripsi ID peta.', ['error' => $e->getMessage()]);
+
+                \Illuminate\Support\Facades\Log::error('Gagal dekripsi ID peta.', ['error' => $e->getMessage()]);
+
                 return redirect()->back()->with('error', 'ID peta tidak valid.');
             }
 
@@ -360,14 +519,14 @@ class Map extends Controller
             $maps = ModelMap::findOrFail($id);
 
             // Toggle status is_active
-            $maps->is_active = !$maps->is_active;
+            $maps->is_active = ! $maps->is_active;
             $message = $maps->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
             $maps->save();
 
             return redirect()->back()->with('success', "Peta berhasil $message.");
         } catch (\Exception $e) {
-            \Log::error('Gagal mengubah status peta', [
+            \Illuminate\Support\Facades\Log::error('Gagal mengubah status peta', [
                 'error' => $e->getMessage(),
                 'request_data' => $request->all(),
                 'stack_trace' => $e->getTraceAsString(),
@@ -400,25 +559,30 @@ class Map extends Controller
             $mimeType = $document->mime_type;
 
             // Cek apakah file ada di storage
-            if (!Storage::disk('public')->exists($filePath)) {
-                \Log::error("File tidak ditemukan di path: $filePath");
+            if (! Storage::disk('public')->exists($filePath)) {
+
+                \Illuminate\Support\Facades\Log::error("File tidak ditemukan di path: $filePath");
+
                 return redirect()->back()->with('error', 'File tidak ditemukan di server.');
             }
 
             // Kembalikan response download file
             return response()->download(Storage::disk('public')->path($filePath), $fileName, [
-                'Content-Type' => $mimeType
+                'Content-Type' => $mimeType,
             ]);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            \Log::error("Gagal dekripsi parameter", ['error' => $e->getMessage()]);
+
+            \Illuminate\Support\Facades\Log::error('Gagal dekripsi parameter', ['error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'ID tidak valid.');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            \Log::error("Data tidak ditemukan", ['error' => $e->getMessage()]);
+            \Illuminate\Support\Facades\Log::error('Data tidak ditemukan', ['error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Data tidak ditemukan.');
         } catch (\Exception $e) {
-            \Log::error("Gagal mendownload file", ['error' => $e->getMessage()]);
+            \Illuminate\Support\Facades\Log::error('Gagal mendownload file', ['error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal mendownload file.');
         }
     }
-
 }

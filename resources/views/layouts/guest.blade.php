@@ -27,18 +27,22 @@
 <body>
     <!-- Preloader-->
     <div class="preloader" id="preloader">
-        <div class="spinner-grow text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+        <div class="spinner-grow text-warning" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>
 
+    <!-- Header Area-->
     @if (!request()->routeIs('explorer'))
-        <!-- Footer Area-->
         @include('guest.partials.header')
     @else
-        @include('guest.partials.explorer')
+        @include('guest.partials.nav')
     @endif
 
     <!-- Header Area-->
     {{ $slot }}
+
+    <!-- modal -->
+    @yield('modal')
+    <!-- .modal -->
 </body>
 @if (!request()->routeIs('explorer'))
     <!-- Footer Area-->

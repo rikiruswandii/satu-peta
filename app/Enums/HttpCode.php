@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Enums;
+
+enum HttpCode: string
+{
+    case E_100 = 'CONTINUE';
+    case E_101 = 'SWITCHING_PROTOCOLS';
+    case E_102 = 'PROCESSING';
+    case E_103 = 'EARLY_HINTS';
+    case E_200 = 'OK';
+    case E_201 = 'CREATED';
+    case E_202 = 'ACCEPTED';
+    case E_203 = 'NON_AUTHORITATIVE_INFORMATION';
+    case E_204 = 'NO_CONTENT';
+    case E_205 = 'RESET_CONTENT';
+    case E_206 = 'PARTIAL_CONTENT';
+    case E_207 = 'MULTI_STATUS';
+    case E_208 = 'ALREADY_REPORTED';
+    case E_226 = 'IM_USED';
+    case E_300 = 'MULTIPLE_CHOICES';
+    case E_301 = 'MOVED_PERMANENTLY';
+    case E_302 = 'FOUND';
+    case E_303 = 'SEE_OTHER';
+    case E_304 = 'NOT_MODIFIED';
+    case E_305 = 'USE_PROXY';
+    case E_306 = 'SWITCH_PROXY';
+    case E_307 = 'TEMPORARY_REDIRECT';
+    case E_308 = 'PERMANENT_REDIRECT';
+    case E_400 = 'BAD_REQUEST';
+    case E_401 = 'UNAUTHORIZED';
+    case E_402 = 'PAYMENT_REQUID';
+    case E_403 = 'FORBIDDEN';
+    case E_404 = 'NOT_FOUND';
+    case E_405 = 'METHOD_NOT_ALLOWED';
+    case E_406 = 'NOT_ACCEPTABLE';
+    case E_407 = 'PROXY_AUTHENTICATION_REQUIRED';
+    case E_408 = 'REQUEST_TIMEOUT';
+    case E_409 = 'CONFLICT';
+    case E_410 = 'GONE';
+    case E_411 = 'LENGTH_REQUIRED';
+    case E_412 = 'PRECONDITION_FAILED';
+    case E_413 = 'PAYLOAD_TOO_LARGE';
+    case E_414 = 'URI_TOO_LONG';
+    case E_415 = 'UNSUPPORTED_MEDIA_TYPE';
+    case E_416 = 'RANGE_NOT_SATISFIABLE';
+    case E_417 = 'EXPECTATION_FAILED';
+    case E_418 = 'IM_A_TEAPOT';
+    case E_421 = 'MISDIRECTED_REQUEST';
+    case E_422 = 'UNPROCESSABLE_ENTITY';
+    case E_423 = 'LOCKED';
+    case E_424 = 'FAILED_DEPENDENCY';
+    case E_425 = 'TOO_EARLY';
+    case E_426 = 'UPGRADE_REQUIRED';
+    case E_428 = 'PRECONDITION_REQUIRED';
+    case E_429 = 'TOO_MANY_REQUESTS';
+    case E_431 = 'REQUEST_HEADER_FIELDS_TOO_LARGE';
+    case E_451 = 'UNAVAILABLE_FOR_LEGAL_REASONS';
+    case E_500 = 'INTERNAL_SERVER_ERROR';
+    case E_501 = 'NOT_IMPLEMENTED';
+    case E_502 = 'BAD_GATEWAY';
+    case E_503 = 'SERVICE_UNAVAILABLE';
+    case E_504 = 'GATEWAY_TIMEOUT';
+    case E_505 = 'HTTP_VERSION_NOT_SUPPORTED';
+    case E_506 = 'VARIANT_ALSO_NEGOTIATES';
+    case E_507 = 'INSUFFICIENT_STORAGE';
+    case E_508 = 'LOOP_DETECTED';
+    case E_510 = 'NOT_EXTENDED';
+    case E_511 = 'NETWORK_AUTHENTICATION_REQUIRED';
+}

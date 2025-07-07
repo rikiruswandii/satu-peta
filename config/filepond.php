@@ -43,7 +43,7 @@ return [
     | Chunks use the same disk as the temporary files do.
     |
     */
-    'chunks_path' => env('FILEPOND_CHUNKS_PATH', 'filepond' . DIRECTORY_SEPARATOR . 'chunks'),
+    'chunks_path' => env('FILEPOND_CHUNKS_PATH', 'filepond'.DIRECTORY_SEPARATOR.'chunks'),
 
     'input_name' => 'file',
 ];

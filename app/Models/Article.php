@@ -4,15 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Tags\HasTags;
 
 class Article extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, HasTags, LogsActivity, SoftDeletes;
 
     protected static $logName = 'articles_activity';
 
@@ -30,11 +30,6 @@ class Article extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -45,7 +40,6 @@ class Article extends Model
     protected $fillable = [
         'id',
         'user_id',
-        'category_id',
         'title',
         'content',
         'image',

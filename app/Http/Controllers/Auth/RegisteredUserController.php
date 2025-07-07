@@ -32,15 +32,16 @@ class RegisteredUserController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'min:8', 'regex:/^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W]).*$/', 'confirmed', Rules\Password::defaults()],
+            'g-recaptcha-response' => ['required', 'recaptcha'],
         ]);
 
         if ($validated->fails()) {
             \Log::info('Validation errors:', $validated->messages()->toArray());
+
             return redirect()->back()->withErrors($validated)->withInput();
         }
-
 
         $user = User::create([
             'name' => $request->name,

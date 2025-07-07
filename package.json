@@ -17,7 +17,10 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "@tmcw/togeojson": "^7.0.0",
+        "dom-to-image-more": "^3.5.0",
         "filepond": "^4.32.7",
+        "filepond-plugin-file-validate-size": "^2.2.8",
         "filepond-plugin-file-validate-type": "^1.2.9",
         "filepond-plugin-image-crop": "^2.0.6",
         "filepond-plugin-image-edit": "^1.6.3",
@@ -26,6 +29,11 @@
         "filepond-plugin-image-resize": "^2.0.10",
         "filepond-plugin-image-transform": "^3.8.7",
         "filepond-plugin-image-validate-size": "^1.2.7",
-        "ol": "^10.4.0"
+        "html-to-image": "^1.11.11",
+        "jspdf": "^2.5.2",
+        "jszip": "^3.10.1",
+        "ol": "^10.4.0",
+        "ol-geocoder": "^4.3.3",
+        "ol-layerswitcher": "^4.1.2"
     }
 }

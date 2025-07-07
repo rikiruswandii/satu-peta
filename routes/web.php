@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Download;
+use App\Http\Controllers\Guest\Article as GuestArticle;
 use App\Http\Controllers\Guest\Explorer;
 use App\Http\Controllers\Guest\Home;
+use App\Http\Controllers\Guest\Search;
 use App\Http\Controllers\Panel\Article;
+use App\Http\Controllers\Panel\Category;
 use App\Http\Controllers\Panel\Dashboard;
-use App\Http\Controllers\Panel\DatasetsCategory;
 use App\Http\Controllers\Panel\Grup;
 use App\Http\Controllers\Panel\Map;
 use App\Http\Controllers\Panel\User\Detail;
@@ -14,8 +16,13 @@ use App\Http\Controllers\Panel\Users;
 use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ Home::class, 'index'])->name('/');
-Route::get('/explorer', [ Explorer::class, 'index'])->name('explorer');
+Route::get('/', [Home::class, 'index'])->name('/');
+Route::get('/explorer', [Explorer::class, 'index'])->name('explorer');
+Route::get('/search', [Search::class, 'index'])->name('search');
+Route::get('/get-maps-by-viewport', [Search::class, 'getMapsByViewport'])->name('get-maps-by-viewport');
+Route::get('article/list', [GuestArticle::class, 'index'])->name('article.list');
+Route::get('article/detail/{article_slug}', [GuestArticle::class, 'show'])->name('article.show');
+Route::get('article/category/{tag}', [GuestArticle::class, 'category'])->name('article.category');
 
 Route::prefix('panel')->middleware(['auth', 'verified'])->group(
     function () {
@@ -77,25 +84,25 @@ Route::prefix('panel')->middleware(['auth', 'verified'])->group(
             Route::get('maps/{map}/download/{id}', [Map::class, 'download'])->name('maps.download');
         });
 
-        //grup
+        // grup
         Route::prefix('groups')->group(function () {
             Route::get('/', [Grup::class, 'index'])->name('groups');
             Route::get('/datatable', [Grup::class, 'datatable'])->name('groups.datatable');
+            Route::get('/sync', [Grup::class, 'sync'])->name('groups.sync');
             Route::post('/store', [Grup::class, 'store'])->name('groups.store');
             Route::post('/update', [Grup::class, 'update'])->name('groups.update');
             Route::delete('/destroy', [Grup::class, 'destroy'])->name('groups.destroy');
         });
 
-        //dataset categories
-        Route::prefix('datasets')->group(function () {
-            Route::get('/', [DatasetsCategory::class, 'index'])->name('datasets');
-            Route::get('/datatable', [DatasetsCategory::class, 'datatable'])->name('datasets.datatable');
-            Route::post('/store', [DatasetsCategory::class, 'store'])->name('datasets.store');
-            Route::post('/update', [DatasetsCategory::class, 'update'])->name('datasets.update');
-            Route::delete('/destroy', [DatasetsCategory::class, 'destroy'])->name('datasets.destroy');
+        // dataset categories
+        Route::prefix('category')->group(function () {
+            Route::get('/', [Category::class, 'index'])->name('category');
+            Route::get('/datatable', [Category::class, 'datatable'])->name('category.datatable');
+            Route::post('/store', [Category::class, 'store'])->name('category.store');
+            Route::post('/update', [Category::class, 'update'])->name('category.update');
+            Route::delete('/destroy', [Category::class, 'destroy'])->name('category.destroy');
         });
     }
 );
 
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

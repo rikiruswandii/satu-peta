@@ -62,11 +62,10 @@
                                                 <!-- Form Select -->
                                                 <select id="category"
                                                     class="form-select js-select2 @error('category_id') is-invalid @enderror"
-                                                    data-search="on" name="category_id" required>
+                                                    data-search="on" name="tag" required>
                                                     <option value="Pilih Kategori" disabled>Pilih Kategori</option>
                                                     @foreach ($categories as $c)
-                                                        <option value="{{ $c->id }}"
-                                                            {{ $data->category_id === $c->id ? 'selected' : '' }}>
+                                                        <option value="{{ $c->name }}" {{ $data->tags->pluck('name')->contains($c->name) ? 'selected' : '' }}>
                                                             {{ $c->name }}</option>
                                                     @endforeach
                                                 </select>

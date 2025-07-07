@@ -19,10 +19,10 @@ class ViewShare
      */
     public function handle(Request $request, Closure $next): Response
     {
-        //settings
+        // settings
         View::share('app', app(GeneralSettings::class));
 
-        //related links
+        // related links
         $links = RelatedLink::where('is_active', true)
             ->orderBy('order')
             ->take(5)
@@ -30,11 +30,11 @@ class ViewShare
             ->get();
         View::share('links', $links);
 
-        //menu guest
+        // menu guest
         $guest = $this->guestMenus();
         View::share('guest', $guest);
 
-        //menu panel
+        // menu panel
         $menus = $this->getMenus();
         View::composer('*', function ($view) use ($menus) {
             if (Auth::check()) {
@@ -95,10 +95,10 @@ class ViewShare
                     'is_active' => request()->routeIs('groups'),
                 ],
                 [
-                    'route' => 'datasets',
+                    'route' => 'category',
                     'icon' => 'ni ni-grid-fill',
                     'text' => 'Kategori',
-                    'is_active' => request()->routeIs('datasets'),
+                    'is_active' => request()->routeIs('category'),
                 ],
             ],
             'Kelola' => [

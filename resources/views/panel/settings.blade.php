@@ -170,22 +170,24 @@
                                     </div><!-- .toggle-wrap -->
                                 </div>
                             </div>
-                            <table class="table table-striped" style="width:100%" id="related-links-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>URL</th>
-                                        <th>Logo</th>
-                                        <th>Dibuat</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="related-links-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>URL</th>
+                                            <th>Logo</th>
+                                            <th>Dibuat</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
@@ -275,8 +277,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#related-links-table').DataTable({
+            var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#related-links-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('related.link.datatable') }}",
@@ -313,23 +316,37 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var userId = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(userId);
+                var userName = $r(this).data('name');
+                $r('#nameAccount').text(userName);
             });
 
-            $(document).on('click', '[data-bs-target="#updateModal"]', function() {
-                var id = $(this).data('id');
-                var url = $(this).data('url');
-                var name = $(this).data('name');
+            $r(document).on('click', '[data-bs-target="#updateModal"]', function() {
+                var id = $r(this).data('id');
+                var url = $r(this).data('url');
+                var name = $r(this).data('name');
 
-                var modal = $('#updateModal');
+                var modal = $r('#updateModal');
 
                 modal.find('input[name="id"]').val(id);
                 modal.find('input[name="title"]').val(name);

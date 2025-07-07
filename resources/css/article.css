@@ -1,0 +1,45 @@
+.single-widget-area .widget-form button {
+    position: absolute !important;
+    -webkit-transition-duration: 500ms !important;
+    transition-duration: 500ms !important;
+    width: 80px !important;
+    height: 50px !important;
+    background-color: #0fac81 !important;
+    color: #ffffff !important;
+    border: none !important;
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 10 !important;
+    cursor: pointer !important;
+    border-radius: 0 6px 6px 0 !important;
+}
+
+.saasbox-pagination-area .page-item.active .page-link {
+    background-color: #0fac81 !important;
+    border-color: #0fac81 !important;
+}
+
+.btn-login {
+    background: #0fac81;
+    color: #ffc107;
+    padding: 10px;
+    margin: 0;
+    border-radius: 3px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-login:hover {
+    background: none;
+    color: #ffc107;
+    border: 5px;
+    border-radius: 3px;
+    border-color: #ffc107;
+    box-shadow: 5px 5px 10px rgba(145, 160, 7, 0.5);
+}
+@media (max-width: 768px) {
+    div.saasbox-blog-area {
+        margin-top: 220px;
+    }
+}

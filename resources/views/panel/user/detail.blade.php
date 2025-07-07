@@ -3,10 +3,10 @@
         <div class="nk-block-head nk-block-head-lg">
             <div class="nk-block-between">
                 <div class="nk-block-head-content">
-                    <h4 class="nk-block-title !text-color-primary">Informasi Pengguna</h4>
+                    <h4 class="nk-block-title text-primary">Informasi Pengguna</h4>
                     <div class="nk-block-des">
-                        <p class="text-color-primary">Info dasar, seperti nama dan alamat, yang Anda gunakan pada
-                            {{ config('app.name', 'Satu Peta Purwakarta') }}
+                        <p>Info dasar, seperti nama dan alamat, yang Anda gunakan pada
+                            <strong class="text-primary">{{ config('app.name', 'Satu Peta Purwakarta') }}</strong>
                         </p>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                 <div class="card-inner">
                     <div class="between-center flex-wrap flex-md-nowrap g-3">
                         <div class="nk-block-text">
-                            <h6>Hapus Pengguna</h6>
+                            <h6 class="text-primary">Hapus Pengguna</h6>
                             <p>{{ __('Setelah aksi ini, pengguna akan dihapus kemudian secara otomatis dikeluarkan.') }}</p>
                         </div>
                         <div class="nk-block-actions">

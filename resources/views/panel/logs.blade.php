@@ -4,9 +4,9 @@
     <div class="nk-block-head nk-block-head-sm">
         <div class="nk-block-between">
             <div class="nk-block-head-content">
-                <h3 class="nk-block-title page-title !text-color-primary">Aktivitas Pengguna</h3>
+                <h3 class="nk-block-title page-title text-primary">Aktivitas Pengguna</h3>
                 <div class="nk-block-des text-soft">
-                    <p class="text-color-primary">Terdapat total <strong>{{ $count }} aktivitas pengguna</strong>
+                    <p>Terdapat total <strong class="text-primary">{{ $count }} aktivitas pengguna</strong>
                         .
                     </p>
                 </div>
@@ -17,24 +17,27 @@
     </div><!-- .nk-block-head -->
     <div class="card card-bordered card-preview">
         <div class="card-inner">
-            <table class="table table-striped" style="width:100%" id="logs-table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Log</th>
-                        <th>Deskripsi</th>
-                        <th>Waktu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped" style="width:100%" id="logs-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Log</th>
+                            <th>Deskripsi</th>
+                            <th>Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div><!-- .card -->
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#logs-table').DataTable({
+            var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#logs-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('logs.datatable') }}",
@@ -57,7 +60,21 @@
                             data: 'created_at',
                             name: 'created_at'
                         },
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
                 });
             });
         </script>

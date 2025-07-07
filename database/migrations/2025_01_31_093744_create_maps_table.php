@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('regional_agency_id')->index(); // Kolom regional_agency dengan tipe unsignedBigInteger
-            $table->unsignedBigInteger('sector_id')->index(); // Kolom sector dengan tipe unsignedBigInteger
             $table->string('name', length: 80);
             $table->string('slug', length: 80);
             $table->boolean('is_active')->default(false); // Kolom untuk menunjukkan apakah layer aktif atau tidak
@@ -24,7 +23,6 @@ return new class extends Migration
             $table->softDeletes(); // Kolom deleted_at untuk soft deletes
 
             // Menambahkan foreign key constraints
-            $table->foreign('sector_id')->references('id')->on('sectors')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('regional_agency_id')->references('id')->on('regional_agencies')->onUpdate('cascade')->onDelete('cascade');
         });
     }

@@ -24,19 +24,23 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title text-color-primary">Grup</h3>
+                            <h3 class="nk-block-title page-title text-primary">Grup</h3>
                             <div class="nk-block-des text-soft">
-                                <p class="text-color-primary">Anda memiliki total {{ $count }}
-                                    <strong>grup</strong>
+                                <p>Anda memiliki total
+                                    <strong class="text-primary">{{ $count }} grup</strong>
                                     .
                                 </p>
                             </div>
                         </div><!-- .nk-block-head-content -->
                         <div class="nk-block-head-content">
                             <div class="toggle-wrap nk-block-tools-toggle">
-                                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addRegionalAgencyModal"
-                                    class="btn btn-primary"><em
-                                        class="icon ni ni-plus-round-fill mr-2"></em><span>Tambah</span></a>
+                                <a href="javascript:void(0);" id="syncBtn" class="btn btn-primary">
+                                    <span class="spinner-border spinner-border-sm" id="spinner" role="status"
+                                        aria-hidden="true" style="display: none;"></span>
+                                    <span id="processText" style="display: none;">Proses...</span>
+                                    <em class="icon ni ni-reload-alt mr-2" id="reloadIcon"></em>
+                                    <span id="syncText">Sinkronisasi</span>
+                                </a>
                             </div><!-- .toggle-wrap -->
                         </div><!-- .nk-block-head-content -->
                     </div><!-- .nk-block-between -->
@@ -44,18 +48,19 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="table table-striped" style="width:100%" id="groups-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Grup</th></th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="groups-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Grup</th>
+                                            <th>Diperbarui</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
@@ -63,68 +68,11 @@
         </div>
     </div>
 
-    @section('modal')
-        <x-modal :id="'editGroupModal'" :data="$modalEdit">
-            <x-slot name="body">
-                <form id="editGroupForm" method="POST" action="{{ route('groups.update') }}"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="row g-gs">
-                        <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
-                        <input type="hidden" name="id" value="">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="form-label" for="name">Nama</label>
-                                <div class="form-control-wrap">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" id="name" value="{{ old('name') }}" required
-                                        placeholder="Masukkan nama grup..">
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </x-slot>
-        </x-modal>
-
-        <x-modal :id="'addRegionalAgencyModal'" :data="$modalTambahRegionalAgency">
-            <x-slot name="body">
-                <form id="addRegionalAgencyForm" method="POST" action="{{ route('groups.store') }}">
-                    @csrf
-                    <div class="row g-gs">
-                        <div class="col-md-12">
-                            <input type="hidden" name="user_id" id="user_id" value="{{ Auth::user()->id }}">
-                            <div class="form-group">
-                                <label class="form-label" for="name">Nama</label>
-                                <div class="form-control-wrap">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" id="name" value="{{ old('name') }}" required
-                                        placeholder="Masukkan nama grup..">
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </x-slot>
-        </x-modal>
-
-        @include('panel.partials.delete')
-    @endsection
-
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#groups-table').DataTable({
+            var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#groups-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('groups.datatable') }}",
@@ -142,42 +90,73 @@
                         {
                             data: 'updated_at',
                             name: 'updated_at'
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
                 });
             });
 
+            $r(document).ready(function() {
+                $r('#syncBtn').click(function() {
+                    console.log('Tombol diklik!'); // Debugging
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
-            });
+                    // Tampilkan spinner & sembunyikan ikon reload
+                    $r('#spinner, #processText').show();
+                    $r('#reloadIcon, #syncText').hide();
 
-            $(document).ready(function() {
-                $("#addRegionalAgencyForm").on("submit", function() {
-                    let submitButton = $("button[form='addRegionalAgencyForm']");
-                    submitButton.prop("disabled", true); // Nonaktifkan tombol saat submit
-                    submitButton.find(".spinner-border").show(); // Tampilkan spinner
-                    submitButton.find("span:last-child").hide(); // Sembunyikan teks tombol
+                    // Kirim request AJAX
+                    $r.ajax({
+                        url: '{{ route('groups.sync') }}',
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            console.log('Response:', response); // Debugging
+
+                            // Tampilkan alert sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message || 'Sinkronisasi berhasil.',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function(xhr) {
+                            console.error('AJAX Error:', xhr); // Debugging
+                            let errorMessage = xhr.responseJSON ? xhr.responseJSON.message :
+                                'Terjadi kesalahan.';
+
+                            // Tampilkan alert error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: errorMessage,
+                                timer: 4000,
+                                showConfirmButton: false
+                            });
+                        },
+                        complete: function() {
+                            // Sembunyikan spinner & tampilkan ikon reload
+                            $r('#spinner, #processText').hide();
+                            $r('#reloadIcon, #syncText').show();
+                        }
+                    });
                 });
-            });
-
-            $(document).on('click', '[data-bs-target="#editGroupModal"]', function() {
-                var id = $(this).data('id');
-                var name = $(this).data('name');
-
-                var modal = $('#editGroupModal');
-
-                modal.find('input[name="id"]').val(id);
-                modal.find('input[name="name"]').val(name);
             });
         </script>
     @endpush

@@ -13,10 +13,10 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title text-color-primary">Artikel </h3>
+                            <h3 class="nk-block-title page-title text-primary">Artikel </h3>
                             <div class="nk-block-des text-soft">
-                                <p class="text-color-primary">Anda memiliki total {{ $count }}
-                                    <strong>artikel</strong>
+                                <p>Anda memiliki total
+                                    <strong class="text-primary"> {{ $count }} artikel</strong>
                                     .
                                 </p>
                             </div>
@@ -32,22 +32,24 @@
                 <div class="nk-block">
                     <div class="card card-stretch">
                         <div class="card-inner">
-                            <table class="table table-striped" style="width:100%" id="articles-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Judul</th>
-                                        <th>Kategori</th>
-                                        <th>Gambar Mini</th>
-                                        <th>Diterbitkan</th>
-                                        <th>Diperbarui</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped" style="width:100%" id="articles-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Judul</th>
+                                            <th>Kategori</th>
+                                            <th>Gambar Mini</th>
+                                            <th>Diterbitkan</th>
+                                            <th>Diperbarui</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
@@ -61,8 +63,9 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#articles-table').DataTable({
+            var $r = jQuery.noConflict();
+            $r(document).ready(function() {
+                $r('#articles-table').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('articles.datatable') }}",
@@ -78,8 +81,8 @@
                             name: 'title'
                         },
                         {
-                            data: 'category.name',
-                            name: 'category.name'
+                            data: 'tags',
+                            name: 'tags'
                         },
                         {
                             data: 'thumbnail',
@@ -101,15 +104,29 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Tidak ditemukan data yang sesuai",
+                        "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                        "infoEmpty": "Menampilkan 0 hingga 0 dari 0 entri",
+                        "infoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "search": "Cari:",
+                        "emptyTable": "Tidak ada data yang tersedia",
+                        "loadingRecords": "Memuat...",
+                        "aria": {
+                            "sortAscending": ": aktifkan untuk mengurutkan kolom secara menaik",
+                            "sortDescending": ": aktifkan untuk mengurutkan kolom secara menurun"
+                        }
+                    }
                 });
             });
 
-            $(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
-                var userId = $(this).data('id');
-                $('#deleteMapModal').find('input[name="id"]').val(userId);
-                var userName = $(this).data('name');
-                $('#nameAccount').text(userName);
+            $r(document).on('click', '[data-bs-target="#deleteMapModal"]', function() {
+                var userId = $r(this).data('id');
+                $r('#deleteMapModal').find('input[name="id"]').val(userId);
+                var userName = $r(this).data('name');
+                $r('#nameAccount').text(userName);
             });
         </script>
     @endpush
