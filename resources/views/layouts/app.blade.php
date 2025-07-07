@@ -1,36 +1,98 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <title>
+        @yield('title', config('app.name')) - {{ config('app.name') }}
+    </title>
+    <meta name="description" content="@yield('description', 'Deskripsi default')">
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{{ asset('assets/images/logo.png') }}">
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
+    <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/skins/theme-green.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.bootstrap5.css">
+
+    @stack('css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="nk-body bg-lighter npc-default has-sidebar ">
+    <div class="nk-app-root">
+        <!-- main @s -->
+        <div class="nk-main ">
+            <!-- sidebar @s -->
+            @include('panel.partials.sidebar')
+            <!-- sidebar @e -->
+            <!-- wrap @s -->
+            <div class="nk-wrap ">
+                <!-- main header @s -->
+                @include('panel.partials.header')
+                <!-- main header @e -->
+                <!-- content @s -->
+                <div class="nk-content ">
+                    <div class="position-absolute top-0 end-0 p-3" style="z-index: 1000">
+                        @if (session('success'))
+                            <div class="alert alert-fill alert-success alert-icon" id="success-alert">
+                                <em class="icon ni ni-check-circle"></em> {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if ($errors->any())
+                            <div class="alert alert-fill alert-danger alert-icon" id="error-alert">
+                                <em class="icon ni ni-cross-circle"></em>
+                                @foreach ($errors->all() as $error)
+                                    <div>{{ $error }}</div>
+                                @endforeach
+                            </div>
+                        @endif
+
+
+                        @if (session('info'))
+                            <div class="alert alert-fill alert-info alert-icon" id="info-alert">
+                                <em class="icon ni ni-alert-circle"></em> {{ session('info') }}
+                            </div>
+                        @endif
                     </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+                    <div class="container-fluid">
+                        <div class="nk-content-inner">
+                            <div class="nk-content-body">
+                                {{ $slot }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- content @e -->
+                <!-- footer @s -->
+                @include('panel.partials.footer')
+                <!-- footer @e -->
+            </div>
+            <!-- wrap @e -->
         </div>
-    </body>
+        <!-- main @e -->
+    </div>
+    <!-- app-root @e -->
+    <!-- modal -->
+    @yield('modal')
+    <!-- .modal -->
+    <!-- JavaScript -->
+    <script src="{{ asset('assets/js/bundle.js') }}"></script>
+    <script src="{{ asset('assets/js/scripts.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
+    <script src="{{ asset('assets/js/editors.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap5.js"></script>
+    @stack('scripts')
+</body>
+
 </html>
