@@ -1,0 +1,2 @@
+[14-May-2025 09:39:23 Asia/Jakarta] PHP Deprecated:  Mobile_Detect::__construct(): Implicitly marking parameter $headers as nullable is deprecated, the explicit nullable type must be used instead in /var/www/html/satu-peta/vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php on line 888
+[27-May-2025 08:26:28 Asia/Jakarta] PHP Deprecated:  Mobile_Detect::__construct(): Implicitly marking parameter $headers as nullable is deprecated, the explicit nullable type must be used instead in /var/www/html/satu-peta/vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php on line 888
